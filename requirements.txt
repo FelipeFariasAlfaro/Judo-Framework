@@ -1,0 +1,24 @@
+# Dependencias básicas (siempre instaladas)
+requests>=2.28.0
+jsonpath-ng>=1.5.3
+pyyaml>=6.0
+jsonschema>=4.17.0
+faker>=18.0.0
+pytest>=7.0.0
+behave>=1.2.6
+jinja2>=3.1.0
+websocket-client>=1.5.0
+beautifulsoup4>=4.12.0
+
+# Dependencias opcionales (instalar según necesidad)
+# Para criptografía: pip install judo-framework[crypto]
+# cryptography>=40.0.0
+
+# Para XML: pip install judo-framework[xml]  
+# lxml>=4.9.0
+
+# Para navegadores: pip install judo-framework[browser]
+# selenium>=4.8.0
+# playwright>=1.32.0
+
+# Para todo: pip install judo-framework[full]
