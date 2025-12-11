@@ -1,0 +1,122 @@
+site_name: Judo Framework
+site_url: https://felipefariaساlfaro.github.io/Judo-Framework/
+site_description: A comprehensive API testing framework for Python, inspired by Karate Framework
+site_author: Felipe Farias - CENTYC
+repo_url: https://github.com/FelipeFariasAlfaro/Judo-Framework
+repo_name: FelipeFariasAlfaro/Judo-Framework
+edit_uri: edit/main/docs-site/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/FelipeFariasAlfaro/Judo-Framework
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/judo-framework/
+  version:
+    provider: mike
+    default: latest
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - tags
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+    - First Test: getting-started/first-test.md
+  - Features:
+    - HTTP Testing: features/http-testing.md
+    - Assertions: features/assertions.md
+    - Variables: features/variables.md
+    - File Support: features/file-support.md
+    - Authentication: features/authentication.md
+    - Parallel Execution: features/parallel-execution.md
+  - Runners:
+    - Creating Runners: runners/creating-runners.md
+    - Configuration: runners/configuration.md
+    - Test Suites: runners/test-suites.md
+  - Reporting:
+    - HTML Reports: reporting/html-reports.md
+    - Cucumber JSON: reporting/cucumber-json.md
+    - Xray Integration: reporting/xray-integration.md
+  - Advanced:
+    - Schema Validation: advanced/schema-validation.md
+    - Mock Server: advanced/mock-server.md
+    - Custom Steps: advanced/custom-steps.md
+  - Reference:
+    - Step Reference: reference/steps.md
+    - API Reference: reference/api.md
+    - Examples: reference/examples.md
+  - About:
+    - Changelog: about/changelog.md
+    - Contributing: about/contributing.md
+    - License: about/license.md
