@@ -1,0 +1,25 @@
+# Judo Framework - Code Owners
+# All code is maintained exclusively by CENTYC
+# Centro Latinoamericano de Testing y Calidad del Software
+
+# Default owner for everything in the repo
+* @FelipeFariasAlfaro
+
+# Core framework
+/judo/ @FelipeFariasAlfaro
+
+# Documentation
+/docs/ @FelipeFariasAlfaro
+*.md @FelipeFariasAlfaro
+
+# Configuration
+/setup.py @FelipeFariasAlfaro
+/pyproject.toml @FelipeFariasAlfaro
+/requirements.txt @FelipeFariasAlfaro
+
+# Tests
+/tests/ @FelipeFariasAlfaro
+/features/ @FelipeFariasAlfaro
+
+# Examples
+/examples/ @FelipeFariasAlfaro

@@ -1,0 +1,35 @@
+name: Close Pull Requests
+
+on:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  close-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close Pull Request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **This project does not accept Pull Requests.**\n\n' +
+                    'Judo Framework is professionally maintained by CENTYC (Centro Latinoamericano de Testing y Calidad del Software). ' +
+                    'All development is handled internally to ensure consistent quality and reliability.\n\n' +
+                    '**How to contribute:**\n' +
+                    '- 🐛 Report bugs via [Issues](https://github.com/FelipeFariasAlfaro/Judo-Framework/issues)\n' +
+                    '- 💡 Suggest features via [Issues](https://github.com/FelipeFariasAlfaro/Judo-Framework/issues)\n' +
+                    '- ❓ Ask questions in [Discussions](https://github.com/FelipeFariasAlfaro/Judo-Framework/discussions)\n\n' +
+                    'See [CONTRIBUTING.md](https://github.com/FelipeFariasAlfaro/Judo-Framework/blob/main/CONTRIBUTING.md) for complete details.\n\n' +
+                    'Thank you for your interest in Judo Framework! 🥋\n\n' +
+                    '_This PR will be closed automatically._'
+            })
+            github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              state: 'closed'
+            })
