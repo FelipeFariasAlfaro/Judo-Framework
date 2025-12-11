@@ -614,33 +614,21 @@ Scenario: Get user
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how:
+**⚠️ This project only accepts contributions through GitHub Issues.**
 
-```bash
-# Clone repository
-git clone https://github.com/FelipeFariasAlfaro/Judo-Framework.git
-cd Judo-Framework
+We welcome:
+- 🐛 **Bug reports** - Help us identify issues
+- 💡 **Feature suggestions** - Share your ideas
+- 📝 **Documentation feedback** - Help improve our docs
+- ❓ **Questions** - Ask in GitHub Discussions
 
-# Install development dependencies
-pip install -e .[dev]
+We do NOT accept:
+- ❌ **Pull Requests** - Will be closed without review
+- ❌ **Code contributions** - All development is internal
 
-# Run tests
-pytest tests/
+**Why?** Judo Framework is professionally maintained by CENTYC to ensure consistent quality, reliability, and enterprise-grade standards.
 
-# Run linting
-flake8 judo/
-black judo/
-
-# Submit PR
-```
-
-**Areas for contribution:**
-- 🐛 Bug fixes
-- ✨ New features
-- 📝 Documentation improvements
-- 🌍 Translations
-- 🧪 More test examples
-- 🎨 UI improvements for reports
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to report bugs and suggest features.
 
 ---
 
