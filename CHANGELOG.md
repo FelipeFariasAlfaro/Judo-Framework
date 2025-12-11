@@ -5,6 +5,70 @@ All notable changes to Judo Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.11] - 2024-12-11
+
+### Added
+- 🎨 Nuevo parámetro `console_format` en BaseRunner para controlar el formato de salida
+- 📝 Opciones disponibles: 'progress', 'progress2', 'pretty', 'plain', 'none'
+
+### Changed
+- 🔧 Formato de consola por defecto cambiado de 'pretty' a 'progress'
+- 📊 Salida más limpia y fácil de leer durante la ejecución de tests
+- ✅ Formato 'progress' muestra solo puntos (.) por cada scenario exitoso
+- ❌ Formato 'pretty' (anterior default) mostraba todos los detalles de cada step
+
+## [1.2.10] - 2024-12-11
+
+### Fixed
+- 🐛 **Fixed duplicate report generation**: Reports are now generated only in the configured `output_dir`
+- 📁 Previously, reports were created in both the custom directory AND the default `judo_reports` directory
+- 🔧 Fixed global reporter initialization to respect the output directory from BaseRunner
+- ✅ Now changing `output_dir` parameter correctly generates reports only in the specified location
+
+## [1.2.9] - 2024-12-10
+
+### Changed
+- 📝 Updated repository URLs to official GitHub repository
+- 🔗 Updated all documentation links to point to https://github.com/FelipeFariasAlfaro/Judo-Framework
+- 📦 Updated package metadata with correct repository information
+
+## [1.2.9] - 2024-12-10
+
+### Added
+- ✨ **New step for nested arrays**: Search items in nested arrays
+- 🔍 English: `Then the response array "users" should contain an item with "name" equal to "John Doe"`
+- 🇪🇸 Spanish: `Entonces el array "usuarios" debe contener un elemento con "nombre" igual a "Juan"`
+- 📊 Supports dot notation for deep nesting: `data.users.active`
+- 🥒 **Cucumber JSON export**: Automatic generation of Cucumber-compatible JSON reports
+- 📦 **JSON consolidation**: Merge all feature JSONs into a single file for Xray/Allure
+- 🎯 **Xray integration ready**: Export results directly to Jira Xray
+
+### Cucumber JSON Features
+- Automatic generation in `cucumber-json/` directory
+- Individual JSON per feature execution
+- Consolidated JSON file for easy upload to Xray
+- Compatible with Cucumber HTML Reporter, Allure, and other tools
+- Can be disabled with `generate_cucumber_json=False`
+
+### Example
+```python
+# Enable Cucumber JSON (enabled by default)
+runner = BaseRunner(
+    features_dir="features",
+    output_dir="judo_reports",
+    generate_cucumber_json=True,  # Default: True
+    cucumber_json_dir="custom/path"  # Optional: custom directory
+)
+
+# Run tests
+runner.run(tags=["@api"])
+
+# Files generated:
+# - judo_reports/cucumber-json/feature1_20241210_120000.json
+# - judo_reports/cucumber-json/feature2_20241210_120001.json
+# - judo_reports/cucumber-json/cucumber-consolidated.json (all features)
+```
+
 ## [1.2.8] - 2024-12-10
 
 ### Fixed

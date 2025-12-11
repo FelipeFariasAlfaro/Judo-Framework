@@ -26,10 +26,13 @@ import sys
 class MyRunner(BaseRunner):
     def __init__(self):
         super().__init__(
-            features_dir="features",      # Tu directorio de .feature files
-            output_dir="test_reports",    # Donde guardar reportes
-            parallel=False,               # Ejecución secuencial
-            max_workers=4                 # Hilos si habilitas paralelo
+            features_dir="features",           # Tu directorio de .feature files
+            output_dir="test_reports",         # Donde guardar reportes (sin duplicados!)
+            parallel=False,                    # Ejecución secuencial
+            max_workers=4,                     # Hilos si habilitas paralelo
+            console_format="progress",         # Salida limpia en consola (nuevo en v1.2.11)
+            generate_cucumber_json=True,       # Generar JSON para Xray (nuevo en v1.2.9)
+            cucumber_json_dir=None             # Directorio custom para JSON (opcional)
         )
         
         # Configuración
@@ -70,6 +73,65 @@ python my_runner.py
 
 # Ejecutar smoke tests
 python my_runner.py smoke
+```
+
+## 🆕 Nuevas Características (v1.2.11)
+
+### **Formato de Consola Personalizado**
+
+Controla cómo se muestra la salida durante la ejecución:
+
+```python
+class MyRunner(BaseRunner):
+    def __init__(self):
+        super().__init__(
+            console_format="progress"  # Opciones: progress, progress2, pretty, plain, none
+        )
+```
+
+**Formatos disponibles:**
+- `progress` (default): Minimalista, solo puntos (`.`) por cada scenario exitoso
+- `progress2`: Similar a progress con más detalles
+- `pretty`: Verboso, muestra todos los steps (anterior default)
+- `plain`: Sin colores
+- `none`: Sin salida de Behave
+
+**Ejemplo de salida con `progress`:**
+```
+features/api_tests.feature  .....
+
+1 feature passed, 0 failed, 0 skipped
+5 scenarios passed, 0 failed, 0 skipped
+```
+
+### **Cucumber JSON para Xray/Allure**
+
+Genera automáticamente JSON en formato Cucumber para integración con herramientas externas:
+
+```python
+class MyRunner(BaseRunner):
+    def __init__(self):
+        super().__init__(
+            generate_cucumber_json=True,              # Habilitar (default: True)
+            cucumber_json_dir="xray-reports"          # Directorio custom (opcional)
+        )
+```
+
+Los archivos JSON se generan automáticamente en `output_dir/cucumber-json/` y pueden ser:
+- Subidos a Jira Xray
+- Usados con Allure
+- Procesados con Cucumber HTML Reporter
+
+Ver [docs/xray-integration.md](xray-integration.md) para más detalles.
+
+### **Reportes Sin Duplicados**
+
+Ahora los reportes se generan **solo** en el directorio especificado en `output_dir`:
+
+```python
+runner = BaseRunner(
+    output_dir="./custom_reports"  # Reporte SOLO aquí, no en judo_reports
+)
 ```
 
 ## 🔧 Configuración Avanzada
