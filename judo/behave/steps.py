@@ -388,6 +388,42 @@ def step_validate_array_contains_item(context, key, value):
     assert found, f"Array does not contain item with {key}={value}"
 
 
+@step('the response array "{array_path}" should contain an item with "{key}" equal to "{value}"')
+def step_validate_nested_array_contains_item(context, array_path, key, value):
+    """Validate that nested array contains item with specific key-value"""
+    response = context.judo_context.response
+    value = context.judo_context.interpolate_string(value)
+    
+    # Navigate to the nested array
+    array_data = response.json
+    for path_part in array_path.split('.'):
+        if isinstance(array_data, dict):
+            array_data = array_data.get(path_part)
+        else:
+            assert False, f"Cannot navigate to '{array_path}' - invalid path"
+    
+    # Validate it's an array
+    assert isinstance(array_data, list), f"'{array_path}' is not an array"
+    
+    # Try to convert to int if it's a numeric string
+    try:
+        numeric_value = int(value)
+    except ValueError:
+        numeric_value = None
+    
+    # Search for the item
+    found = False
+    for item in array_data:
+        if isinstance(item, dict):
+            item_value = item.get(key)
+            # Check both string and numeric comparison
+            if item_value == value or (numeric_value is not None and item_value == numeric_value):
+                found = True
+                break
+    
+    assert found, f"Array '{array_path}' does not contain item with {key}={value}"
+
+
 @step('each item in the response array should have "{key}"')
 def step_validate_each_item_has_key(context, key):
     """Validate that each array item has a specific key"""

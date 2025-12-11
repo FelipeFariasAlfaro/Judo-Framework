@@ -13,6 +13,16 @@
 
 Judo Framework brings the simplicity and elegance of Karate Framework to the Python ecosystem. Write API tests in plain English (or Spanish!), get beautiful HTML reports automatically, and enjoy the power of Python's ecosystem.
 
+## 🎉 What's New in v1.2.11
+
+- 🐛 **Fixed duplicate report generation** - Reports now generate only in the configured `output_dir`
+- 🎨 **Cleaner console output** - New `console_format` parameter with minimalista `progress` format by default
+- 🥒 **Cucumber JSON export** - Automatic generation for Xray/Allure integration
+- 🔍 **Nested array search** - New step to search items in nested arrays with dot notation
+- 🔧 **Variable interpolation fixes** - Proper variable replacement in JSON bodies, headers, and endpoints
+
+[See full changelog](CHANGELOG.md)
+
 ---
 
 ## 🌟 Why Judo Framework?
@@ -608,8 +618,8 @@ We welcome contributions! Here's how:
 
 ```bash
 # Clone repository
-git clone https://github.com/judo-framework/judo
-cd judo
+git clone https://github.com/FelipeFariasAlfaro/Judo-Framework.git
+cd Judo-Framework
 
 # Install development dependencies
 pip install -e .[dev]
@@ -671,7 +681,7 @@ We are dedicated to advancing software quality and testing practices across Lati
 - **Language**: Python 3.8+
 - **License**: MIT
 - **Status**: Production Ready
-- **Version**: 1.2.8
+- **Version**: 1.2.9
 - **Downloads**: [![Downloads](https://pepy.tech/badge/judo-framework)](https://pepy.tech/project/judo-framework)
 
 ---
@@ -679,19 +689,19 @@ We are dedicated to advancing software quality and testing practices across Lati
 ## 🔗 Links
 
 - **PyPI**: https://pypi.org/project/judo-framework/
-- **GitHub**: https://github.com/judo-framework/judo
+- **GitHub**: https://github.com/FelipeFariasAlfaro/Judo-Framework
 - **Documentation**: [docs/](docs/)
 - **CENTYC**: https://www.centyc.cl
-- **Issues**: https://github.com/judo-framework/judo/issues
-- **Discussions**: https://github.com/judo-framework/judo/discussions
+- **Issues**: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+- **Discussions**: https://github.com/FelipeFariasAlfaro/Judo-Framework/discussions
 
 ---
 
 ## 💬 Community
 
 Join our community:
-- 💬 [GitHub Discussions](https://github.com/judo-framework/judo/discussions)
-- 🐛 [Report Issues](https://github.com/judo-framework/judo/issues)
+- 💬 [GitHub Discussions](https://github.com/FelipeFariasAlfaro/Judo-Framework/discussions)
+- 🐛 [Report Issues](https://github.com/FelipeFariasAlfaro/Judo-Framework/issues)
 - 📧 Contact: felipe.farias@centyc.cl
 
 ---

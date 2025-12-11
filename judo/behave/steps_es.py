@@ -221,6 +221,42 @@ def step_validate_each_has_field_es(context, campo):
             f"Item at index {i} does not have field '{campo}'"
 
 
+@step('el array "{ruta_array}" debe contener un elemento con "{campo}" igual a "{valor}"')
+def step_validate_nested_array_contains_item_es(context, ruta_array, campo, valor):
+    """Validar que un array anidado contiene un elemento con un valor específico"""
+    response = context.judo_context.response
+    valor = context.judo_context.interpolate_string(valor)
+    
+    # Navegar al array anidado
+    array_data = response.json
+    for parte in ruta_array.split('.'):
+        if isinstance(array_data, dict):
+            array_data = array_data.get(parte)
+        else:
+            assert False, f"No se puede navegar a '{ruta_array}' - ruta inválida"
+    
+    # Validar que es un array
+    assert isinstance(array_data, list), f"'{ruta_array}' no es un array"
+    
+    # Intentar convertir a número si es posible
+    try:
+        valor_numerico = int(valor)
+    except ValueError:
+        valor_numerico = None
+    
+    # Buscar el elemento
+    encontrado = False
+    for item in array_data:
+        if isinstance(item, dict):
+            valor_item = item.get(campo)
+            # Comparar tanto string como número
+            if valor_item == valor or (valor_numerico is not None and valor_item == valor_numerico):
+                encontrado = True
+                break
+    
+    assert encontrado, f"El array '{ruta_array}' no contiene un elemento con {campo}={valor}"
+
+
 # ============================================================
 # STEPS DE EXTRACCIÓN DE DATOS
 # ============================================================

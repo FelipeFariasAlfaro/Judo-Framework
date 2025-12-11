@@ -25,7 +25,10 @@ class BaseRunner:
                  features_dir: str = "features",
                  output_dir: str = "judo_reports",
                  parallel: bool = False,
-                 max_workers: int = 4):
+                 max_workers: int = 4,
+                 generate_cucumber_json: bool = True,
+                 cucumber_json_dir: str = None,
+                 console_format: str = "progress"):
         """
         Inicializar runner base
         
@@ -34,12 +37,33 @@ class BaseRunner:
             output_dir: Directorio para reportes
             parallel: Ejecutar en paralelo
             max_workers: Número máximo de hilos
+            generate_cucumber_json: Generar JSON en formato Cucumber
+            cucumber_json_dir: Directorio para JSON Cucumber (default: output_dir/cucumber-json)
+            console_format: Formato de salida en consola ('progress', 'progress2', 'pretty', 'plain', 'none')
+                           'progress' (default) es limpio y minimalista
+                           'pretty' muestra todos los detalles de cada step
         """
         self.features_dir = Path(features_dir)
         self.output_dir = Path(output_dir)
         self.parallel = parallel
         self.max_workers = max_workers
+        self.console_format = console_format
+        
+        # Configurar el reporter global para que el formatter lo use
+        from ..reporting.reporter import set_reporter
         self.reporter = JudoReporter("Test Execution Report", str(output_dir))
+        set_reporter(self.reporter)
+        
+        # Configuración de Cucumber JSON
+        self.generate_cucumber_json = generate_cucumber_json
+        if cucumber_json_dir:
+            self.cucumber_json_dir = Path(cucumber_json_dir)
+        else:
+            self.cucumber_json_dir = self.output_dir / "cucumber-json"
+        
+        # Crear directorio si no existe
+        if self.generate_cucumber_json:
+            self.cucumber_json_dir.mkdir(parents=True, exist_ok=True)
         
         # Configuración
         self.config = {
@@ -211,6 +235,7 @@ class BaseRunner:
         
         # Configurar formato de salida multiplataforma
         import tempfile
+        from datetime import datetime
         
         # Crear archivo temporal para capturar JSON (funciona en todos los OS)
         json_output_file = tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=False)
@@ -219,7 +244,19 @@ class BaseRunner:
         
         # Configurar formatos de salida
         cmd.extend(["--format", "json", "--outfile", json_output_path])
-        cmd.extend(["--format", "pretty"])  # También mostrar formato legible en stdout
+        
+        # Si está habilitado, también generar Cucumber JSON
+        cucumber_json_path = None
+        if self.generate_cucumber_json:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            feature_name = feature_file.stem
+            cucumber_json_path = self.cucumber_json_dir / f"{feature_name}_{timestamp}.json"
+            cmd.extend(["--format", "json", "--outfile", str(cucumber_json_path)])
+        
+        # Usar formato de consola configurado
+        # 'progress' es más limpio que 'pretty', 'judo-simple' es el más minimalista
+        if self.console_format != "none":
+            cmd.extend(["--format", self.console_format])
         cmd.extend(["--no-capture"])
         
         start_time = time.time()
@@ -287,7 +324,8 @@ class BaseRunner:
                 "stdout": stdout_content,
                 "stderr": stderr_content,
                 "duration": duration,
-                "json_data": json_data  # Agregar datos JSON para el reporte
+                "json_data": json_data,  # Agregar datos JSON para el reporte
+                "cucumber_json": str(cucumber_json_path) if cucumber_json_path else None
             }
             
         except subprocess.TimeoutExpired:
@@ -464,13 +502,22 @@ class BaseRunner:
         # Generar reporte
         self._generate_final_report(execution_results)
         
+        # Consolidar Cucumber JSON si está habilitado
+        if self.generate_cucumber_json and execution_results:
+            self.consolidate_cucumber_json()
+        
         return self.results
     
     def _generate_final_report(self, execution_results: List[Dict[str, Any]]):
         """Generar reporte final con datos de Behave"""
         try:
             # Procesar datos JSON de cada feature ejecutado
+            cucumber_json_files = []
             for result in execution_results:
+                # Recopilar archivos Cucumber JSON
+                if result.get("cucumber_json"):
+                    cucumber_json_files.append(result["cucumber_json"])
+                
                 if result.get("json_data"):
                     json_data = result["json_data"]
                     
@@ -482,6 +529,18 @@ class BaseRunner:
             # Generar reporte HTML
             report_path = self.reporter.generate_html_report("test_execution_report.html")
             self.log(f"📊 Reporte HTML generado: {report_path}")
+            
+            # Mostrar información sobre archivos Cucumber JSON
+            if cucumber_json_files:
+                self.log(f"\n🥒 Cucumber JSON generados ({len(cucumber_json_files)} archivos):")
+                self.log(f"📁 Directorio: {self.cucumber_json_dir}")
+                for json_file in cucumber_json_files:
+                    self.log(f"   - {Path(json_file).name}")
+                self.log(f"\n💡 Estos archivos pueden ser usados con:")
+                self.log(f"   • Xray (Jira)")
+                self.log(f"   • Cucumber HTML Reporter")
+                self.log(f"   • Allure")
+                self.log(f"   • Cualquier herramienta compatible con Cucumber JSON")
         except Exception as e:
             self.log(f"⚠️ Error generando reporte: {e}")
     
@@ -575,6 +634,41 @@ class BaseRunner:
                         
         except Exception as e:
             self.log(f"⚠️ Error procesando datos de feature: {e}")
+    
+    def consolidate_cucumber_json(self, output_file: str = "cucumber-consolidated.json"):
+        """
+        Consolidar todos los archivos Cucumber JSON en uno solo
+        Útil para herramientas como Xray que prefieren un solo archivo
+        
+        Args:
+            output_file: Nombre del archivo consolidado
+        """
+        import json
+        
+        consolidated = []
+        
+        # Leer todos los archivos JSON en el directorio
+        for json_file in self.cucumber_json_dir.glob("*.json"):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        consolidated.extend(data)
+                    else:
+                        consolidated.append(data)
+            except Exception as e:
+                self.log(f"⚠️ Error leyendo {json_file.name}: {e}")
+        
+        # Guardar archivo consolidado
+        if consolidated:
+            output_path = self.cucumber_json_dir / output_file
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(consolidated, f, indent=2, ensure_ascii=False)
+            
+            self.log(f"📦 JSON consolidado generado: {output_path}")
+            return str(output_path)
+        
+        return None
     
     def log(self, message: str):
         """Log mensaje (puede ser override por usuarios)"""

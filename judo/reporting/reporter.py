@@ -129,11 +129,11 @@ class JudoReporter:
 _global_reporter: Optional[JudoReporter] = None
 
 
-def get_reporter() -> JudoReporter:
+def get_reporter(output_dir: str = None) -> JudoReporter:
     """Get global reporter instance"""
     global _global_reporter
     if _global_reporter is None:
-        _global_reporter = JudoReporter()
+        _global_reporter = JudoReporter(output_dir=output_dir)
     return _global_reporter
 
 
