@@ -1,0 +1,17 @@
+[
+  {
+    "title": "First Post from File",
+    "body": "Content of first post",
+    "userId": 1
+  },
+  {
+    "title": "Second Post from File", 
+    "body": "Content of second post",
+    "userId": 1
+  },
+  {
+    "title": "Third Post from File",
+    "body": "Content of third post", 
+    "userId": 2
+  }
+]

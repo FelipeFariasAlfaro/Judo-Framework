@@ -318,3 +318,43 @@ def step_validate_response_time_es(context, max_time):
     elapsed = context.judo_context.response.elapsed_time
     assert elapsed < max_time, \
         f"Response time {elapsed}s exceeded maximum {max_time}s"
+
+
+# ============================================================
+# STEPS DE CONFIGURACIÓN DE LOGGING
+# ============================================================
+
+@step('habilito el guardado de peticiones y respuestas')
+def step_enable_request_response_logging_es(context):
+    """Habilitar guardado automático de peticiones y respuestas"""
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    context.judo_context.configure_request_response_logging(True)
+
+
+@step('deshabilito el guardado de peticiones y respuestas')
+def step_disable_request_response_logging_es(context):
+    """Deshabilitar guardado automático de peticiones y respuestas"""
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    context.judo_context.configure_request_response_logging(False)
+
+
+@step('habilito el guardado de peticiones y respuestas en el directorio "{directory}"')
+def step_enable_request_response_logging_with_directory_es(context, directory):
+    """Habilitar guardado automático con directorio personalizado"""
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    context.judo_context.configure_request_response_logging(True, directory)
+
+
+@step('establezco el directorio de salida a "{directory}"')
+def step_set_output_directory_es(context, directory):
+    """Establecer directorio de salida para el guardado de peticiones y respuestas"""
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    context.judo_context.output_directory = directory

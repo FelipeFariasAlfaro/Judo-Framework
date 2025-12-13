@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {"type": "string"},
+        "suite": {"type": "string"},
+        "city": {"type": "string"},
+        "zipcode": {"type": "string"}
+      },
+      "required": ["street", "city"]
+    },
+    "phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "company": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "catchPhrase": {"type": "string"},
+        "bs": {"type": "string"}
+      }
+    }
+  },
+  "required": ["id", "name", "username", "email"]
+}

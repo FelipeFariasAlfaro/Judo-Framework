@@ -1,0 +1,14 @@
+api:
+  base_url: "https://jsonplaceholder.typicode.com"
+  timeout: 30
+  retry_count: 3
+
+test_data:
+  default_user_id: 1
+  test_post_title: "YAML Configuration Test"
+  test_post_body: "This post was created using YAML configuration"
+
+headers:
+  content_type: "application/json"
+  accept: "application/json"
+  user_agent: "Judo-Framework-Test"

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="judo-framework",
-    version="1.2.11",
+    version="1.3.32",
     author="Felipe Farias - CENTYC",
     author_email="felipe.farias@centyc.cl",
     description="A comprehensive API testing framework for Python, inspired by Karate Framework",

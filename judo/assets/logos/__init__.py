@@ -1,0 +1,1 @@
+# Logos for Judo Framework HTML reports

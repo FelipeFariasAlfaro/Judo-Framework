@@ -55,3 +55,6 @@ Thumbs.db
 # Temporary files
 *.log
 *.tmp
+
+# Internal documentation (technical docs for development)
+.kiro/

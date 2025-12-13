@@ -3,6 +3,7 @@ Behave Context Integration
 Provides Judo Framework integration with Behave context
 """
 
+import os
 from judo import Judo
 from typing import Any, Dict, Optional
 
@@ -21,6 +22,12 @@ class JudoContext:
         self.variables = {}
         self.test_data = {}
         
+        # Request/Response logging configuration
+        self.save_requests_responses = False
+        self.output_directory = None
+        self.current_scenario_name = None
+        self.request_counter = 0
+        
         # Initialize default configuration
         self._setup_defaults()
     
@@ -32,6 +39,11 @@ class JudoContext:
             "Accept": "application/json",
             "User-Agent": "Judo-Framework-Behave/1.0"
         })
+        
+        # Configure request/response logging from environment variables
+        import os
+        self.save_requests_responses = os.getenv('JUDO_SAVE_REQUESTS_RESPONSES', 'false').lower() == 'true'
+        self.output_directory = os.getenv('JUDO_OUTPUT_DIRECTORY', 'judo_output')
     
     # URL Management
     def set_base_url(self, url: str):
@@ -61,6 +73,94 @@ class JudoContext:
             result = result.replace(f"${{{key}}}", str(value))
         return result
     
+    # Request/Response Logging Configuration
+    def configure_request_response_logging(self, enabled: bool, output_directory: str = None):
+        """
+        Configure automatic request/response logging
+        
+        Args:
+            enabled: True to enable logging, False to disable
+            output_directory: Directory where to save the files (default: 'judo_output')
+        """
+        self.save_requests_responses = enabled
+        if output_directory:
+            self.output_directory = output_directory
+        
+        if enabled and not self.output_directory:
+            self.output_directory = 'judo_output'
+    
+    def set_current_scenario(self, scenario_name: str):
+        """Set the current scenario name for file organization"""
+        self.current_scenario_name = scenario_name
+        self.request_counter = 0  # Reset counter for new scenario
+    
+    def _sanitize_filename(self, name: str) -> str:
+        """Sanitize scenario name for use as directory name"""
+        import re
+        # Remove or replace invalid characters for filenames
+        sanitized = re.sub(r'[<>:"/\\|?*]', '_', name)
+        # Replace spaces with underscores
+        sanitized = sanitized.replace(' ', '_')
+        # Remove multiple consecutive underscores
+        sanitized = re.sub(r'_+', '_', sanitized)
+        # Remove leading/trailing underscores
+        sanitized = sanitized.strip('_')
+        return sanitized
+    
+    def _save_request_response(self, method: str, endpoint: str, request_data: dict, response_data: dict):
+        """
+        Save request and response data to JSON files
+        
+        Args:
+            method: HTTP method (GET, POST, etc.)
+            endpoint: API endpoint
+            request_data: Request data including headers, body, etc.
+            response_data: Response data including status, headers, body, etc.
+        """
+        if not self.save_requests_responses or not self.current_scenario_name:
+            return
+        
+        import os
+        import json
+        from pathlib import Path
+        from datetime import datetime
+        
+        try:
+            # Create directory structure: output_dir/scenario_name/
+            scenario_dir_name = self._sanitize_filename(self.current_scenario_name)
+            scenario_path = Path(self.output_directory) / scenario_dir_name
+            scenario_path.mkdir(parents=True, exist_ok=True)
+            
+            # Increment counter for this request
+            self.request_counter += 1
+            
+            # Create filenames with counter and method
+            timestamp = datetime.now().strftime("%H%M%S")
+            base_filename = f"{self.request_counter:02d}_{method}_{timestamp}"
+            
+            request_filename = f"{base_filename}_request.json"
+            response_filename = f"{base_filename}_response.json"
+            
+            # Save request
+            request_path = scenario_path / request_filename
+            with open(request_path, 'w', encoding='utf-8') as f:
+                json.dump(request_data, f, indent=2, ensure_ascii=False, default=str)
+            
+            # Save response
+            response_path = scenario_path / response_filename
+            with open(response_path, 'w', encoding='utf-8') as f:
+                json.dump(response_data, f, indent=2, ensure_ascii=False, default=str)
+            
+            # Log the saved files (optional, can be enabled with environment variable)
+            if os.getenv('JUDO_LOG_SAVED_FILES', 'false').lower() == 'true':
+                print(f"💾 Saved request: {request_path}")
+                print(f"💾 Saved response: {response_path}")
+                print(f"📁 Files saved in: {scenario_path}")
+                
+        except Exception as e:
+            # Don't fail the test if logging fails, just log the error
+            print(f"⚠️ Warning: Could not save request/response files: {e}")
+    
     # HTTP Methods
     def make_request(self, method: str, endpoint: str, **kwargs):
         """Make HTTP request and store response"""
@@ -68,6 +168,51 @@ class JudoContext:
         
         # Interpolate endpoint
         endpoint = self.interpolate_string(endpoint)
+        
+        # Prepare request data for logging
+        request_data = None
+        if self.save_requests_responses:
+            # Capture all headers (default + any additional from kwargs)
+            all_headers = {}
+            
+            # Get default headers from Judo client
+            if hasattr(self.judo.http_client, 'default_headers'):
+                all_headers.update(dict(self.judo.http_client.default_headers))
+            
+            # Add any headers from kwargs
+            if 'headers' in kwargs:
+                all_headers.update(kwargs['headers'])
+            
+            # Get query parameters
+            all_params = {}
+            if hasattr(self.judo.http_client, 'default_params'):
+                all_params.update(dict(self.judo.http_client.default_params))
+            if 'params' in kwargs:
+                all_params.update(kwargs['params'])
+            
+            request_data = {
+                "method": method,
+                "url": f"{self.judo.url}{endpoint}" if self.judo.url else endpoint,
+                "endpoint": endpoint,
+                "headers": all_headers,
+                "query_parameters": all_params,
+                "timestamp": self._get_timestamp(),
+                "scenario": self.current_scenario_name
+            }
+            
+            # Add body data if present
+            if 'json' in kwargs:
+                request_data['body'] = kwargs['json']
+                request_data['body_type'] = 'application/json'
+            elif 'data' in kwargs:
+                request_data['body'] = kwargs['data']
+                request_data['body_type'] = 'application/x-www-form-urlencoded'
+            elif 'files' in kwargs:
+                request_data['files'] = str(kwargs['files'])  # Convert to string for JSON serialization
+                request_data['body_type'] = 'multipart/form-data'
+            else:
+                request_data['body'] = None
+                request_data['body_type'] = None
         
         # Make request based on method
         if method == 'GET':
@@ -83,7 +228,154 @@ class JudoContext:
         else:
             raise ValueError(f"Unsupported HTTP method: {method}")
         
+        # Always capture request/response data for HTML reports (regardless of file logging)
+        if self.response:
+            # Capture all headers (default + any additional from kwargs)
+            all_headers = {}
+            
+            # Get default headers from Judo client
+            if hasattr(self.judo.http_client, 'default_headers'):
+                all_headers.update(dict(self.judo.http_client.default_headers))
+            
+            # Add any headers from kwargs
+            if 'headers' in kwargs:
+                all_headers.update(kwargs['headers'])
+            
+            # Get query parameters
+            all_params = {}
+            if hasattr(self.judo.http_client, 'default_params'):
+                all_params.update(dict(self.judo.http_client.default_params))
+            if 'params' in kwargs:
+                all_params.update(kwargs['params'])
+            
+            # Prepare request data for HTML report
+            html_request_data = {
+                "method": method,
+                "url": f"{self.judo.url}{endpoint}" if self.judo.url else endpoint,
+                "endpoint": endpoint,
+                "headers": all_headers,
+                "query_parameters": all_params,
+                "timestamp": self._get_timestamp(),
+                "scenario": self.current_scenario_name
+            }
+            
+            # Add body data if present
+            if 'json' in kwargs:
+                html_request_data['body'] = kwargs['json']
+                html_request_data['body_type'] = 'application/json'
+            elif 'data' in kwargs:
+                html_request_data['body'] = kwargs['data']
+                html_request_data['body_type'] = 'application/x-www-form-urlencoded'
+            elif 'files' in kwargs:
+                html_request_data['files'] = str(kwargs['files'])  # Convert to string for JSON serialization
+                html_request_data['body_type'] = 'multipart/form-data'
+            else:
+                html_request_data['body'] = None
+                html_request_data['body_type'] = None
+            
+            # Capture response headers with better handling
+            response_headers = {}
+            if hasattr(self.response, 'headers') and self.response.headers:
+                response_headers = dict(self.response.headers)
+            
+            # Determine content type from response
+            content_type = response_headers.get('content-type', response_headers.get('Content-Type', 'unknown'))
+            
+            # Try to parse JSON body safely
+            json_body = None
+            text_body = None
+            
+            try:
+                if hasattr(self.response, 'json') and self.response.json is not None:
+                    json_body = self.response.json
+                if hasattr(self.response, 'text') and self.response.text is not None:
+                    text_body = self.response.text
+            except Exception:
+                # If JSON parsing fails, just capture as text
+                if hasattr(self.response, 'text'):
+                    text_body = self.response.text
+            
+            html_response_data = {
+                "status_code": self.response.status,
+                "status_text": getattr(self.response, 'reason', 'Unknown'),
+                "headers": response_headers,
+                "content_type": content_type,
+                "body": json_body,
+                "text": text_body,
+                "size_bytes": len(text_body.encode('utf-8')) if text_body else 0,
+                "elapsed_ms": getattr(self.response, 'elapsed', 0) * 1000 if hasattr(self.response, 'elapsed') else 0,
+                "timestamp": self._get_timestamp(),
+                "scenario": self.current_scenario_name
+            }
+            
+            # Send data to HTML reporter system
+            try:
+                from ..reporting.reporter import get_reporter
+                reporter = get_reporter()
+                
+                # Debug: Log reporter state (can be enabled with JUDO_DEBUG_REPORTER env var)
+                debug_enabled = os.getenv('JUDO_DEBUG_REPORTER', 'false').lower() == 'true'
+                if debug_enabled:
+                    print(f"[DEBUG] Reporter: {reporter is not None}")
+                    if reporter:
+                        print(f"[DEBUG] Current step: {reporter.current_step is not None}")
+                        if reporter.current_step:
+                            print(f"[DEBUG] Step text: {reporter.current_step.step_text}")
+                
+                if reporter and reporter.current_step:
+                    # Add request data to current step
+                    from ..reporting.report_data import RequestData, ResponseData
+                    
+                    # Create RequestData object
+                    request_obj = RequestData(
+                        method=method,
+                        url=html_request_data['url'],
+                        headers=all_headers,
+                        params=all_params,
+                        body=html_request_data.get('body'),
+                        body_type=html_request_data.get('body_type', 'json')
+                    )
+                    
+                    # Create ResponseData object
+                    response_obj = ResponseData(
+                        status_code=self.response.status,
+                        headers=response_headers,
+                        body=json_body,
+                        body_type=content_type,
+                        elapsed_time=getattr(self.response, 'elapsed', 0)
+                    )
+                    
+                    # Add to current step
+                    reporter.current_step.request_data = request_obj
+                    reporter.current_step.response_data = response_obj
+                    
+                    if debug_enabled:
+                        print(f"[DEBUG] Request/Response data added to step")
+                        
+                elif reporter:
+                    if debug_enabled:
+                        print(f"[DEBUG] ❌ Reporter exists but current_step is None")
+                else:
+                    if debug_enabled:
+                        print(f"[DEBUG] ❌ No reporter available")
+                    
+            except Exception as e:
+                # Don't fail the test if reporter integration fails
+                print(f"⚠️ Warning: Could not integrate with HTML reporter: {e}")
+                import traceback
+                if os.getenv('JUDO_DEBUG_REPORTER', 'false').lower() == 'true':
+                    traceback.print_exc()
+            
+            # Save to files if logging is enabled
+            if self.save_requests_responses and request_data:
+                self._save_request_response(method, endpoint, request_data, html_response_data)
+        
         return self.response
+    
+    def _get_timestamp(self):
+        """Get current timestamp in ISO format"""
+        from datetime import datetime
+        return datetime.now().isoformat()
     
     # Response Validation
     def validate_status(self, expected_status: int):
@@ -204,6 +496,10 @@ class JudoContext:
     
     def reset(self):
         """Reset context for new scenario"""
+        # Preserve logging configuration
+        save_logging_config = self.save_requests_responses
+        save_output_dir = self.output_directory
+        
         self.response = None
         self.variables.clear()
         self.test_data.clear()
@@ -215,3 +511,9 @@ class JudoContext:
         
         # Re-setup defaults
         self._setup_defaults()
+        
+        # Restore logging configuration (in case _setup_defaults changed it)
+        self.save_requests_responses = save_logging_config
+        self.output_directory = save_output_dir
+        
+        # Note: current_scenario_name is NOT reset here - it will be set by the hook

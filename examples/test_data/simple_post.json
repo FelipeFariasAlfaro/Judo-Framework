@@ -1,0 +1,5 @@
+{
+  "title": "Simple Post from File",
+  "body": "This is a simple post created from a JSON file",
+  "userId": 1
+}
