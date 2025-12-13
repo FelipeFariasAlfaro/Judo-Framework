@@ -28,7 +28,9 @@ class BaseRunner:
                  max_workers: int = 4,
                  generate_cucumber_json: bool = True,
                  cucumber_json_dir: str = None,
-                 console_format: str = "progress"):
+                 console_format: str = "progress",
+                 save_requests_responses: bool = False,
+                 requests_responses_dir: str = None):
         """
         Inicializar runner base
         
@@ -42,6 +44,8 @@ class BaseRunner:
             console_format: Formato de salida en consola ('progress', 'progress2', 'pretty', 'plain', 'none')
                            'progress' (default) es limpio y minimalista
                            'pretty' muestra todos los detalles de cada step
+            save_requests_responses: Guardar automáticamente requests y responses en archivos JSON
+            requests_responses_dir: Directorio para guardar requests/responses (default: output_dir/requests_responses)
         """
         self.features_dir = Path(features_dir)
         self.output_dir = Path(output_dir)
@@ -64,6 +68,24 @@ class BaseRunner:
         # Crear directorio si no existe
         if self.generate_cucumber_json:
             self.cucumber_json_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Configuración de Request/Response logging
+        self.save_requests_responses = save_requests_responses
+        if requests_responses_dir:
+            self.requests_responses_dir = Path(requests_responses_dir)
+        else:
+            self.requests_responses_dir = self.output_dir / "requests_responses"
+        
+        # Configurar variables de entorno para que los hooks las usen
+        import os
+        # IMPORTANTE: Configurar el directorio de salida para que el formatter lo use
+        os.environ['JUDO_REPORT_OUTPUT_DIR'] = str(self.output_dir)
+        
+        if self.save_requests_responses:
+            os.environ['JUDO_SAVE_REQUESTS_RESPONSES'] = 'true'
+            os.environ['JUDO_OUTPUT_DIRECTORY'] = str(self.requests_responses_dir)
+            # Crear directorio si no existe
+            self.requests_responses_dir.mkdir(parents=True, exist_ok=True)
         
         # Configuración
         self.config = {
@@ -103,6 +125,35 @@ class BaseRunner:
         """Configurar ejecución paralela"""
         self.parallel = enabled
         self.max_workers = max_workers
+        return self
+    
+    def set_request_response_logging(self, enabled: bool, directory: str = None):
+        """
+        Configurar el guardado automático de requests y responses
+        
+        Args:
+            enabled: True para habilitar, False para deshabilitar
+            directory: Directorio donde guardar los archivos (opcional)
+        """
+        self.save_requests_responses = enabled
+        
+        if directory:
+            self.requests_responses_dir = Path(directory)
+        elif not hasattr(self, 'requests_responses_dir'):
+            self.requests_responses_dir = self.output_dir / "requests_responses"
+        
+        # Configurar variables de entorno
+        import os
+        if enabled:
+            os.environ['JUDO_SAVE_REQUESTS_RESPONSES'] = 'true'
+            os.environ['JUDO_OUTPUT_DIRECTORY'] = str(self.requests_responses_dir)
+            # Crear directorio si no existe
+            self.requests_responses_dir.mkdir(parents=True, exist_ok=True)
+            self.log(f"📁 Request/Response logging habilitado: {self.requests_responses_dir}")
+        else:
+            os.environ['JUDO_SAVE_REQUESTS_RESPONSES'] = 'false'
+            self.log("🚫 Request/Response logging deshabilitado")
+        
         return self
     
     def set_callbacks(self, 
@@ -201,7 +252,9 @@ class BaseRunner:
             line = line.strip()
             if line.startswith('@'):
                 # Extraer todos los tags de la línea
-                found_tags = re.findall(r'@\w+', line)
+                # Incluye letras, números, guiones medios (-) y guiones bajos (_)
+                # Esto permite tags como @PROJ-123, @api-test, @smoke_test, etc.
+                found_tags = re.findall(r'@[\w-]+', line)
                 tags.extend(found_tags)
         
         return tags
@@ -245,6 +298,9 @@ class BaseRunner:
         # Configurar formatos de salida
         cmd.extend(["--format", "json", "--outfile", json_output_path])
         
+        # NO agregar el formatter de Judo aquí porque los auto_hooks ya capturan los datos
+        # El formatter causaría duplicados
+        
         # Si está habilitado, también generar Cucumber JSON
         cucumber_json_path = None
         if self.generate_cucumber_json:
@@ -271,7 +327,8 @@ class BaseRunner:
                     cwd=os.getcwd(),
                     encoding='utf-8',
                     errors='replace',
-                    capture_output=False  # Mostrar salida en consola
+                    capture_output=False,  # Mostrar salida en consola
+                    env=os.environ  # Pass environment variables
                 )
                 stdout_content = ""
                 stderr_content = ""
@@ -283,6 +340,7 @@ class BaseRunner:
                     timeout=self.config.get("timeout", 300),
                     cwd=os.getcwd(),
                     encoding='utf-8',
+                    env=os.environ,  # Pass environment variables
                     errors='replace'
                 )
                 stdout_content = result.stdout
@@ -511,24 +569,22 @@ class BaseRunner:
     def _generate_final_report(self, execution_results: List[Dict[str, Any]]):
         """Generar reporte final con datos de Behave"""
         try:
-            # Procesar datos JSON de cada feature ejecutado
+            # Recopilar archivos Cucumber JSON
             cucumber_json_files = []
             for result in execution_results:
-                # Recopilar archivos Cucumber JSON
                 if result.get("cucumber_json"):
                     cucumber_json_files.append(result["cucumber_json"])
-                
-                if result.get("json_data"):
-                    json_data = result["json_data"]
-                    
-                    # Procesar cada feature en los datos JSON
-                    if isinstance(json_data, list):
-                        for feature_data in json_data:
-                            self._process_feature_data(feature_data)
             
-            # Generar reporte HTML
-            report_path = self.reporter.generate_html_report("test_execution_report.html")
-            self.log(f"📊 Reporte HTML generado: {report_path}")
+            # IMPORTANTE: El reporte HTML ya fue generado por los auto_hooks durante
+            # la ejecución de behave (en after_all_judo). Los hooks capturan todos los 
+            # datos de request/response en tiempo real.
+            # NO necesitamos generar el reporte aquí.
+            
+            report_path = self.output_dir / "test_execution_report.html"
+            if report_path.exists():
+                self.log(f"📊 Reporte HTML generado: {report_path}")
+            else:
+                self.log(f"⚠️ Reporte HTML no encontrado en: {report_path}")
             
             # Mostrar información sobre archivos Cucumber JSON
             if cucumber_json_files:

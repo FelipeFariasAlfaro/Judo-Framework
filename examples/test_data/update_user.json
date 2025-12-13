@@ -1,0 +1,19 @@
+{
+  "id": 1,
+  "name": "Updated User Name",
+  "username": "updated_user",
+  "email": "updated@example.com",
+  "address": {
+    "street": "Updated Street",
+    "suite": "Apt. 556",
+    "city": "Updated City",
+    "zipcode": "92998-3874"
+  },
+  "phone": "1-770-736-8031 x56442",
+  "website": "updated.org",
+  "company": {
+    "name": "Updated Company",
+    "catchPhrase": "Multi-layered client-server neural-net",
+    "bs": "harness real-time e-markets"
+  }
+}

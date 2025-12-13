@@ -24,9 +24,13 @@ class JudoFormatter(Formatter):
         """Inicializar formatter"""
         super(JudoFormatter, self).__init__(stream_opener, config)
         
+        # Obtener directorio de salida desde variable de entorno (configurado por BaseRunner)
+        import os
+        output_dir = os.environ.get('JUDO_REPORT_OUTPUT_DIR', None)
+        
         # Resetear reporter para nueva ejecución
         reset_reporter()
-        self.reporter = get_reporter()
+        self.reporter = get_reporter(output_dir=output_dir)
         
         # Estado actual
         self.current_feature = None
@@ -36,7 +40,8 @@ class JudoFormatter(Formatter):
         # Tracking de scenarios procesados
         self.scenarios_in_feature = []
         
-        print("🥋 Judo Framework - Captura automática de reportes activada")
+        from ..utils.safe_print import safe_emoji_print
+        safe_emoji_print("🥋", "Judo Framework - Captura automática de reportes activada")
     
     def uri(self, uri):
         """Callback cuando se procesa un archivo"""
@@ -153,24 +158,32 @@ class JudoFormatter(Formatter):
         # Finalizar cualquier feature/scenario pendiente
         self._finish_current_feature()
         
-        try:
-            # Generar reporte HTML
-            report_path = self.reporter.generate_html_report()
-            print(f"\n📊 Reporte HTML generado: {report_path}")
-            
-            # Mostrar resumen
-            summary = self.reporter.get_report_data().get_summary()
-            print(f"\n{'='*60}")
-            print(f"📈 RESUMEN DE EJECUCIÓN")
-            print(f"{'='*60}")
-            print(f"Features:  {summary['total_features']}")
-            print(f"Scenarios: {summary['total_scenarios']} (✅ {summary['scenario_counts']['passed']} | ❌ {summary['scenario_counts']['failed']} | ⏭️ {summary['scenario_counts']['skipped']})")
-            print(f"Steps:     {summary['total_steps']} (✅ {summary['step_counts']['passed']} | ❌ {summary['step_counts']['failed']} | ⏭️ {summary['step_counts']['skipped']})")
-            print(f"Tasa de éxito: {summary['success_rate']:.1f}%")
-            print(f"{'='*60}\n")
-            
-        except Exception as e:
-            print(f"⚠️ Error generando reporte: {e}")
-            traceback.print_exc()
+        # Importar el módulo para evitar duplicados
+        import judo.behave.auto_hooks as auto_hooks_module
+        
+        # Solo generar reporte si no se ha generado ya
+        if not auto_hooks_module._report_generated:
+            try:
+                # Generar reporte HTML con nombre fijo
+                report_path = self.reporter.generate_html_report("test_execution_report.html")
+                print(f"\n📊 Reporte HTML generado: {report_path}")
+                
+                # Marcar como generado
+                auto_hooks_module._report_generated = True
+                
+                # Mostrar resumen
+                summary = self.reporter.get_report_data().get_summary()
+                print(f"\n{'='*60}")
+                print(f"📈 RESUMEN DE EJECUCIÓN")
+                print(f"{'='*60}")
+                print(f"Features:  {summary['total_features']}")
+                print(f"Scenarios: {summary['total_scenarios']} (✅ {summary['scenario_counts']['passed']} | ❌ {summary['scenario_counts']['failed']} | ⏭️ {summary['scenario_counts']['skipped']})")
+                print(f"Steps:     {summary['total_steps']} (✅ {summary['step_counts']['passed']} | ❌ {summary['step_counts']['failed']} | ⏭️ {summary['step_counts']['skipped']})")
+                print(f"Tasa de éxito: {summary['success_rate']:.1f}%")
+                print(f"{'='*60}\n")
+                
+            except Exception as e:
+                print(f"⚠️ Error generando reporte: {e}")
+                traceback.print_exc()
         
         super(JudoFormatter, self).close()

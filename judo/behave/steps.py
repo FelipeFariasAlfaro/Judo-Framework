@@ -21,6 +21,9 @@ def step_setup_judo_client(context):
         context.judo_context = JudoContext(context)
 
 
+# Additional missing step definitions for showcase compatibility
+
+
 @step('the base URL is "{base_url}"')
 def step_set_base_url(context, base_url):
     """Set the base URL for API calls"""
@@ -94,6 +97,15 @@ def step_send_get_request(context, endpoint):
     context.judo_context.make_request('GET', endpoint)
 
 
+# Variable-based request steps (must come BEFORE specific method steps to avoid conflicts)
+@step('I send a {method} request to "{endpoint}" with the variable "{var_name}"')
+def step_send_request_with_variable(context, method, endpoint, var_name):
+    """Send request with JSON data from variable"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
+    json_data = context.judo_context.get_variable(var_name)
+    context.judo_context.make_request(method, endpoint, json=json_data)
+
+
 @step('I send a POST request to "{endpoint}"')
 def step_send_post_request(context, endpoint):
     """Send POST request without body"""
@@ -148,13 +160,6 @@ def step_send_delete_request(context, endpoint):
     """Send DELETE request"""
     endpoint = context.judo_context.interpolate_string(endpoint)
     context.judo_context.make_request('DELETE', endpoint)
-
-
-@step('I send a {method} request to "{endpoint}" with the variable "{var_name}"')
-def step_send_request_with_variable(context, method, endpoint, var_name):
-    """Send request with JSON data from variable"""
-    json_data = context.judo_context.get_variable(var_name)
-    context.judo_context.make_request(method, endpoint, json=json_data)
 
 
 # Response Validation Steps
@@ -289,6 +294,7 @@ def step_load_test_data_from_file(context, data_name, file_path):
 @step('I POST to "{endpoint}" with JSON file "{file_path}"')
 def step_send_post_request_with_json_file(context, endpoint, file_path):
     """Send POST request with JSON body from file"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
     json_data = context.judo_context.read_json_file(file_path)
     context.judo_context.make_request('POST', endpoint, json=json_data)
 
@@ -296,6 +302,7 @@ def step_send_post_request_with_json_file(context, endpoint, file_path):
 @step('I PUT to "{endpoint}" with JSON file "{file_path}"')
 def step_send_put_request_with_json_file(context, endpoint, file_path):
     """Send PUT request with JSON body from file"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
     json_data = context.judo_context.read_json_file(file_path)
     context.judo_context.make_request('PUT', endpoint, json=json_data)
 
@@ -303,6 +310,7 @@ def step_send_put_request_with_json_file(context, endpoint, file_path):
 @step('I PATCH to "{endpoint}" with JSON file "{file_path}"')
 def step_send_patch_request_with_json_file(context, endpoint, file_path):
     """Send PATCH request with JSON body from file"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
     json_data = context.judo_context.read_json_file(file_path)
     context.judo_context.make_request('PATCH', endpoint, json=json_data)
 
@@ -310,6 +318,7 @@ def step_send_patch_request_with_json_file(context, endpoint, file_path):
 @step('I {method} to "{endpoint}" with data file "{file_path}"')
 def step_send_request_with_data_from_file(context, method, endpoint, file_path):
     """Send request with data from file (auto-detect format)"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
     data = context.judo_context.read_file(file_path)
     context.judo_context.make_request(method, endpoint, json=data)
 
@@ -583,6 +592,36 @@ def _register_all_steps():
 
 # Call registration when module is imported
 _register_all_steps()
+
+
+# Request/Response Logging Steps
+
+@step('I enable request/response logging')
+def step_enable_request_response_logging(context):
+    """Enable automatic request/response logging"""
+    context.judo_context.configure_request_response_logging(True)
+
+
+@step('I disable request/response logging')
+def step_disable_request_response_logging(context):
+    """Disable automatic request/response logging"""
+    context.judo_context.configure_request_response_logging(False)
+
+
+@step('I enable request/response logging to directory "{directory}"')
+def step_enable_request_response_logging_with_directory(context, directory):
+    """Enable automatic request/response logging with custom directory"""
+    context.judo_context.configure_request_response_logging(True, directory)
+
+
+@step('I set the output directory to "{directory}"')
+def step_set_output_directory(context, directory):
+    """Set the output directory for request/response logging"""
+    context.judo_context.output_directory = directory
+
+
+
+
 
 # Also ensure steps are available when imported with *
 __all__ = [name for name, obj in globals().items() 

@@ -1,0 +1,5 @@
+{
+  "title": "Post from JSON File",
+  "body": "This post was created using data from a JSON file",
+  "userId": 1
+}

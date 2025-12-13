@@ -47,7 +47,8 @@ def before_all(context):
         except Exception as e:
             print(f"Warning: Could not load test data file {test_data_file}: {e}")
     
-    print("🥋 Judo Framework initialized for Behave tests")
+    from ..utils.safe_print import safe_emoji_print
+    safe_emoji_print("🥋", "Judo Framework initialized for Behave tests")
 
 
 def before_scenario(context, scenario):
@@ -61,6 +62,9 @@ def before_scenario(context, scenario):
     
     # Reset context for new scenario
     context.judo_context.reset()
+    
+    # Set current scenario for request/response logging
+    context.judo_context.set_current_scenario(scenario.name)
     
     # Log scenario start
     context.judo_context.log(f"Starting scenario: {scenario.name}")

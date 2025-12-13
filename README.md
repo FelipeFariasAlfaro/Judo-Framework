@@ -1,6 +1,8 @@
-# 🥋 Judo Framework
-
-**A comprehensive API testing framework for Python, inspired by Karate Framework**
+<div align="center">
+  <img src="assets/judo-framework-logo.png" alt="Judo Framework Logo" width="400"/>
+  
+  **A comprehensive API testing framework for Python, inspired by Karate Framework**
+</div>
 
 [![PyPI version](https://badge.fury.io/py/judo-framework.svg)](https://badge.fury.io/py/judo-framework)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -13,13 +15,17 @@
 
 Judo Framework brings the simplicity and elegance of Karate Framework to the Python ecosystem. Write API tests in plain English (or Spanish!), get beautiful HTML reports automatically, and enjoy the power of Python's ecosystem.
 
-## 🎉 What's New in v1.2.11
+## 🎉 What's New in v1.3.18
 
-- 🐛 **Fixed duplicate report generation** - Reports now generate only in the configured `output_dir`
-- 🎨 **Cleaner console output** - New `console_format` parameter with minimalista `progress` format by default
-- 🥒 **Cucumber JSON export** - Automatic generation for Xray/Allure integration
-- 🔍 **Nested array search** - New step to search items in nested arrays with dot notation
-- 🔧 **Variable interpolation fixes** - Proper variable replacement in JSON bodies, headers, and endpoints
+- 📊 **Enhanced HTML Reports** - Professional reports with official CENTYC and Judo Framework logos
+- 🎨 **Modern Report Design** - Beautiful gradient headers, responsive layout, and professional footer
+- 💾 **Request/Response Logging** - Automatic saving of HTTP interactions to JSON files with complete headers
+- 📁 **Organized by Scenario** - Each scenario gets its own directory with numbered files
+- 🔧 **Flexible Configuration** - Enable/disable via environment variables, runner, or feature files
+- 🌐 **Bilingual Support** - English and Spanish steps for logging configuration
+- 🏷️ **Tag Support with Hyphens** - Full support for Jira-style tags like `@PROJ-123`, `@API-456`
+- 📖 **Official Documentation** - Complete docs now available at http://centyc.cl/judo-framework/
+- 🎨 **Professional Branding** - Official logos and visual identity by CENTYC
 
 [See full changelog](CHANGELOG.md)
 
@@ -261,30 +267,73 @@ Scenario: Create user from file
   Then the response status should be 201
 ```
 
-### 📊 Automatic HTML Reports
-Zero configuration, maximum insight:
+### 📊 Professional HTML Reports
+Zero configuration, maximum insight with professional branding:
 
-- **Request Details**: Method, URL, headers, body
-- **Response Details**: Status, headers, body, timing
-- **Assertions**: All validations with expected vs actual
-- **Variables**: Track variable usage across scenarios
-- **Statistics**: Success rate, timing, error tracking
-- **Modern UI**: Clean, responsive design
+- **🏢 Official Branding**: CENTYC and Judo Framework logos in header and footer
+- **🎨 Modern Design**: Beautiful gradient headers and responsive layout
+- **📋 Request Details**: Method, URL, headers, body with syntax highlighting
+- **📥 Response Details**: Status, headers, body, timing with color-coded status
+- **✅ Assertions**: All validations with expected vs actual comparisons
+- **💾 Variables**: Track variable usage and data flow across scenarios
+- **📊 Statistics**: Success rate, timing, error tracking with visual indicators
+- **🔗 Professional Footer**: Creator information and links to documentation
+- **📱 Responsive Design**: Works perfectly on desktop and mobile devices
 
-### ⚡ Parallel Execution
-Run tests faster with parallel execution:
+### 💾 Advanced Request/Response Logging
+Automatically save all HTTP interactions to JSON files with complete details:
+
+```gherkin
+Feature: API Testing with Enhanced Logging
+
+  Background:
+    Given I have a Judo API client
+    And the base URL is "https://api.example.com"
+    # Enable automatic request/response logging
+    And I enable request/response logging to directory "api_logs"
+
+  Scenario: User operations with detailed logging
+    When I send a GET request to "/users/1"
+    Then the response status should be 200
+    # Files automatically saved with complete details:
+    # api_logs/User_operations_with_detailed_logging/01_GET_143052_request.json
+    # api_logs/User_operations_with_detailed_logging/01_GET_143052_response.json
+```
+
+**Enhanced Features:**
+- 📁 **Organized by scenario** - Each scenario gets its own directory
+- 🔢 **Sequential numbering** - Requests numbered in execution order
+- ⏰ **Timestamped files** - Easy to track when requests were made
+- 📝 **Complete headers** - All request and response headers captured
+- 🔍 **Query parameters** - Separate tracking of URL parameters
+- 📊 **Response metadata** - Content type, size, and timing information
+- 🛡️ **Error handling** - Graceful handling of malformed responses
+- 🔧 **Configurable** - Enable/disable per scenario or globally
+- 🌐 **Bilingual support** - English and Spanish steps available
+
+### ⚡ Parallel Execution with Tag Support
+Run tests faster with parallel execution and advanced tag filtering:
 
 ```python
 from judo.runner import ParallelRunner
 
 runner = ParallelRunner(
     features_dir="features",
-    max_workers=8
+    max_workers=8,
+    save_requests_responses=True,
+    requests_responses_dir="./api_logs"
 )
 
-results = runner.run(tags=["@api"])
+# Support for Jira-style tags with hyphens
+results = runner.run(tags=["@PROJ-123", "@API-456", "@end-to-end"])
 print(f"Passed: {results['passed']}/{results['total']}")
 ```
+
+**Tag Features:**
+- 🏷️ **Hyphen Support** - Full support for tags like `@PROJ-123`, `@API-456`
+- 🎯 **Jira Integration** - Perfect for Jira ticket references
+- 🔍 **Advanced Filtering** - Combine multiple tags for precise test selection
+- ⚡ **Parallel Safe** - Tag filtering works seamlessly with parallel execution
 
 ### 🎭 Built-in Mock Server
 Test without external dependencies:
@@ -357,16 +406,24 @@ Scenario: Basic authentication
 ### 🔧 Configuration Steps
 
 **English:**
+- `Given I have a Judo API client`
 - `Given the base URL is "{url}"`
 - `Given I set the variable "{name}" to "{value}"`
 - `Given I set the header "{name}" to "{value}"`
 - `Given I set the query parameter "{name}" to "{value}"`
+- `Given I enable request/response logging`
+- `Given I enable request/response logging to directory "{directory}"`
+- `Given I disable request/response logging`
 
 **Spanish:**
+- `Dado que tengo un cliente API Judo`
 - `Dado que la URL base es "{url}"`
 - `Dado que establezco la variable "{nombre}" a "{valor}"`
 - `Dado que establezco el header "{nombre}" a "{valor}"`
 - `Dado que establezco el parámetro "{nombre}" a "{valor}"`
+- `Dado que habilito el guardado de peticiones y respuestas`
+- `Dado que habilito el guardado de peticiones y respuestas en el directorio "{directorio}"`
+- `Dado que deshabilito el guardado de peticiones y respuestas`
 
 ### 🔐 Authentication Steps
 
@@ -600,15 +657,15 @@ Scenario: Get user
 
 ## 📚 Documentation
 
-| Topic | English | Español |
-|-------|---------|---------|
-| **Getting Started** | [📖 Read](docs/getting-started.md) | [📖 Leer](docs/getting-started_ES.md) |
-| **DSL Reference** | [📖 Read](docs/dsl-reference.md) | [📖 Leer](docs/dsl-reference_ES.md) |
-| **Behave Integration** | [📖 Read](docs/behave-integration.md) | [📖 Leer](docs/behave-integration_ES.md) |
-| **HTML Reporting** | [📖 Read](docs/html-reporting.md) | [📖 Leer](docs/html-reporting_ES.md) |
-| **Creating Runners** | [📖 Read](docs/creating-runners.md) | [📖 Leer](docs/creating-runners_ES.md) |
-| **Examples** | [📖 Read](docs/examples.md) | [📖 Leer](docs/examples_ES.md) |
-| **Author Info** | [📖 Read](docs/AUTHOR.md) | [📖 Leer](docs/AUTHOR_ES.md) |
+### 🌐 Official Documentation
+**Complete documentation available at: [http://centyc.cl/judo-framework/](http://centyc.cl/judo-framework/)**
+
+### 📖 Quick Reference
+| Topic | Description |
+|-------|-------------|
+| **Request/Response Logging** | [📖 Read](docs/request-response-logging.md) - Automatic logging of HTTP interactions |
+| **Examples** | [📖 Read](examples/README.md) - Complete examples and tutorials |
+| **Test Data** | [📖 Read](examples/test_data/README.md) - Guide for using test data files |
 
 ---
 
@@ -669,19 +726,19 @@ We are dedicated to advancing software quality and testing practices across Lati
 - **Language**: Python 3.8+
 - **License**: MIT
 - **Status**: Production Ready
-- **Version**: 1.2.9
+- **Version**: 1.3.18
 - **Downloads**: [![Downloads](https://pepy.tech/badge/judo-framework)](https://pepy.tech/project/judo-framework)
 
 ---
 
 ## 🔗 Links
 
-- **PyPI**: https://pypi.org/project/judo-framework/
-- **GitHub**: https://github.com/FelipeFariasAlfaro/Judo-Framework
-- **Documentation**: [docs/](docs/)
-- **CENTYC**: https://www.centyc.cl
-- **Issues**: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
-- **Discussions**: https://github.com/FelipeFariasAlfaro/Judo-Framework/discussions
+- **📖 Official Documentation**: http://centyc.cl/judo-framework/
+- **📦 PyPI**: https://pypi.org/project/judo-framework/
+- **💻 GitHub**: https://github.com/FelipeFariasAlfaro/Judo-Framework
+- **🏢 CENTYC**: https://www.centyc.cl
+- **🐛 Issues**: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+- **💬 Discussions**: https://github.com/FelipeFariasAlfaro/Judo-Framework/discussions
 
 ---
 

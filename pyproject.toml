@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "judo-framework"
-version = "1.2.11"
+version = "1.3.32"
 description = "A comprehensive API testing framework for Python, inspired by Karate Framework"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -67,11 +67,11 @@ judo = "judo.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/FelipeFariasAlfaro/Judo-Framework"
-Documentation = "https://github.com/FelipeFariasAlfaro/Judo-Framework/blob/main/README.md"
+Documentation = "http://centyc.cl/judo-framework/"
 Repository = "https://github.com/FelipeFariasAlfaro/Judo-Framework"
 Issues = "https://github.com/FelipeFariasAlfaro/Judo-Framework/issues"
 "CENTYC" = "https://www.centyc.cl"
-"Author" = "https://www.centyc.cl"
+"Official Docs" = "http://centyc.cl/judo-framework/"
 
 [tool.setuptools.packages.find]
 where = ["."]

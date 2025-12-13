@@ -4,6 +4,7 @@ HTML Reporter - Generate comprehensive HTML reports for Judo Framework tests
 
 import json
 import os
+import base64
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any
@@ -25,6 +26,82 @@ class HTMLReporter:
         
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Cargar logos como base64
+        self.centyc_logo_b64 = self._load_logo_as_base64("logo_centyc.png")
+        self.judo_logo_b64 = self._load_logo_as_base64("logo_judo.png")
+    
+    def _load_logo_as_base64(self, logo_filename: str) -> str:
+        """Load logo file and convert to base64 data URL"""
+        try:
+            # Método 1: Buscar desde el paquete instalado usando importlib.resources
+            try:
+                import importlib.resources as resources
+                
+                # Intentar cargar desde judo.assets.logos
+                try:
+                    logo_data = resources.read_binary('judo.assets.logos', logo_filename)
+                    logo_b64 = base64.b64encode(logo_data).decode('utf-8')
+                    return f"data:image/png;base64,{logo_b64}"
+                except:
+                    pass
+                
+                # Fallback: intentar desde judo/assets/logos/
+                try:
+                    logo_data = resources.read_binary('judo', f'assets/logos/{logo_filename}')
+                    logo_b64 = base64.b64encode(logo_data).decode('utf-8')
+                    return f"data:image/png;base64,{logo_b64}"
+                except:
+                    pass
+                    
+            except ImportError:
+                pass
+            
+            # Método 2: Buscar desde el directorio del paquete (desarrollo y fallback)
+            current_dir = Path(__file__).parent.parent  # judo/reporting/ -> judo/
+            logo_path = current_dir / "assets" / "logos" / logo_filename
+            
+            if logo_path.exists():
+                with open(logo_path, 'rb') as f:
+                    logo_data = f.read()
+                    logo_b64 = base64.b64encode(logo_data).decode('utf-8')
+                    return f"data:image/png;base64,{logo_b64}"
+            
+            # Método 3: Buscar desde la raíz del proyecto (desarrollo)
+            root_dir = Path(__file__).parent.parent.parent  # Subir a la raíz
+            logo_path = root_dir / "assets" / "logos" / logo_filename
+            
+            if logo_path.exists():
+                with open(logo_path, 'rb') as f:
+                    logo_data = f.read()
+                    logo_b64 = base64.b64encode(logo_data).decode('utf-8')
+                    return f"data:image/png;base64,{logo_b64}"
+            
+            # Método 4: Fallback a pkg_resources para compatibilidad
+            try:
+                import pkg_resources
+                
+                # Intentar diferentes rutas en el paquete
+                for resource_path in [
+                    f'assets/logos/{logo_filename}',
+                    f'assets\\logos\\{logo_filename}',  # Windows path
+                    logo_filename
+                ]:
+                    try:
+                        logo_data = pkg_resources.resource_string('judo', resource_path)
+                        logo_b64 = base64.b64encode(logo_data).decode('utf-8')
+                        return f"data:image/png;base64,{logo_b64}"
+                    except:
+                        continue
+            except ImportError:
+                pass
+            
+            print(f"Warning: Logo not found: {logo_filename}")
+            return ""
+            
+        except Exception as e:
+            print(f"Warning: Could not load logo {logo_filename}: {e}")
+            return ""
     
     def generate_report(self, report_data: ReportData, filename: str = None) -> str:
         """Generate HTML report"""
@@ -65,6 +142,8 @@ class HTMLReporter:
         {self._generate_features_section(report_data.features)}
     </div>
     
+    {self._generate_footer()}
+    
     <script>
         {self._get_javascript()}
     </script>
@@ -80,20 +159,38 @@ class HTMLReporter:
         return f"""
         <header class="report-header">
             <div class="header-content">
-                <h1>🥋 {report_data.title}</h1>
-                <div class="header-info">
-                    <div class="info-item">
-                        <span class="label">Start Time:</span>
-                        <span class="value">{report_data.start_time.strftime('%Y-%m-%d %H:%M:%S')}</span>
+                <div class="header-layout">
+                    <!-- Logo CENTYC en esquina superior izquierda -->
+                    <div class="centyc-logo">
+                        <a href="https://www.centyc.cl" target="_blank" class="centyc-link">
+                            {f'<img src="{self.centyc_logo_b64}" alt="CENTYC Logo" class="centyc-img">' if self.centyc_logo_b64 else '<span class="centyc-fallback">CENTYC</span>'}
+                            <span class="centyc-text">www.centyc.cl</span>
+                        </a>
                     </div>
-                    <div class="info-item">
-                        <span class="label">Duration:</span>
-                        <span class="value">{report_data.duration:.2f}s</span>
+                    
+                    <!-- Logo Judo Framework y título centrados -->
+                    <div class="main-title">
+                        <div class="judo-logo-circle">
+                            {f'<img src="{self.judo_logo_b64}" alt="Judo Framework Logo" class="judo-img">' if self.judo_logo_b64 else '<span class="judo-fallback">🥋</span>'}
+                        </div>
+                        <h1 class="report-title">{report_data.title}</h1>
                     </div>
-                    <div class="info-item">
-                        <span class="label">Status:</span>
-                        <span class="value status-{status_class}">
-                            {'✅ PASSED' if status_class == 'success' else '❌ FAILED'}
+                </div>
+                
+                <!-- Información del reporte en layout horizontal -->
+                <div class="header-info-horizontal">
+                    <div class="info-group">
+                        <span class="info-label">Start Time:</span>
+                        <span class="info-value">{report_data.start_time.strftime('%Y-%m-%d %H:%M:%S')}</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Duration:</span>
+                        <span class="info-value">{report_data.duration:.2f}s</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Status:</span>
+                        <span class="status-badge status-{status_class}">
+                            {'✓' if status_class == 'success' else '✗'}
                         </span>
                     </div>
                 </div>
@@ -167,6 +264,29 @@ class HTMLReporter:
             """
         
         return features_html
+    
+    def _generate_footer(self) -> str:
+        """Generate report footer"""
+        logo_html = f'<img src="{self.judo_logo_b64}" alt="Judo Framework Logo" class="judo-logo-footer">' if self.judo_logo_b64 else '<span class="judo-fallback-footer">🥋</span>'
+        
+        return f"""
+        <footer class="report-footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    {logo_html}
+                    <span class="footer-text">Framework creado por Felipe Farias - </span>
+                    <a href="mailto:felipe.farias@centyc.cl" class="footer-email">felipe.farias@centyc.cl</a>
+                </div>
+                <div class="footer-links">
+                    <a href="https://www.centyc.cl" target="_blank" class="footer-link">CENTYC</a>
+                    <span class="separator">•</span>
+                    <a href="http://centyc.cl/judo-framework/" target="_blank" class="footer-link">Documentación</a>
+                    <span class="separator">•</span>
+                    <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework" target="_blank" class="footer-link">GitHub</a>
+                </div>
+            </div>
+        </footer>
+        """
     
     def _generate_scenarios_section(self, scenarios, feature_index) -> str:
         """Generate scenarios section"""
@@ -418,50 +538,160 @@ class HTMLReporter:
         
         /* Header Styles */
         .report-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
             color: white;
-            padding: 30px;
-            border-radius: 10px;
+            padding: 25px 30px;
+            border-radius: 15px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
         }
         
-        .header-content h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .header-info {
+        .header-layout {
             display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 20px;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            position: relative;
         }
         
-        .info-item {
-            text-align: center;
+        /* Logo CENTYC en esquina superior izquierda */
+        .centyc-logo {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         
-        .info-item .label {
-            display: block;
-            font-size: 0.9em;
+        .centyc-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+        
+        .centyc-link:hover {
             opacity: 0.8;
-            margin-bottom: 5px;
         }
         
-        .info-item .value {
-            display: block;
+        .centyc-text {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .centyc-img {
+            height: 30px;
+            width: auto;
+            max-width: 120px;
+            transition: opacity 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .centyc-img:hover {
+            opacity: 0.8;
+        }
+        
+        .centyc-fallback {
             font-size: 1.2em;
             font-weight: bold;
+            color: white;
         }
         
-        .status-success {
-            color: #4CAF50;
+        /* Logo Judo Framework y título centrados */
+        .main-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 0 auto;
+            padding-top: 10px;
         }
         
-        .status-failure {
-            color: #f44336;
+        .judo-logo-circle {
+            transition: transform 0.3s ease;
+        }
+        
+        .judo-logo-circle:hover {
+            transform: scale(1.05);
+        }
+        
+        .judo-img {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            object-fit: cover;
+        }
+        
+        .judo-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .judo-fallback {
+            font-size: 2em;
+        }
+        
+        .report-title {
+            font-size: 2.2em;
+            margin: 0;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Información horizontal */
+        .header-info-horizontal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .info-label {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: white;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+        }
+        
+        .status-badge.status-success {
+            background: #22c55e;
+            color: white;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+        
+        .status-badge.status-failure {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
         }
         
         /* Summary Section */
@@ -858,14 +1088,116 @@ class HTMLReporter:
             transform: rotate(180deg);
         }
         
+        /* Footer Styles */
+        .report-footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .judo-logo-footer {
+            height: 24px;
+            width: 24px;
+            opacity: 0.8;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .judo-fallback-footer {
+            font-size: 1.2em;
+        }
+        
+        .footer-text {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .footer-email {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-email:hover {
+            color: #5dade2;
+            text-decoration: underline;
+        }
+        
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .separator {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8em;
+        }
+        
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
             }
             
-            .header-info {
+            .header-layout {
                 flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .centyc-logo {
+                position: static;
+                order: -1;
+            }
+            
+            .main-title {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .report-title {
+                font-size: 1.8em;
+            }
+            
+            .header-info-horizontal {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .info-group {
+                flex-direction: row;
                 gap: 10px;
             }
             
@@ -882,6 +1214,16 @@ class HTMLReporter:
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .footer-links {
+                justify-content: center;
             }
         }
         """

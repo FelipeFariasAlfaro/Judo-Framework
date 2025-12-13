@@ -18,7 +18,7 @@ from .runner.base_runner import BaseRunner
 from .runner.test_suite import TestSuite, CommonSuites
 from .utils.helpers import *
 
-__version__ = "1.0.0"
+__version__ = "1.3.32"
 __author__ = "Judo Framework Team"
 
 # Main exports
