@@ -30,7 +30,8 @@ class BaseRunner:
                  cucumber_json_dir: str = None,
                  console_format: str = "progress",
                  save_requests_responses: bool = False,
-                 requests_responses_dir: str = None):
+                 requests_responses_dir: str = None,
+                 run_all_features_together: bool = True):
         """
         Inicializar runner base
         
@@ -46,12 +47,15 @@ class BaseRunner:
                            'pretty' muestra todos los detalles de cada step
             save_requests_responses: Guardar automáticamente requests y responses en archivos JSON
             requests_responses_dir: Directorio para guardar requests/responses (default: output_dir/requests_responses)
+            run_all_features_together: Ejecutar todos los features en una sola llamada a behave (genera un solo reporte HTML)
+                                      Si es False, ejecuta cada feature por separado (útil para paralelo)
         """
         self.features_dir = Path(features_dir)
         self.output_dir = Path(output_dir)
         self.parallel = parallel
         self.max_workers = max_workers
         self.console_format = console_format
+        self.run_all_features_together = run_all_features_together
         
         # Configurar el reporter global para que el formatter lo use
         from ..reporting.reporter import set_reporter
@@ -435,6 +439,119 @@ class BaseRunner:
         
         return result
     
+    def run_all_features_in_one_execution(self, feature_files: List[Path]) -> Dict[str, Any]:
+        """
+        Ejecutar todos los features en una sola llamada a behave
+        Esto genera un solo reporte HTML con todos los features
+        """
+        if not feature_files:
+            return {"success": False, "duration": 0, "stdout": "", "stderr": "No features to run"}
+        
+        self.log(f"🎯 Ejecutando {len(feature_files)} features en una sola ejecución")
+        
+        cmd = [sys.executable, "-m", "behave"]
+        
+        # Agregar todos los archivos feature
+        for feature_file in feature_files:
+            cmd.append(str(feature_file))
+        
+        # Agregar tags si están configurados
+        if self.current_tags:
+            for tag in self.current_tags:
+                cmd.extend(["--tags", tag])
+        
+        # Agregar exclude tags si están configurados
+        if self.current_exclude_tags:
+            for tag in self.current_exclude_tags:
+                cmd.extend(["--tags", f"~{tag}"])
+        
+        # Configurar formato de salida
+        import tempfile
+        from datetime import datetime
+        
+        json_output_file = tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=False)
+        json_output_path = json_output_file.name
+        json_output_file.close()
+        
+        cmd.extend(["--format", "json", "--outfile", json_output_path])
+        
+        # Cucumber JSON si está habilitado
+        cucumber_json_path = None
+        if self.generate_cucumber_json:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            cucumber_json_path = self.cucumber_json_dir / f"all_features_{timestamp}.json"
+            cmd.extend(["--format", "json", "--outfile", str(cucumber_json_path)])
+        
+        # Formato de consola
+        if self.console_format != "none":
+            cmd.extend(["--format", self.console_format])
+        cmd.extend(["--no-capture"])
+        
+        start_time = time.time()
+        
+        try:
+            if self.config.get("verbose", True):
+                result = subprocess.run(
+                    cmd,
+                    text=True,
+                    timeout=self.config.get("timeout", 300),
+                    cwd=os.getcwd(),
+                    encoding='utf-8',
+                    errors='replace',
+                    capture_output=False,
+                    env=os.environ
+                )
+                stdout_content = ""
+                stderr_content = ""
+            else:
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.config.get("timeout", 300),
+                    cwd=os.getcwd(),
+                    encoding='utf-8',
+                    env=os.environ,
+                    errors='replace'
+                )
+                stdout_content = result.stdout
+                stderr_content = result.stderr
+            
+            duration = time.time() - start_time
+            
+            # Limpiar archivo temporal
+            try:
+                os.unlink(json_output_path)
+            except:
+                pass
+            
+            return {
+                "success": result.returncode == 0,
+                "duration": duration,
+                "stdout": stdout_content,
+                "stderr": stderr_content,
+                "returncode": result.returncode
+            }
+            
+        except subprocess.TimeoutExpired:
+            duration = time.time() - start_time
+            return {
+                "success": False,
+                "duration": duration,
+                "stdout": "",
+                "stderr": "Test execution timed out",
+                "returncode": -1
+            }
+        except Exception as e:
+            duration = time.time() - start_time
+            return {
+                "success": False,
+                "duration": duration,
+                "stdout": "",
+                "stderr": str(e),
+                "returncode": -1
+            }
+    
     def run_features_sequential(self, feature_files: List[Path]) -> List[Dict[str, Any]]:
         """Ejecutar features secuencialmente"""
         results = []
@@ -542,11 +659,25 @@ class BaseRunner:
             self.log(f"🚫 Tags excluidos: {', '.join(exclude_tags)}")
         
         # Ejecutar features
-        if self.parallel and len(feature_files) > 1:
+        if self.run_all_features_together and not self.parallel:
+            # Ejecutar todos los features en una sola llamada a behave
+            # Esto genera un solo reporte HTML con todos los features
+            self.log("📝 Ejecutando todos los features juntos (un solo reporte)")
+            single_result = self.run_all_features_in_one_execution(feature_files)
+            execution_results = [single_result]
+            
+            # Actualizar estadísticas basadas en el resultado
+            if single_result["success"]:
+                self.results["passed"] = len(feature_files)
+                self.log(f"✅ Todos los features - PASSED ({single_result['duration']:.2f}s)")
+            else:
+                self.results["failed"] = len(feature_files)
+                self.log(f"❌ Ejecución - FAILED ({single_result['duration']:.2f}s)")
+        elif self.parallel and len(feature_files) > 1:
             self.log(f"🚀 Ejecutando en paralelo con {self.max_workers} hilos")
             execution_results = self.run_features_parallel(feature_files)
         else:
-            self.log("📝 Ejecutando secuencialmente")
+            self.log("📝 Ejecutando secuencialmente (un feature a la vez)")
             execution_results = self.run_features_sequential(feature_files)
         
         # Finalizar

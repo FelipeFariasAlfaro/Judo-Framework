@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Judo Framework - Documentación Completa</title>
+    <style>
+    .judo-docs-container {
+        display: flex;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .judo-sidebar {
+        width: 280px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px 0 0 8px;
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .judo-sidebar h3 {
+        color: white;
+        margin: 0 0 20px 0;
+        font-size: 1.5em;
+        text-align: center;
+        border-bottom: 2px solid rgba(255,255,255,0.3);
+        padding-bottom: 10px;
+    }
+
+    .judo-nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .judo-nav-list li {
+        margin-bottom: 8px;
+    }
+
+    .nav-link {
+        display: block;
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .judo-content {
+        flex: 1;
+        padding: 30px;
+        background: white;
+        border-radius: 0 8px 8px 0;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .judo-section {
+        display: none;
+    }
+
+    .judo-section.active {
+        display: block;
+    }
+
+    .judo-section h1 {
+        color: #2c3e50;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+        margin-bottom: 25px;
+    }
+
+    .judo-section h2 {
+        color: #34495e;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+
+    .judo-section h3 {
+        color: #7f8c8d;
+        margin-top: 25px;
+        margin-bottom: 10px;
+    }
+
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 15px;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    code {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+    }
+
+    pre code {
+        background: none;
+        padding: 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    th, td {
+        border: 1px solid #dee2e6;
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .highlight {
+        background: #fff3cd;
+        padding: 15px;
+        border-left: 4px solid #ffc107;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+
+    .info-box {
+        background: #d1ecf1;
+        padding: 15px;
+        border-left: 4px solid #17a2b8;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+
+    .warning-box {
+        background: #f8d7da;
+        padding: 15px;
+        border-left: 4px solid #dc3545;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+
+    .success-box {
+        background: #d4edda;
+        padding: 15px;
+        border-left: 4px solid #28a745;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .feature-card {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 0 6px 6px 0;
+    }
+
+    ul, ol {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 5px;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .judo-docs-container {
+            flex-direction: column;
+        }
+        
+        .judo-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .judo-content {
+            border-radius: 0 0 8px 8px;
+        }
+    }
+    </style>
+</head>
+<body>
+
+<div class="judo-docs-container">
+    <!-- Sidebar Navigation -->
+    <nav class="judo-sidebar">
+        <h3>🥋 Judo Framework</h3>
+        <ul class="judo-nav-list">
+            <li><a href="#overview" class="nav-link active" onclick="showSection('overview')">Resumen</a></li>
+            <li><a href="#whats-new" class="nav-link" onclick="showSection('whats-new')">Novedades</a></li>
+            <li><a href="#why-judo" class="nav-link" onclick="showSection('why-judo')">¿Por qué Judo?</a></li>
+            <li><a href="#architecture" class="nav-link" onclick="showSection('architecture')">Arquitectura</a></li>
+            <li><a href="#quick-start" class="nav-link" onclick="showSection('quick-start')">Inicio Rápido</a></li>
+            <li><a href="#project-structure" class="nav-link" onclick="showSection('project-structure')">Estructura de Proyecto</a></li>
+            <li><a href="#installation" class="nav-link" onclick="showSection('installation')">Instalación</a></li>
+            <li><a href="#features" class="nav-link" onclick="showSection('features')">Características</a></li>
+            <li><a href="#comparison" class="nav-link" onclick="showSection('comparison')">vs Karate</a></li>
+            <li><a href="#steps-config" class="nav-link" onclick="showSection('steps-config')">Pasos: Configuración</a></li>
+            <li><a href="#steps-auth" class="nav-link" onclick="showSection('steps-auth')">Pasos: Autenticación</a></li>
+            <li><a href="#steps-http" class="nav-link" onclick="showSection('steps-http')">Pasos: HTTP</a></li>
+            <li><a href="#steps-validation" class="nav-link" onclick="showSection('steps-validation')">Pasos: Validación</a></li>
+            <li><a href="#steps-data" class="nav-link" onclick="showSection('steps-data')">Pasos: Datos</a></li>
+            <li><a href="#steps-variables" class="nav-link" onclick="showSection('steps-variables')">Pasos: Variables</a></li>
+            <li><a href="#steps-files" class="nav-link" onclick="showSection('steps-files')">Pasos: Archivos</a></li>
+            <li><a href="#steps-arrays" class="nav-link" onclick="showSection('steps-arrays')">Pasos: Arrays</a></li>
+            <li><a href="#steps-schema" class="nav-link" onclick="showSection('steps-schema')">Pasos: Esquemas</a></li>
+            <li><a href="#steps-types" class="nav-link" onclick="showSection('steps-types')">Pasos: Tipos</a></li>
+            <li><a href="#steps-utility" class="nav-link" onclick="showSection('steps-utility')">Pasos: Utilidad</a></li>
+            <li><a href="#patterns" class="nav-link" onclick="showSection('patterns')">Patrones</a></li>
+            <li><a href="#examples" class="nav-link" onclick="showSection('examples')">Ejemplos Avanzados</a></li>
+            <li><a href="#documentation" class="nav-link" onclick="showSection('documentation')">Documentación</a></li>
+            <li><a href="#contributing" class="nav-link" onclick="showSection('contributing')">Contribuir</a></li>
+            <li><a href="#author" class="nav-link" onclick="showSection('author')">Autor y CENTYC</a></li>
+        </ul>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="judo-content">
+        
+        <!-- Overview Section -->
+        <section id="overview" class="judo-section active">
+            <h1>🥋 Judo Framework</h1>
+            <p><strong>Un framework integral de pruebas de API para Python, inspirado en Karate Framework</strong></p>
+            <p>
+                <span class="badge badge-primary">Python 3.8+</span>
+                <span class="badge badge-success">Licencia MIT</span>
+                <span class="badge badge-info">v1.3.36</span>
+            </p>
+            <blockquote style="border-left: 4px solid #007bff; padding-left: 20px; margin: 20px 0; font-style: italic; color: #555;">
+                "Tan simple como Karate, tan poderoso como Python"
+            </blockquote>
+            <p>Judo Framework trae la simplicidad y elegancia de Karate Framework al ecosistema de Python. Escribe pruebas de API en español (¡o inglés!), obtén reportes HTML hermosos automáticamente, y disfruta del poder del ecosistema de Python.</p>
+            
+            <h3>🌐 Soporte de Idiomas</h3>
+            <ul>
+                <li><strong>🇺🇸 Inglés</strong> - Definiciones completas de pasos</li>
+                <li><strong>🇪🇸 Español</strong> - Definiciones completas de pasos</li>
+            </ul>
+            
+            <h3>📦 Instalación</h3>
+            <pre><code>pip install judo-framework</code></pre>
+            
+            <h3>🔗 Enlaces</h3>
+            <ul>
+                <li><strong>PyPI:</strong> <a href="https://pypi.org/project/judo-framework/" target="_blank">https://pypi.org/project/judo-framework/</a></li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework" target="_blank">https://github.com/FelipeFariasAlfaro/Judo-Framework</a></li>
+                <li><strong>CENTYC:</strong> <a href="https://www.centyc.cl" target="_blank">https://www.centyc.cl</a></li>
+            </ul>
+        </section>
+        <!-- What's New Section -->
+        <section id="whats-new" class="judo-section">
+            <h1>🎉 Novedades en v1.3.36</h1>
+            
+            <h3>🚀 Reporte HTML Consolidado Único</h3>
+            <p><strong>SOLUCIONADO:</strong> Múltiples features ahora generan un solo reporte HTML en lugar de sobrescribirse entre sí</p>
+            <ul>
+                <li>✅ Nuevo parámetro <code>run_all_features_together=True</code> (por defecto)</li>
+                <li>✅ Todos los features ejecutados en una sola llamada a behave</li>
+                <li>✅ Funciona con features de idiomas mixtos (Inglés + Español)</li>
+                <li>✅ No más reportes sobrescritos</li>
+            </ul>
+            
+            <h3>🔐 Soporte de Variables de Entorno (.env)</h3>
+            <p><strong>NUEVO en v1.3.35:</strong> Carga headers desde variables de entorno y archivos .env</p>
+            <ul>
+                <li>✅ Agregada dependencia <code>python-dotenv>=1.0.0</code></li>
+                <li>✅ Nuevos pasos para cargar headers desde archivos .env</li>
+                <li>✅ Perfecto para API keys, tokens y datos sensibles</li>
+                <li>✅ Mantiene credenciales fuera del control de versiones</li>
+            </ul>
+            
+            <h3>📊 Reportes HTML Mejorados</h3>
+            <p>Reportes profesionales con logos oficiales de CENTYC y Judo Framework</p>
+            <ul>
+                <li>✅ Diseño moderno con headers degradados</li>
+                <li>✅ Layout responsivo para todos los dispositivos</li>
+                <li>✅ Footer profesional con información de contacto</li>
+                <li>✅ Detalles completos de request/response</li>
+            </ul>
+            
+            <h3>💾 Logging de Request/Response</h3>
+            <p>Guardado automático de interacciones HTTP en archivos JSON</p>
+            <ul>
+                <li>✅ Headers completos, body, timing y metadata</li>
+                <li>✅ Organizados por escenario con archivos numerados</li>
+                <li>✅ Configurable vía variables de entorno o runner</li>
+            </ul>
+            
+            <p><a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/blob/main/CHANGELOG.md" target="_blank">Ver changelog completo →</a></p>
+        </section>
+
+        <!-- Why Judo Section -->
+        <section id="why-judo" class="judo-section">
+            <h1>⭐ ¿Por qué Judo Framework?</h1>
+            
+            <h2>✅ Configuración Simple (¡Solo 10 Líneas!)</h2>
+            <pre><code># features/environment.py
+from judo.behave import *
+
+before_all = before_all_judo
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_scenario = before_scenario_judo
+after_scenario = after_scenario_judo
+before_step = before_step_judo
+after_step = after_step_judo
+after_all = after_all_judo</code></pre>
+            <p><strong>¡Eso es todo!</strong> Reportes HTML automáticos, seguimiento completo de pruebas y estadísticas detalladas incluidas.</p>
+            
+            <h2>🚀 Escribe Pruebas en Lenguaje Natural</h2>
+            <pre><code># language: es
+Característica: Pruebas de API de Usuarios
+
+  Escenario: Crear un nuevo usuario
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://api.example.com"
+    Cuando hago una petición POST a "/users" con el cuerpo:
+      """
+      {
+        "name": "Juan Pérez",
+        "email": "juan@example.com"
+      }
+      """
+    Entonces el código de respuesta debe ser 201
+    Y la respuesta debe contener el campo "id"
+    Y el campo "name" debe ser "Juan Pérez"</code></pre>
+            
+            <h2>🇺🇸 Soporte Completo de Inglés</h2>
+            <pre><code># language: en
+Feature: User API Testing
+
+  Scenario: Create a new user
+    Given I have a Judo API client
+    And the base URL is "https://api.example.com"
+    When I send a POST request to "/users" with JSON:
+      """
+      {
+        "name": "John Doe",
+        "email": "john@example.com"
+      }
+      """
+    Then the response status should be 201
+    And the response should contain "id"
+    And the response field "name" should equal "John Doe"</code></pre>
+            
+            <h2>📊 Reportes HTML Hermosos (¡Automáticos!)</h2>
+            <p>Cada ejecución de pruebas genera un reporte HTML integral con:</p>
+            <ul>
+                <li>✅ Detalles completos de request/response</li>
+                <li>📋 Todos los escenarios y pasos con estado</li>
+                <li>⏱️ Tiempos de ejecución y métricas de rendimiento</li>
+                <li>🔍 Mensajes de error con stack traces completos</li>
+                <li>📈 Tasa de éxito y estadísticas</li>
+                <li>🎨 UI limpia y moderna con branding profesional</li>
+            </ul>
+            <p><strong>No se necesita configuración</strong> - los reportes se generan automáticamente en <code>judo_reports/</code></p>
+        </section>
+        <!-- Architecture Section -->
+        <section id="architecture" class="judo-section">
+            <h1>🏗️ Arquitectura</h1>
+            
+            <h2>Componentes Principales</h2>
+            <ul>
+                <li><strong>judo.core</strong> - DSL principal y cliente HTTP con sintaxis similar a Karate</li>
+                <li><strong>judo.behave</strong> - Integración con Behave/Gherkin con más de 100 pasos predefinidos</li>
+                <li><strong>judo.runner</strong> - Ejecución de pruebas, procesamiento paralelo y BaseRunner</li>
+                <li><strong>judo.reporting</strong> - Generación de reportes HTML con diseño profesional</li>
+                <li><strong>judo.http</strong> - Cliente HTTP avanzado con soporte de autenticación</li>
+                <li><strong>judo.mock</strong> - Servidor mock integrado para pruebas sin dependencias</li>
+                <li><strong>judo.utils</strong> - Cargadores de archivos, helpers y funciones de utilidad</li>
+            </ul>
+            
+            <h2>Flujo de Ejecución</h2>
+            <pre><code>┌─────────────────────────────────────────────────────────┐
+│                 Archivos Feature (.feature)              │
+│              (Escenarios de Prueba Gherkin/BDD)         │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Framework Behave                       │
+│            (Ejecutor de Pruebas BDD - Python)          │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│              Integración Judo Behave                    │
+│    • Auto Hooks (before/after scenario/step)           │
+│    • Más de 100 Pasos Predefinidos (ES + EN)          │
+│    • JudoContext (gestión de estado)                   │
+└────────────────────┬────────────────────────────────────┘
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│ Cliente  │  │ Sistema  │  │ Gestor   │
+│   HTTP   │  │Reporter  │  │Variables │
+└──────────┘  └──────────┘  └──────────┘
+        │            │            │
+        └────────────┼────────────┘
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Ejecución de Pruebas                   │
+│  • Peticiones HTTP → API Bajo Prueba                   │
+│  • Validación de Respuestas                            │
+│  • Extracción y Almacenamiento de Datos                │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                Generación de Reporte HTML               │
+│  • Automático después de cada ejecución                │
+│  • Detalles completos de request/response              │
+│  • Estadísticas y métricas                             │
+└─────────────────────────────────────────────────────────┘</code></pre>
+            
+            <h2>Arquitectura del BaseRunner</h2>
+            <p>El BaseRunner proporciona una API de Python para ejecutar pruebas programáticamente:</p>
+            <ul>
+                <li><strong>Descubrimiento de Features</strong> - Encuentra archivos .feature basado en tags y rutas</li>
+                <li><strong>Modos de Ejecución</strong> - Secuencial, paralelo o ejecución consolidada</li>
+                <li><strong>Generación de Reportes</strong> - Reportes HTML únicos o múltiples</li>
+                <li><strong>Logging de Request/Response</strong> - Captura automática de interacciones HTTP</li>
+                <li><strong>Integración de Entorno</strong> - Soporte para archivos .env y variables</li>
+            </ul>
+            
+            <pre><code>from judo.runner.base_runner import BaseRunner
+
+runner = BaseRunner(
+    features_dir="features",
+    output_dir="judo_reports",
+    run_all_features_together=True,  # Reporte consolidado único
+    save_requests_responses=True,
+    requests_responses_dir="api_logs"
+)
+
+results = runner.run(tags=["@smoke"])
+print(f"Pasaron: {results['passed']}/{results['total']}")</code></pre>
+        </section>
+
+        <!-- Quick Start Section -->
+        <section id="quick-start" class="judo-section">
+            <h1>🚀 Guía de Inicio Rápido</h1>
+            <p>¡Comienza con Judo Framework en menos de 5 minutos!</p>
+            
+            <h2>📦 Paso 1: Instalar (30 segundos)</h2>
+            <pre><code>pip install judo-framework</code></pre>
+            
+            <h2>📝 Paso 2: Crear Tu Primera Prueba (2 minutos)</h2>
+            
+            <h3>Crear Archivo Feature</h3>
+            <p><strong>features/mi_primera_prueba.feature:</strong></p>
+            <pre><code># language: es
+Característica: Mi Primera Prueba de API
+
+  Escenario: Obtener información de usuario
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://jsonplaceholder.typicode.com"
+    Cuando hago una petición GET a "/users/1"
+    Entonces el código de respuesta debe ser 200
+    Y la respuesta debe contener el campo "name"
+    Y la respuesta debe contener el campo "email"</code></pre>
+            
+            <h3>Crear Archivo de Entorno</h3>
+            <p><strong>features/environment.py:</strong></p>
+            <pre><code>from judo.behave import *
+
+before_all = before_all_judo
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_scenario = before_scenario_judo
+after_scenario = after_scenario_judo
+before_step = before_step_judo
+after_step = after_step_judo
+after_all = after_all_judo</code></pre>
+            
+            <h2>🏃 Paso 3: Ejecutar Tu Prueba (30 segundos)</h2>
+            <pre><code>behave features/</code></pre>
+            
+            <p><strong>Verás:</strong></p>
+            <pre><code>🥋 Judo Framework - Captura automática de reportes activada
+
+📋 Característica: Mi Primera Prueba de API
+  📝 Escenario: Obtener información de usuario
+    ✅ Dado que tengo un cliente Judo API
+    ✅ Y que la URL base es "https://jsonplaceholder.typicode.com"
+    ✅ Cuando hago una petición GET a "/users/1"
+    ✅ Entonces el código de respuesta debe ser 200
+    ✅ Y la respuesta debe contener el campo "name"
+    ✅ Y la respuesta debe contener el campo "email"
+  ✅ Escenario completado: Obtener información de usuario
+
+📊 Reporte HTML generado: judo_reports/test_execution_report.html
+
+============================================================
+📈 RESUMEN DE EJECUCIÓN
+============================================================
+Features:  1
+Escenarios: 1 (✅ 1 | ❌ 0 | ⏭️ 0)
+Pasos:     6 (✅ 6 | ❌ 0 | ⏭️ 0)
+Tasa de éxito: 100.0%
+============================================================</code></pre>
+            
+            <h2>🎉 ¡Eso es Todo!</h2>
+            <p>Ahora tienes:</p>
+            <ul>
+                <li>✅ Una prueba de API funcionando</li>
+                <li>✅ Reporte HTML automático en <code>judo_reports/</code></li>
+                <li>✅ Seguimiento completo de ejecución de pruebas</li>
+                <li>✅ Salida hermosa en consola</li>
+            </ul>
+        </section>
+        
+        <!-- Project Structure Section -->
+        <section id="project-structure" class="judo-section">
+            <h1>📁 Estructura de Proyecto Recomendada</h1>
+            
+            <h2>Estructura Básica</h2>
+            <p>Judo Framework funciona mejor con una estructura de proyecto organizada. Aquí está la estructura recomendada:</p>
+            
+            <pre><code>MiProyectoAPI/
+├── 📁 .venv/                          # Entorno virtual Python
+├── 📁 features/                       # Archivos de pruebas BDD
+│   ├── 📁 steps/                      # Pasos personalizados (opcional)
+│   ├── 🥒 api_usuarios.feature        # Features de pruebas
+│   ├── 🥒 api_productos.feature
+│   └── 🐍 environment.py              # Configuración Judo
+├── 📁 Runner/                         # Ejecutor personalizado (opcional)
+│   ├── 📁 judo_reports/               # Reportes HTML generados
+│   │   ├── 📁 api_logs/               # Logs de requests/responses
+│   │   └── 📄 test_execution_report.html
+│   └── 🐍 runner.py                   # BaseRunner personalizado
+├── 📁 test_data/                      # Datos de prueba
+│   ├── 📁 requests/                   # JSONs para requests
+│   ├── 📁 responses/                  # Respuestas esperadas
+│   └── 📁 schemas/                    # Esquemas JSON
+├── 📁 base_requests/                  # Templates de requests (opcional)
+├── 📁 base_responses/                 # Templates de responses (opcional)
+├── 📁 base_variables/                 # Variables base (opcional)
+├── 📄 .env                            # Variables de entorno
+├── 📄 requirements.txt                # Dependencias Python
+└── 📄 README.md                       # Documentación del proyecto</code></pre>
+            
+            <h2>Descripción de Directorios</h2>
+            
+            <h3>📁 features/</h3>
+            <p><strong>Directorio principal de pruebas BDD</strong></p>
+            <ul>
+                <li><strong>*.feature</strong> - Archivos Gherkin con escenarios de prueba</li>
+                <li><strong>environment.py</strong> - Configuración de hooks de Judo Framework</li>
+                <li><strong>steps/</strong> - Pasos personalizados adicionales (opcional)</li>
+            </ul>
+            
+            <h3>📁 Runner/ (Opcional)</h3>
+            <p><strong>Para proyectos que usan BaseRunner</strong></p>
+            <ul>
+                <li><strong>runner.py</strong> - Configuración personalizada del BaseRunner</li>
+                <li><strong>judo_reports/</strong> - Reportes HTML y logs generados automáticamente</li>
+                <li><strong>api_logs/</strong> - Logs detallados de requests/responses JSON</li>
+            </ul>
+            
+            <h3>📁 test_data/</h3>
+            <p><strong>Datos de prueba organizados</strong></p>
+            <ul>
+                <li><strong>requests/</strong> - Archivos JSON para cuerpos de peticiones</li>
+                <li><strong>responses/</strong> - Respuestas esperadas para validación</li>
+                <li><strong>schemas/</strong> - Esquemas JSON para validación de estructura</li>
+            </ul>
+            
+            <h3>📁 base_* (Opcional)</h3>
+            <p><strong>Templates y configuraciones base</strong></p>
+            <ul>
+                <li><strong>base_requests/</strong> - Templates de requests reutilizables</li>
+                <li><strong>base_responses/</strong> - Templates de responses</li>
+                <li><strong>base_variables/</strong> - Variables base del proyecto</li>
+            </ul>
+            
+            <h2>Archivos Clave</h2>
+            
+            <h3>📄 features/environment.py</h3>
+            <p><strong>Configuración mínima requerida:</strong></p>
+            <pre><code>from judo.behave import *
+
+before_all = before_all_judo
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_scenario = before_scenario_judo
+after_scenario = after_scenario_judo
+before_step = before_step_judo
+after_step = after_step_judo
+after_all = after_all_judo</code></pre>
+            
+            <h3>📄 .env</h3>
+            <p><strong>Variables de entorno para datos sensibles:</strong></p>
+            <pre><code># API Configuration
+API_BASE_URL=https://api.example.com
+API_TOKEN=Bearer abc123xyz789
+API_KEY=sk_test_456789
+
+# Database (si aplica)
+DB_HOST=localhost
+DB_USER=testuser
+DB_PASS=testpass
+
+# Environment
+ENVIRONMENT=testing
+DEBUG=true</code></pre>
+            
+            <h3>📄 Runner/runner.py (Opcional)</h3>
+            <p><strong>BaseRunner personalizado con configuración avanzada:</strong></p>
+            <pre><code>from judo.runner.base_runner import BaseRunner
+import os
+
+# Habilitar debug del reporter
+os.environ['JUDO_DEBUG_REPORTER'] = 'true'
+
+class MiRunner(BaseRunner):
+    def __init__(self):
+        # Ajustar rutas a tu estructura
+        super().__init__(
+            features_dir="../features",  # Subir un nivel y entrar a features
+            output_dir="./judo_reports",  # Reportes en Runner/judo_reports
+            
+            generate_cucumber_json=False,
+            cucumber_json_dir="./judo_reports/cucumber-json",
+            
+            parallel=False,
+            max_workers=6,
+            
+            save_requests_responses=True,  # 🆕 Habilitar logging
+            requests_responses_dir="./judo_reports/api_logs"
+        )
+    
+    def run_smoke_tests(self):
+        features = self.find_features(tags=["@smoke"])
+        print(f"📁 Archivos encontrados con @smoke:")
+        for f in features:
+            print(f"  - {f}")
+        
+        return self.run(tags=["@smoke"])
+    
+    def run_headers_tests(self):
+        features = self.find_features(tags=["@headers"])
+        print(f"📁 Archivos encontrados con @headers:")
+        for f in features:
+            print(f"  - {f}")
+        
+        return self.run(tags=["@headers"])
+    
+    def run_api_tests_parallel(self):
+        self.set_parallel(True, max_workers=8)
+        return self.run(tags=["@api"], exclude_tags=["@manual"])
+
+# Uso
+if __name__ == "__main__":
+    # Cambiar al directorio correcto
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    
+    runner = MiRunner()
+    
+    print("🥋 Judo Framework - Ejecutando desde Runner/")
+    print(f"📁 features dir: {os.path.abspath('../features')}")
+    print(f"📊 Reports dir: {os.path.abspath('./judo_reports')}")
+    
+    try:
+        results = runner.run_smoke_tests()
+        print(f"📊 Resultado: {results['passed']}/{results['total']} tests pasaron")
+        
+        if results['total'] > 0:
+            print(f"📄 Ver reporte HTML en: Runner/judo_reports/")
+    
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        print("💡 Verifica que los archivos .feature tengan los tags correctos")</code></pre>
+            
+            <h2>Ejemplo de Feature</h2>
+            <p><strong>features/api_usuarios.feature:</strong></p>
+            <pre><code># language: es
+@usuarios @api
+Característica: API de Gestión de Usuarios
+  Como desarrollador
+  Quiero probar la API de usuarios
+  Para asegurar que funciona correctamente
+
+  Antecedentes:
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://api.example.com"
+    Y que establezco el header "Authorization" desde env "API_TOKEN"
+
+  @smoke @crear
+  Escenario: Crear un nuevo usuario
+    Cuando hago una petición POST a "/users" con archivo JSON "test_data/requests/nuevo_usuario.json"
+    Entonces el código de respuesta debe ser 201
+    Y la respuesta debe coincidir con el archivo de esquema "test_data/schemas/usuario_schema.json"
+    Y guardo el valor del campo "id" en la variable "userId"
+
+  @smoke @consultar
+  Escenario: Consultar usuario creado
+    Dado que establezco la variable "userId" a 1
+    Cuando hago una petición GET a "/users/{userId}"
+    Entonces el código de respuesta debe ser 200
+    Y la respuesta debe contener el campo "name"
+    Y la respuesta debe contener el campo "email"</code></pre>
+            
+            <h2>Comandos de Ejecución</h2>
+            
+            <h3>Ejecución Directa con Behave</h3>
+            <pre><code># Ejecutar todas las pruebas
+behave features/
+
+# Ejecutar por tags
+behave features/ --tags=@smoke
+behave features/ --tags=@usuarios
+behave features/ --tags="@smoke and @usuarios"
+
+# Ejecutar feature específico
+behave features/api_usuarios.feature
+
+# Ejecutar con formato específico
+behave features/ --format=progress</code></pre>
+            
+            <h3>Ejecución con BaseRunner</h3>
+            <pre><code># Desde el directorio Runner/
+cd Runner/
+python runner.py
+
+# O ejecutar métodos específicos
+python -c "from runner import MiRunner; MiRunner().run_smoke_tests()"</code></pre>
+            
+            <h2>Mejores Prácticas</h2>
+            
+            <h3>🏷️ Organización con Tags</h3>
+            <ul>
+                <li><strong>@smoke</strong> - Pruebas críticas básicas</li>
+                <li><strong>@regression</strong> - Suite completa de regresión</li>
+                <li><strong>@api</strong> - Todas las pruebas de API</li>
+                <li><strong>@usuarios</strong> - Pruebas específicas de usuarios</li>
+                <li><strong>@productos</strong> - Pruebas específicas de productos</li>
+                <li><strong>@crear, @actualizar, @eliminar</strong> - Por operación CRUD</li>
+            </ul>
+            
+            <h3>📂 Organización de Archivos</h3>
+            <ul>
+                <li>Un feature por módulo/entidad de la API</li>
+                <li>Nombres descriptivos para archivos de datos</li>
+                <li>Esquemas JSON reutilizables</li>
+                <li>Variables de entorno para datos sensibles</li>
+            </ul>
+            
+            <h3>🔄 Flujo de Trabajo</h3>
+            <ol>
+                <li>Crear/actualizar archivos .feature</li>
+                <li>Preparar datos de prueba en test_data/</li>
+                <li>Configurar variables en .env</li>
+                <li>Ejecutar pruebas con behave o BaseRunner</li>
+                <li>Revisar reportes HTML en judo_reports/</li>
+                <li>Analizar logs de API en api_logs/ si es necesario</li>
+            </ol>
+            
+            <div style="background-color: #e8f4fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <h4>💡 Consejo Pro</h4>
+                <p>Usa esta estructura desde el inicio de tu proyecto. Te ahorrará tiempo en organización y mantenimiento a largo plazo. La estructura es escalable y funciona tanto para proyectos pequeños como grandes.</p>
+            </div>
+        </section>
+        
+        <!-- Installation Section -->
+        <section id="installation" class="judo-section">
+            <h1>🔧 Opciones de Instalación</h1>
+            
+            <h2>Instalación Básica</h2>
+            <pre><code>pip install judo-framework</code></pre>
+            
+            <h2>Con Características Opcionales</h2>
+            
+            <h3>Soporte de criptografía (JWT, OAuth, encriptación)</h3>
+            <pre><code>pip install judo-framework[crypto]</code></pre>
+            
+            <h3>Soporte de pruebas XML/SOAP</h3>
+            <pre><code>pip install judo-framework[xml]</code></pre>
+            
+            <h3>Automatización de navegador (Selenium, Playwright)</h3>
+            <pre><code>pip install judo-framework[browser]</code></pre>
+            
+            <h3>Todas las características</h3>
+            <pre><code>pip install judo-framework[full]</code></pre>
+            
+            <h2>Requisitos</h2>
+            <ul>
+                <li>Python 3.8 o superior</li>
+                <li>pip (gestor de paquetes de Python)</li>
+                <li>behave (se instala automáticamente)</li>
+                <li>python-dotenv (para soporte .env)</li>
+            </ul>
+            
+            <h2>Verificar Instalación</h2>
+            <pre><code>python -c "import judo; print(f'Judo Framework v{judo.__version__} instalado exitosamente!')"</code></pre>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="judo-section">
+            <h1>🎯 Características Principales</h1>
+            
+            <h2>🥋 DSL Similar a Karate</h2>
+            <p>Sintaxis familiar para usuarios de Karate Framework con el poder de Python:</p>
+            <pre><code>from judo import Judo
+
+judo = Judo()
+response = judo.get("https://api.example.com/users/1")
+
+# Matching estilo Karate
+judo.match(response.status, 200)
+judo.match(response.json["name"], "##string")
+judo.match(response.json["email"], "##email")
+judo.match(response.json["age"], "##number")</code></pre>
+            
+            <h2>🎭 Integración BDD (Behave/Gherkin)</h2>
+            <p>Soporte completo de Behave con más de 100 pasos predefinidos en inglés y español</p>
+            
+            <h2>🌐 Pruebas HTTP Completas</h2>
+            <p>Todos los métodos HTTP con control total:</p>
+            <pre><code>Escenario: Operaciones CRUD completas
+  Dado que tengo un cliente Judo API
+  Y que la URL base es "https://api.example.com"
+  
+  # CREAR
+  Cuando hago una petición POST a "/users" con el cuerpo:
+    """
+    {"name": "Juan", "email": "juan@example.com"}
+    """
+  Entonces el código de respuesta debe ser 201
+  Y guardo el valor del campo "id" en la variable "userId"
+  
+  # LEER
+  Cuando hago una petición GET a "/users/{userId}"
+  Entonces el código de respuesta debe ser 200
+  
+  # ACTUALIZAR
+  Cuando hago una petición PUT a "/users/{userId}" con el cuerpo:
+    """
+    {"name": "Juan Actualizado"}
+    """
+  Entonces el código de respuesta debe ser 200
+  
+  # ELIMINAR
+  Cuando hago una petición DELETE a "/users/{userId}"
+  Entonces el código de respuesta debe ser 204</code></pre>
+            
+            <h2>🔐 Soporte de Variables de Entorno</h2>
+            <p>Carga datos sensibles desde archivos .env:</p>
+            <pre><code># archivo .env
+API_TOKEN=Bearer abc123xyz
+API_KEY=sk_test_456789
+
+# En tus pruebas
+Dado que establezco el header "Authorization" desde env "API_TOKEN"
+Y que establezco el header "X-API-Key" desde env "API_KEY"</code></pre>
+            
+            <h2>📄 Soporte de Archivos (Como read() de Karate)</h2>
+            <p>Carga datos de prueba desde archivos JSON, YAML o CSV:</p>
+            <pre><code># Cargar datos de prueba
+user_data = judo.read("test_data/users/create_user.json")
+response = judo.post("/users", json=user_data)
+
+# En Gherkin
+Escenario: Crear usuario desde archivo
+  Cuando hago una petición POST a "/users" con archivo JSON "test_data/users/juan.json"
+  Entonces el código de respuesta debe ser 201</code></pre>
+            
+            <h2>⚡ Ejecución Paralela</h2>
+            <p>Ejecuta pruebas más rápido con ejecución paralela:</p>
+            <pre><code>from judo.runner import BaseRunner
+
+runner = BaseRunner(
+    features_dir="features",
+    parallel=True,
+    max_workers=8
+)
+
+results = runner.run(tags=["@api"])</code></pre>
+            
+            <h2>🎭 Servidor Mock Integrado</h2>
+            <p>Prueba sin dependencias externas:</p>
+            <pre><code>from judo import Judo
+
+judo = Judo()
+
+# Iniciar servidor mock
+mock = judo.start_mock(port=8080)
+
+# Configurar respuestas mock
+mock.when("GET", "/users/1").then(
+    status=200,
+    json={"id": 1, "name": "Usuario Mock"}
+)
+
+# Probar contra mock
+response = judo.get("http://localhost:8080/users/1")
+judo.match(response.json["name"], "Usuario Mock")</code></pre>
+            
+            <h2>✅ Validación de Esquemas</h2>
+            <p>Valida respuestas contra esquemas JSON:</p>
+            <pre><code>Escenario: Validar esquema de usuario
+  Cuando hago una petición GET a "/users/1"
+  Entonces la respuesta debe coincidir con el archivo de esquema "schemas/user_schema.json"</code></pre>
+        </section>
+        <!-- Comparison Section -->
+        <section id="comparison" class="judo-section">
+            <h1>🆚 Comparación con Karate</h1>
+            
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Característica</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Karate (Java)</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Judo (Python)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Lenguaje</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Java/JavaScript</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Python</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Soporte BDD</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Cucumber</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Behave</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Sintaxis DSL</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ DSL Karate</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ DSL Similar</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Pruebas HTTP</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Completo</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Completo</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Soporte de Archivos</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ read()</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ read()</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Reportes HTML</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Integrado</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Automático</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Ejecución Paralela</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Sí</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Servidor Mock</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Sí</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Soporte Español</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">❌ No</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Variables de Entorno</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">❌ Limitado</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Soporte completo .env</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Complejidad de Configuración</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Media</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Muy Simple</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Ecosistema Python</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">❌ No</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Acceso Completo</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2>Ejemplo de Migración</h2>
+            
+            <h3>Karate:</h3>
+            <pre><code>Feature: User API
+
+Scenario: Get user
+  Given url 'https://api.example.com'
+  And path 'users', 1
+  When method get
+  Then status 200
+  And match response.name == '#string'
+  And match response.email == '#email'</code></pre>
+            
+            <h3>Judo:</h3>
+            <pre><code>Característica: API de Usuario
+
+Escenario: Obtener usuario
+  Dado que tengo un cliente Judo API
+  Y que la URL base es "https://api.example.com"
+  Cuando hago una petición GET a "/users/1"
+  Entonces el código de respuesta debe ser 200
+  Y el campo "name" debe ser una cadena
+  Y el campo "email" debe ser un email</code></pre>
+        </section>
+        <!-- Steps: Configuration -->
+        <section id="steps-config" class="judo-section">
+            <h1>🔧 Pasos de Configuración</h1>
+            
+            <h2>Inicializar Cliente Judo</h2>
+            <p><strong>Español:</strong> <code>Dado que tengo un cliente Judo API</code></p>
+            <p>Inicializa el contexto Judo para pruebas de API.</p>
+            <pre><code>Dado que tengo un cliente Judo API</code></pre>
+            
+            <h2>Establecer URL Base</h2>
+            <p><strong>Español:</strong> <code>Dado que la URL base es "{url}"</code></p>
+            <p>Establece la URL base para todas las peticiones API subsecuentes.</p>
+            <pre><code>Dado que la URL base es "https://api.example.com"
+Cuando hago una petición GET a "/users/1"
+# Llamará a: https://api.example.com/users/1</code></pre>
+            
+            <h2>Establecer Variable (Cadena)</h2>
+            <p><strong>Español:</strong> <code>Dado que establezco la variable "{nombre}" a "{valor}"</code></p>
+            <p>Crea o actualiza una variable de cadena para uso posterior.</p>
+            <pre><code>Dado que establezco la variable "claveApi" a "sk_test_abc123xyz"
+Y que establezco el header "Authorization" a "Bearer {claveApi}"</code></pre>
+            
+            <h2>Establecer Variable (Número)</h2>
+            <p><strong>Español:</strong> <code>Dado que establezco la variable "{nombre}" a {valor:d}</code></p>
+            <p>Crea o actualiza una variable numérica.</p>
+            <pre><code>Dado que establezco la variable "idUsuario" a 42
+Cuando hago una petición GET a "/users/{idUsuario}"</code></pre>
+            
+            <h2>Obtener Variable de Entorno (¡NUEVO!)</h2>
+            <p><strong>Español:</strong> <code>obtengo el valor "{nombre_var_env}" desde env y lo almaceno en "{nombre_variable}"</code></p>
+            <p>Obtiene el valor de una variable de entorno (.env) y lo almacena en una variable para uso posterior.</p>
+            <pre><code># Archivo .env:
+BASE_URL=https://api.staging.com
+USER_ID=12345
+
+# En tu prueba:
+Dado que obtengo el valor "BASE_URL" desde env y lo almaceno en "urlBase"
+Y que obtengo el valor "USER_ID" desde env y lo almaceno in "userId"
+Y que la URL base es "{urlBase}"
+Cuando hago una petición GET a "/users/{userId}"</code></pre>
+            
+            <h2>Establecer Variable (JSON)</h2>
+            <p><strong>Español:</strong> <code>Dado que establezco la variable "{nombre}" al JSON</code></p>
+            <p>Almacena un objeto JSON completo en una variable.</p>
+            <pre><code>Dado que establezco la variable "nuevoUsuario" al JSON
+  """
+  {
+    "name": "Juan Pérez",
+    "email": "juan@example.com",
+    "age": 30
+  }
+  """
+Cuando hago una petición POST a "/users" con la variable "nuevoUsuario"</code></pre>
+            
+            <h2>Establecer Header</h2>
+            <p><strong>Español:</strong> <code>Dado que establezco el header "{nombre}" a "{valor}"</code></p>
+            <p>Agrega un header HTTP personalizado a todas las peticiones subsecuentes.</p>
+            <pre><code>Dado que establezco el header "X-API-Version" a "v2"
+Y que establezco el header "Accept-Language" a "es-ES"</code></pre>
+            
+            <h2>Establecer Parámetro de Query</h2>
+            <p><strong>Español:</strong> <code>Dado que establezco el parámetro "{nombre}" a "{valor}"</code></p>
+            <p>Agrega un parámetro de query a la siguiente petición.</p>
+            <pre><code>Dado que establezco el parámetro "pagina" a "1"
+Y que establezco el parámetro "limite" a "10"
+Cuando hago una petición GET a "/users"
+# Llama a: /users?pagina=1&limite=10</code></pre>
+        </section>
+
+        <!-- Steps: Authentication -->
+        <section id="steps-auth" class="judo-section">
+            <h1>🔐 Pasos de Autenticación</h1>
+            
+            <h2>Autenticación con Token Bearer</h2>
+            <p><strong>Español:</strong> <code>Dado que uso el token bearer "{token}"</code></p>
+            <p>Configura autenticación con token Bearer (JWT).</p>
+            <pre><code>Dado que uso el token bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+Cuando hago una petición GET a "/protected/profile"
+Entonces el código de respuesta debe ser 200
+
+# Usando token desde variable
+Dado que hago una petición POST a "/auth/login" con el cuerpo:
+  """
+  {"username": "user@example.com", "password": "secret"}
+  """
+Y guardo el valor del campo "token" en la variable "authToken"
+Y que uso el token bearer "{authToken}"
+Cuando hago una petición GET a "/protected/data"</code></pre>
+            
+            <h2>Autenticación Básica</h2>
+            <p><strong>Español:</strong> <code>Dado que uso autenticación básica con usuario "{usuario}" y contraseña "{password}"</code></p>
+            <p>Configura autenticación HTTP Basic.</p>
+            <pre><code>Dado que uso autenticación básica con usuario "admin" y contraseña "P@ssw0rd123"
+Cuando hago una petición GET a "/admin/users"
+Entonces el código de respuesta debe ser 200</code></pre>
+            
+            <h2>Establecer Header desde Variable de Entorno (¡NUEVO!)</h2>
+            <p><strong>Español:</strong> <code>Dado que establezco el header "{nombre_header}" desde env "{nombre_var_env}"</code></p>
+            <p><strong>Español:</strong> <code>Dado que agrego el header "{nombre_header}" desde env "{nombre_var_env}"</code></p>
+            <p>Carga un valor de header desde variable de entorno o archivo .env.</p>
+            <pre><code># Crear archivo .env:
+# API_TOKEN=Bearer abc123xyz
+# API_KEY=sk_test_456
+
+Dado que establezco el header "Authorization" desde env "API_TOKEN"
+Y que agrego el header "X-API-Key" desde env "API_KEY"
+Cuando hago una petición GET a "/protected/resource"
+Entonces el código de respuesta debe ser 200</code></pre>
+        </section>
+
+        <!-- Steps: HTTP Requests -->
+        <section id="steps-http" class="judo-section">
+            <h1>🌐 Pasos de Peticiones HTTP</h1>
+            
+            <h2>Petición GET</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición GET a "{endpoint}"</code></p>
+            <p>Envía una petición HTTP GET para recuperar datos.</p>
+            <pre><code>Cuando hago una petición GET a "/users/1"
+Entonces el código de respuesta debe ser 200</code></pre>
+            
+            <h2>Petición POST (Con Cuerpo JSON)</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición POST a "{endpoint}" con el cuerpo</code></p>
+            <p>Envía una petición HTTP POST con payload JSON.</p>
+            <pre><code>Cuando hago una petición POST a "/users" con el cuerpo
+  """
+  {
+    "name": "Juan Pérez",
+    "email": "juan@example.com",
+    "age": 30
+  }
+  """
+Entonces el código de respuesta debe ser 201
+Y guardo el valor del campo "id" en la variable "nuevoIdUsuario"</code></pre>
+            
+            <h2>Petición POST (Con Variable)</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición POST a "{endpoint}" con la variable "{nombre_var}"</code></p>
+            <p>Envía una petición HTTP POST con datos JSON desde una variable.</p>
+            <pre><code>Dado que establezco la variable "datosUsuario" al JSON
+  """
+  {"name": "Juan", "email": "juan@example.com"}
+  """
+Cuando hago una petición POST a "/users" con la variable "datosUsuario"</code></pre>
+            
+            <h2>Petición con Método Variable</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición {método} a "{endpoint}" con la variable "{nombre_var}"</code></p>
+            <p>Envía una petición HTTP de cualquier método con datos desde una variable.</p>
+            <pre><code># Funciona con cualquier método HTTP
+Cuando hago una petición POST a "/users" con la variable "userData"
+Cuando hago una petición PUT a "/users/1" con la variable "updateData"
+Cuando hago una petición PATCH a "/users/1" con la variable "patchData"</code></pre>
+            
+            <h2>Petición PUT</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición PUT a "{endpoint}" con el cuerpo</code></p>
+            <p>Envía una petición HTTP PUT para reemplazar completamente un recurso.</p>
+            <pre><code>Cuando hago una petición PUT a "/users/1" con el cuerpo
+  """
+  {
+    "name": "Juan Pérez Actualizado",
+    "email": "juan.actualizado@example.com",
+    "age": 31
+  }
+  """
+Entonces el código de respuesta debe ser 200</code></pre>
+            
+            <h2>Petición PATCH</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición PATCH a "{endpoint}" con el cuerpo</code></p>
+            <p>Envía una petición HTTP PATCH para actualizar parcialmente un recurso.</p>
+            <pre><code>Cuando hago una petición PATCH a "/users/1" con el cuerpo
+  """
+  {
+    "email": "nuevoemail@example.com"
+  }
+  """
+Entonces el código de respuesta debe ser 200</code></pre>
+            
+            <h2>Petición DELETE</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición DELETE a "{endpoint}"</code></p>
+            <p>Envía una petición HTTP DELETE para eliminar un recurso.</p>
+            <pre><code>Cuando hago una petición DELETE a "/users/1"
+Entonces el código de respuesta debe ser 204</code></pre>
+        </section>
+        <!-- Steps: Validation -->
+        <section id="steps-validation" class="judo-section">
+            <h1>✅ Pasos de Validación de Respuesta</h1>
+            
+            <h2>Validar Código de Estado</h2>
+            <p><strong>Español:</strong> <code>Entonces el código de respuesta debe ser {status:d}</code></p>
+            <p>Valida el código de estado de respuesta HTTP.</p>
+            <pre><code># Códigos de estado comunes:
+# 200 - OK
+# 201 - Creado
+# 204 - Sin Contenido
+# 400 - Petición Incorrecta
+# 401 - No Autorizado
+# 404 - No Encontrado
+# 500 - Error del Servidor
+
+Entonces el código de respuesta debe ser 200
+Entonces el código de respuesta debe ser 201
+Entonces el código de respuesta debe ser 404</code></pre>
+            
+            <h2>Validar Respuesta Exitosa</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe ser exitosa</code></p>
+            <p>Valida que la respuesta sea exitosa (códigos de estado 2xx).</p>
+            <pre><code>Entonces la respuesta debe ser exitosa
+# Acepta 200, 201, 202, 204, etc.</code></pre>
+            
+            <h2>Validar que la Respuesta Contiene Campo</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe contener el campo "{campo}"</code></p>
+            <p>Valida que un campo existe en la respuesta.</p>
+            <pre><code>Entonces la respuesta debe contener el campo "id"
+Y la respuesta debe contener el campo "name"
+Y la respuesta debe contener el campo "email"</code></pre>
+            
+            <h2>Validar Valor de Campo (Cadena)</h2>
+            <p><strong>Español:</strong> <code>Entonces el campo "{campo}" debe ser "{valor}"</code></p>
+            <p>Valida coincidencia exacta de valor de cadena (sensible a mayúsculas).</p>
+            <pre><code>Entonces el campo "name" debe ser "Juan Pérez"
+Y el campo "email" debe ser "juan@example.com"</code></pre>
+            
+            <h2>Validar Valor de Campo (Número)</h2>
+            <p><strong>Español:</strong> <code>Entonces el campo "{campo}" debe ser {valor:d}</code></p>
+            <p>Valida valor numérico exacto.</p>
+            <pre><code>Entonces el campo "id" debe ser 1
+Y el campo "age" debe ser 30</code></pre>
+            
+            <h2>Validar Tiempo de Respuesta</h2>
+            <p><strong>Español:</strong> <code>Entonces el tiempo de respuesta debe ser menor a {max_time:f} segundos</code></p>
+            <p>Valida el rendimiento del tiempo de respuesta.</p>
+            <pre><code>Entonces el tiempo de respuesta debe ser menor a 2.0 segundos</code></pre>
+            
+            <h2>Validar Ruta JSON</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{json_path}" debe ser "{valor_esperado}"</code></p>
+            <p>Valida un valor de ruta JSON específica.</p>
+            <pre><code>Entonces la respuesta "$.user.name" debe ser "Juan Pérez"
+Y la respuesta "$.user.address.city" debe ser "Madrid"</code></pre>
+        </section>
+
+        <!-- Steps: Data Extraction -->
+        <section id="steps-data" class="judo-section">
+            <h1>💾 Pasos de Extracción de Datos</h1>
+            
+            <h2>Extraer Campo a Variable</h2>
+            <p><strong>Español:</strong> <code>Cuando guardo el valor del campo "{campo}" en la variable "{variable}"</code></p>
+            <p>Extrae un valor de la respuesta y lo almacena en una variable.</p>
+            <pre><code>Cuando hago una petición POST a "/users" con el cuerpo:
+  """
+  {"name": "Juan"}
+  """
+Entonces el código de respuesta debe ser 201
+Y guardo el valor del campo "id" en la variable "userId"
+
+# Usar variable extraída
+Cuando hago una petición GET a "/users/{userId}"
+Entonces el código de respuesta debe ser 200</code></pre>
+            
+            <h2>Almacenar Respuesta Completa</h2>
+            <p><strong>Español:</strong> <code>Cuando guardo la respuesta completa en la variable "{variable}"</code></p>
+            <p>Almacena toda la respuesta en una variable.</p>
+            <pre><code>Cuando hago una petición GET a "/users/1"
+Y guardo la respuesta completa en la variable "userResponse"</code></pre>
+        </section>
+
+        <!-- Steps: Variables -->
+        <section id="steps-variables" class="judo-section">
+            <h1>🔄 Pasos de Variables</h1>
+            
+            <h2>Comparar Variables</h2>
+            <p><strong>Español:</strong> <code>Entonces la variable "{variable1}" debe ser igual a la variable "{variable2}"</code></p>
+            <p>Compara que dos variables tengan exactamente el mismo valor.</p>
+            <pre><code>Dado que establezco la variable "esperado" a "Juan Pérez"
+Y que guardo el valor del campo "name" en la variable "actual"
+Entonces la variable "actual" debe ser igual a la variable "esperado"</code></pre>
+            
+            <h2>Verificar Variables Diferentes</h2>
+            <p><strong>Español:</strong> <code>Entonces la variable "{variable1}" no debe ser igual a la variable "{variable2}"</code></p>
+            <p>Verifica que dos variables tengan valores diferentes.</p>
+            <pre><code>Dado que establezco la variable "usuario1" a "admin"
+Y que establezco la variable "usuario2" a "guest"
+Entonces la variable "usuario1" no debe ser igual a la variable "usuario2"</code></pre>
+        </section>
+
+        <!-- Steps: Arrays -->
+        <section id="steps-arrays" class="judo-section">
+            <h1>📊 Pasos de Arrays/Colecciones</h1>
+            
+            <h2>Validar que la Respuesta es Array</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe ser un array</code></p>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe ser una lista</code></p>
+            <p>Valida que la respuesta es un array JSON.</p>
+            <pre><code>Cuando hago una petición GET a "/users"
+Entonces la respuesta debe ser un array</code></pre>
+            
+            <h2>Validar Cantidad de Array</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe tener {count:d} elementos</code></p>
+            <p>Valida el número de elementos en el array de respuesta.</p>
+            <pre><code>Entonces la respuesta debe tener 10 elementos</code></pre>
+            
+            <h2>Validar que Array Contiene Elemento</h2>
+            <p><strong>Español:</strong> <code>Entonces el array "{ruta_array}" debe contener un elemento con "{campo}" igual a "{valor}"</code></p>
+            <p>Valida que el array contiene un elemento con un par clave-valor específico.</p>
+            <pre><code># Para respuesta: {"users": [{"id": 1, "name": "Juan"}, {"id": 2, "name": "Ana"}]}
+Entonces el array "users" debe contener un elemento con "name" igual a "Juan"
+
+# Para array de nivel raíz: [{"id": 1, "name": "Juan"}, {"id": 2, "name": "Ana"}]
+Entonces el array "users" debe contener un elemento con "name" igual a "Juan"</code></pre>
+            
+            <h2>Validar que Cada Elemento Tiene Campo</h2>
+            <p><strong>Español:</strong> <code>Entonces cada elemento debe tener el campo "{campo}"</code></p>
+            <p>Valida que cada elemento en el array tiene un campo específico.</p>
+            <pre><code>Cuando hago una petición GET a "/users"
+Entonces la respuesta debe ser un array
+Y cada elemento debe tener el campo "id"
+Y cada elemento debe tener el campo "name"</code></pre>
+        </section>
+        <!-- Steps: File Operations -->
+        <section id="steps-files" class="judo-section">
+            <h1>📄 Pasos de Operaciones con Archivos</h1>
+            
+            <h2>POST con Archivo JSON</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición POST a "{endpoint}" con archivo JSON "{ruta_archivo}"</code></p>
+            <p><strong>Español (Alternativo):</strong> <code>Cuando hago POST a "{endpoint}" con archivo JSON "{ruta_archivo}"</code></p>
+            <p>Envía una petición POST con datos JSON desde un archivo.</p>
+            <pre><code>Cuando hago una petición POST a "/users" con archivo JSON "test_data/crear_usuario.json"
+Entonces el código de respuesta debe ser 201
+
+# Sintaxis alternativa más corta
+Cuando hago POST a "/users" con archivo JSON "test_data/crear_usuario.json"</code></pre>
+            
+            <h2>PUT con Archivo JSON</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición PUT a "{endpoint}" con archivo JSON "{ruta_archivo}"</code></p>
+            <p><strong>Español (Alternativo):</strong> <code>Cuando hago PUT a "{endpoint}" con archivo JSON "{ruta_archivo}"</code></p>
+            <p>Envía una petición PUT con datos JSON desde un archivo.</p>
+            <pre><code>Cuando hago una petición PUT a "/users/1" con archivo JSON "test_data/actualizar_usuario.json"
+Entonces el código de respuesta debe ser 200
+
+# Sintaxis alternativa más corta
+Cuando hago PUT a "/users/1" con archivo JSON "test_data/actualizar_usuario.json"</code></pre>
+            
+            <h2>PATCH con Archivo JSON</h2>
+            <p><strong>Español:</strong> <code>Cuando hago una petición PATCH a "{endpoint}" con archivo JSON "{ruta_archivo}"</code></p>
+            <p><strong>Español (Alternativo):</strong> <code>Cuando hago PATCH a "{endpoint}" con archivo JSON "{ruta_archivo}"</code></p>
+            <p>Envía una petición PATCH con datos JSON desde un archivo.</p>
+            <pre><code>Cuando hago una petición PATCH a "/users/1" con archivo JSON "test_data/patch_usuario.json"
+Entonces el código de respuesta debe ser 200
+
+# Sintaxis alternativa más corta
+Cuando hago PATCH a "/users/1" con archivo JSON "test_data/patch_usuario.json"</code></pre>
+            
+            <h2>Validar Respuesta Coincide con Archivo de Esquema</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe coincidir con el archivo de esquema "{ruta_archivo}"</code></p>
+            <p>Valida la respuesta contra un archivo de esquema JSON.</p>
+            <pre><code>Entonces la respuesta debe coincidir con el archivo de esquema "schemas/user_schema.json"</code></pre>
+            
+            <h2>Guardar Respuesta en Archivo</h2>
+            <p><strong>Español:</strong> <code>Cuando guardo la respuesta en el archivo "{ruta_archivo}"</code></p>
+            <p>Guarda la respuesta en un archivo.</p>
+            <pre><code>Cuando guardo la respuesta en el archivo "output/user_response.json"</code></pre>
+            
+            <h2>Guardar Variable en Archivo</h2>
+            <p><strong>Español:</strong> <code>Cuando guardo la variable "{nombre_var}" en el archivo "{ruta_archivo}"</code></p>
+            <p>Guarda el contenido de una variable en un archivo.</p>
+            <pre><code>Dado que guardo el valor del campo "title" en la variable "postTitle"
+Cuando guardo la variable "postTitle" en el archivo "output/post_title.txt"</code></pre>
+        </section>
+
+        <!-- Steps: Schema -->
+        <section id="steps-schema" class="judo-section">
+            <h1>✅ Pasos de Validación de Esquemas</h1>
+            
+            <h2>Validar Contra Esquema</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe coincidir con el esquema</code></p>
+            <p>Valida la respuesta contra un esquema JSON.</p>
+            <pre><code>Cuando hago una petición GET a "/users/1"
+Entonces la respuesta debe coincidir con el esquema
+  """
+  {
+    "type": "object",
+    "properties": {
+      "id": {"type": "number"},
+      "name": {"type": "string"},
+      "email": {"type": "string", "format": "email"}
+    },
+    "required": ["id", "name", "email"]
+  }
+  """</code></pre>
+            
+            <h2>Validar Estructura de Respuesta</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe tener la siguiente estructura</code></p>
+            <p>Valida la respuesta contra una estructura JSON con patrones.</p>
+            <pre><code>Entonces la respuesta debe tener la siguiente estructura
+  """
+  {
+    "id": "#number",
+    "name": "#string",
+    "email": "#email",
+    "active": "#boolean"
+  }
+  """</code></pre>
+            
+            <h2>Validar Respuesta Coincide con Archivo de Esquema</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta debe coincidir con el archivo de esquema "{ruta_archivo}"</code></p>
+            <p>Valida la respuesta contra un esquema JSON desde un archivo.</p>
+            <pre><code>Entonces la respuesta debe coincidir con el archivo de esquema "schemas/user_schema.json"</code></pre>
+            
+            <h2>Ejemplo de Esquema JSON</h2>
+            <p>Ejemplo de archivo de esquema <code>schemas/user_schema.json</code>:</p>
+            <pre><code>{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 150
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {"type": "string"},
+        "city": {"type": "string"},
+        "zipCode": {"type": "string"}
+      },
+      "required": ["street", "city"]
+    }
+  },
+  "required": ["id", "name", "email"],
+  "additionalProperties": false
+}</code></pre>
+        </section>
+
+        <!-- Steps: Type Validation -->
+        <section id="steps-types" class="judo-section">
+            <h1>🔍 Pasos de Validación de Tipos</h1>
+            
+            <h2>Validar Campo es Cadena</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser una cadena</code></p>
+            <p>Valida que un campo es de tipo cadena.</p>
+            <pre><code>Entonces la respuesta "$.user.name" debe ser una cadena
+Y la respuesta "$.user.email" debe ser una cadena</code></pre>
+            
+            <h2>Validar Campo es Número</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser un número</code></p>
+            <p>Valida que un campo es de tipo número.</p>
+            <pre><code>Entonces la respuesta "$.user.age" debe ser un número
+Y la respuesta "$.user.id" debe ser un número</code></pre>
+            
+            <h2>Validar Campo es Booleano</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser un booleano</code></p>
+            <p>Valida que un campo es de tipo booleano.</p>
+            <pre><code>Entonces la respuesta "$.user.active" debe ser un booleano
+Y la respuesta "$.user.verified" debe ser un booleano</code></pre>
+            
+            <h2>Validar Campo es Array</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser un array</code></p>
+            <p>Valida que un campo es de tipo array.</p>
+            <pre><code>Entonces la respuesta "$.user.hobbies" debe ser un array
+Y la respuesta "$.user.skills" debe ser un array</code></pre>
+            
+            <h2>Validar Campo es Objeto</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser un objeto</code></p>
+            <p>Valida que un campo es de tipo objeto.</p>
+            <pre><code>Entonces la respuesta "$.user.address" debe ser un objeto
+Y la respuesta "$.user.preferences" debe ser un objeto</code></pre>
+            
+            <h2>Validar Campo es Null</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser null</code></p>
+            <p>Valida que un campo es null.</p>
+            <pre><code>Entonces la respuesta "$.user.deletedAt" debe ser null</code></pre>
+            
+            <h2>Validar Campo No es Null</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" no debe ser null</code></p>
+            <p>Valida que un campo no es null.</p>
+            <pre><code>Entonces la respuesta "$.user.id" no debe ser null
+Y la respuesta "$.user.createdAt" no debe ser null</code></pre>
+            
+            <h2>Validar Formato Email</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser un email válido</code></p>
+            <p>Valida que un campo tiene formato de email válido.</p>
+            <pre><code>Entonces la respuesta "$.user.email" debe ser un email válido
+Y la respuesta "$.user.alternativeEmail" debe ser un email válido</code></pre>
+            
+            <h2>Validar Formato UUID</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser un UUID válido</code></p>
+            <p>Valida que un campo tiene formato UUID válido.</p>
+            <pre><code>Entonces la respuesta "$.user.id" debe ser un UUID válido</code></pre>
+            
+            <h2>Validar Formato URL</h2>
+            <p><strong>Español:</strong> <code>Entonces la respuesta "{ruta_json}" debe ser una URL válida</code></p>
+            <p>Valida que un campo tiene formato URL válido.</p>
+            <pre><code>Entonces la respuesta "$.user.website" debe ser una URL válida
+Y la respuesta "$.user.profilePicture" debe ser una URL válida</code></pre>
+            
+            <h2>Ejemplo Completo de Validación de Tipos</h2>
+            <pre><code>Escenario: Validar tipos de datos de usuario
+  Dado que tengo un cliente Judo API
+  Y que la URL base es "https://api.example.com"
+  Cuando hago una petición GET a "/users/1"
+  Entonces el código de respuesta debe ser 200
+  
+  # Validaciones de tipo
+  Y la respuesta "$.id" debe ser un número
+  Y la respuesta "$.name" debe ser una cadena
+  Y la respuesta "$.email" debe ser un email válido
+  Y la respuesta "$.age" debe ser un número
+  Y la respuesta "$.active" debe ser un booleano
+  Y la respuesta "$.address" debe ser un objeto
+  Y la respuesta "$.hobbies" debe ser un array
+  Y la respuesta "$.website" debe ser una URL válida
+  Y la respuesta "$.uuid" debe ser un UUID válido
+  Y la respuesta "$.deletedAt" debe ser null
+  Y la respuesta "$.createdAt" no debe ser null</code></pre>
+        </section>
+
+        <!-- Steps: Utility -->
+        <section id="steps-utility" class="judo-section">
+            <h1>🛠️ Pasos de Utilidad</h1>
+            
+            <h2>Esperar</h2>
+            <p><strong>Español:</strong> <code>Cuando espero {segundos:f} segundos</code></p>
+            <p>Pausa la ejecución por el número especificado de segundos.</p>
+            <pre><code>Cuando hago una petición POST a "/jobs/start"
+Y espero 2.5 segundos
+Cuando hago una petición GET a "/jobs/status"</code></pre>
+            
+            <h2>Imprimir Respuesta</h2>
+            <p><strong>Español:</strong> <code>Cuando imprimo la respuesta</code></p>
+            <p>Imprime la respuesta en la consola para depuración.</p>
+            <pre><code>Cuando hago una petición GET a "/users/1"
+Y imprimo la respuesta</code></pre>
+            
+            <h2>Habilitar Logging de Requests/Responses</h2>
+            <p><strong>Español:</strong> <code>Cuando habilito el guardado de peticiones y respuestas</code></p>
+            <p>Activa el guardado automático de todas las interacciones HTTP en archivos JSON.</p>
+            <pre><code>Cuando habilito el guardado de peticiones y respuestas
+Cuando hago una petición GET a "/users/1"
+# Se guardará automáticamente en judo_reports/api_logs/</code></pre>
+            
+            <h2>Deshabilitar Logging de Requests/Responses</h2>
+            <p><strong>Español:</strong> <code>Cuando deshabilito el guardado de peticiones y respuestas</code></p>
+            <p>Desactiva el guardado automático de interacciones HTTP.</p>
+            <pre><code>Cuando deshabilito el guardado de peticiones y respuestas</code></pre>
+            
+            <h2>Habilitar Logging con Directorio Personalizado</h2>
+            <p><strong>Español:</strong> <code>Cuando habilito el guardado de peticiones y respuestas en el directorio "{directorio}"</code></p>
+            <p>Activa el logging con un directorio personalizado.</p>
+            <pre><code>Cuando habilito el guardado de peticiones y respuestas en el directorio "logs/api_calls"</code></pre>
+            
+            <h2>Establecer Directorio de Salida</h2>
+            <p><strong>Español:</strong> <code>Cuando establezco el directorio de salida a "{directorio}"</code></p>
+            <p>Configura el directorio donde se guardarán los logs.</p>
+            <pre><code>Cuando establezco el directorio de salida a "custom_logs"</code></pre>
+        </section>
+
+        <!-- Pattern Matching -->
+        <section id="patterns" class="judo-section">
+            <h1>🎯 Coincidencia de Patrones</h1>
+            <p>Judo Framework soporta coincidencia de patrones estilo Karate para validaciones flexibles:</p>
+            
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Patrón</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Descripción</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##string</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Cualquier cadena</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"name": "##string"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##number</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Cualquier número</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"age": "##number"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##boolean</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Valor booleano</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"active": "##boolean"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##array</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Cualquier array</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"items": "##array"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##object</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Cualquier objeto</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"user": "##object"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##email</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Formato email</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"email": "##email"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##uuid</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Formato UUID</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"id": "##uuid"</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2>📝 Interpolación de Variables</h2>
+            <p>Las variables pueden usarse en endpoints y cuerpos JSON usando la sintaxis <code>{nombreVariable}</code>:</p>
+            <pre><code>Dado que establezco la variable "userId" a 42
+Cuando hago una petición GET a "/users/{userId}"
+
+Cuando hago una petición POST a "/posts" con el cuerpo:
+  """
+  {
+    "userId": {userId},
+    "title": "Mi Post"
+  }
+  """</code></pre>
+            
+            <h2>🔐 Variables de Entorno</h2>
+            <p>Carga datos sensibles y configuraciones desde archivos .env:</p>
+            <pre><code># archivo .env
+API_TOKEN=Bearer abc123xyz
+API_KEY=sk_test_456789
+BASE_URL=https://api.example.com
+USER_ID=12345
+
+# En tus pruebas - Headers directos
+Dado que establezco el header "Authorization" desde env "API_TOKEN"
+Y que establezco el header "X-API-Key" desde env "API_KEY"
+
+# En tus pruebas - Variables dinámicas
+Dado que obtengo el valor "BASE_URL" desde env y lo almaceno en "urlBase"
+Y que obtengo el valor "USER_ID" desde env y lo almaceno en "userId"
+Y que la URL base es "{urlBase}"
+Cuando hago una petición GET a "/users/{userId}"</code></pre>
+        </section>
+        <!-- Advanced Examples -->
+        <section id="examples" class="judo-section">
+            <h1>🚀 Ejemplos Avanzados</h1>
+            
+            <h2>Flujo CRUD Completo</h2>
+            <pre><code>Característica: API de Gestión de Usuarios
+
+  Antecedentes:
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://api.example.com"
+    Y que establezco el header "Authorization" desde env "API_TOKEN"
+
+  Escenario: Ciclo de vida completo de usuario
+    # CREAR - Crear un nuevo usuario
+    Cuando hago una petición POST a "/users" con el cuerpo:
+      """
+      {
+        "name": "Juan Pérez",
+        "email": "juan@example.com",
+        "role": "user"
+      }
+      """
+    Entonces el código de respuesta debe ser 201
+    Y la respuesta debe contener el campo "id"
+    Y guardo el valor del campo "id" en la variable "userId"
+    
+    # LEER - Obtener el usuario creado
+    Cuando hago una petición GET a "/users/{userId}"
+    Entonces el código de respuesta debe ser 200
+    Y el campo "name" debe ser "Juan Pérez"
+    Y el campo "email" debe ser "juan@example.com"
+    
+    # ACTUALIZAR - Actualizar el usuario
+    Cuando hago una petición PUT a "/users/{userId}" con el cuerpo:
+      """
+      {
+        "name": "Juan Pérez Actualizado",
+        "email": "juan.actualizado@example.com",
+        "role": "admin"
+      }
+      """
+    Entonces el código de respuesta debe ser 200
+    Y el campo "name" debe ser "Juan Pérez Actualizado"
+    
+    # ACTUALIZACIÓN PARCIAL - Actualizar solo email
+    Cuando hago una petición PATCH a "/users/{userId}" con el cuerpo:
+      """
+      {
+        "email": "juan.final@example.com"
+      }
+      """
+    Entonces el código de respuesta debe ser 200
+    Y el campo "email" debe ser "juan.final@example.com"
+    
+    # ELIMINAR - Remover el usuario
+    Cuando hago una petición DELETE a "/users/{userId}"
+    Entonces el código de respuesta debe ser 204
+    
+    # VERIFICAR ELIMINACIÓN - Confirmar que el usuario se fue
+    Cuando hago una petición GET a "/users/{userId}"
+    Entonces el código de respuesta debe ser 404</code></pre>
+            
+            <h2>Flujo de Autenticación</h2>
+            <pre><code>Característica: Flujo de Autenticación
+
+  Antecedentes:
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://api.example.com"
+
+  Escenario: Login y acceso a recursos protegidos
+    # Login para obtener token
+    Cuando hago una petición POST a "/auth/login" con el cuerpo:
+      """
+      {
+        "username": "admin@example.com",
+        "password": "secure123"
+      }
+      """
+    Entonces el código de respuesta debe ser 200
+    Y la respuesta debe contener el campo "token"
+    Y guardo el valor del campo "token" en la variable "authToken"
+    
+    # Usar token para endpoint protegido
+    Dado que uso el token bearer "{authToken}"
+    Cuando hago una petición GET a "/protected/profile"
+    Entonces el código de respuesta debe ser 200
+    Y la respuesta debe contener el campo "user"
+    
+    # Probar renovación de token
+    Cuando hago una petición POST a "/auth/refresh" con el cuerpo:
+      """
+      {
+        "token": "{authToken}"
+      }
+      """
+    Entonces el código de respuesta debe ser 200
+    Y guardo el valor del campo "token" en la variable "newToken"
+    
+    # Usar nuevo token
+    Dado que uso el token bearer "{newToken}"
+    Cuando hago una petición GET a "/protected/admin"
+    Entonces el código de respuesta debe ser 200</code></pre>
+            
+            <h2>Pruebas Basadas en Datos con Archivos</h2>
+            <pre><code>Característica: Creación de Usuario Basada en Datos
+
+  Antecedentes:
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://api.example.com"
+    Y que establezco el header "Authorization" desde env "API_TOKEN"
+
+  Escenario: Crear usuario desde archivo
+    Cuando hago una petición POST a "/users" con archivo JSON "test_data/users/juan.json"
+    Entonces el código de respuesta debe ser 201
+    Y la respuesta debe coincidir con el archivo de esquema "schemas/user_response.json"
+    
+  Escenario: Validar esquema de usuario
+    Cuando hago una petición GET a "/users/1"
+    Entonces el código de respuesta debe ser 200
+    Y la respuesta debe coincidir con el archivo de esquema "schemas/user_schema.json"</code></pre>
+            
+            <h2>Pruebas de Arrays y Colecciones</h2>
+            <pre><code>Característica: Operaciones de Colecciones
+
+  Antecedentes:
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://jsonplaceholder.typicode.com"
+
+  Escenario: Probar colección de usuarios
+    Cuando hago una petición GET a "/users"
+    Entonces el código de respuesta debe ser 200
+    Y la respuesta debe ser un array
+    Y la respuesta debe tener 10 elementos
+    Y el array "users" debe contener un elemento con "name" igual a "Leanne Graham"
+    Y el array "users" debe contener un elemento con "username" igual a "Bret"
+    
+  Escenario: Probar paginación
+    Dado que establezco el parámetro "_page" a "1"
+    Y que establezco el parámetro "_limit" a "5"
+    Cuando hago una petición GET a "/posts"
+    Entonces el código de respuesta debe ser 200
+    Y la respuesta debe ser un array
+    Y la respuesta debe tener 5 elementos</code></pre>
+        </section>
+
+        <!-- Documentation -->
+        <section id="documentation" class="judo-section">
+            <h1>📚 Documentación</h1>
+            
+            <h2>🌐 Documentación Oficial</h2>
+            <p><strong>Documentación completa:</strong> <a href="http://centyc.cl/judo-framework/" target="_blank">http://centyc.cl/judo-framework/</a></p>
+            
+            <h2>📖 Enlaces Rápidos</h2>
+            <ul>
+                <li><strong>Repositorio GitHub:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework" target="_blank">https://github.com/FelipeFariasAlfaro/Judo-Framework</a></li>
+                <li><strong>Paquete PyPI:</strong> <a href="https://pypi.org/project/judo-framework/" target="_blank">https://pypi.org/project/judo-framework/</a></li>
+                <li><strong>Changelog:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/blob/main/CHANGELOG.md" target="_blank">CHANGELOG.md</a></li>
+                <li><strong>Ejemplos:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/tree/main/examples" target="_blank">Ejemplos en GitHub</a></li>
+            </ul>
+            
+            <h2>📋 Obtener Ayuda</h2>
+            <ul>
+                <li><strong>Issues:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/issues" target="_blank">Reportar bugs o solicitar características</a></li>
+                <li><strong>Discusiones:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/discussions" target="_blank">Hacer preguntas y compartir ideas</a></li>
+                <li><strong>Email:</strong> felipe.farias@centyc.cl</li>
+            </ul>
+            
+            <h2>📚 Recursos de Aprendizaje</h2>
+            <ul>
+                <li><strong>Documentación Behave:</strong> <a href="https://behave.readthedocs.io/" target="_blank">https://behave.readthedocs.io/</a></li>
+                <li><strong>Sintaxis Gherkin:</strong> <a href="https://cucumber.io/docs/gherkin/" target="_blank">https://cucumber.io/docs/gherkin/</a></li>
+                <li><strong>JSON Schema:</strong> <a href="https://json-schema.org/" target="_blank">https://json-schema.org/</a></li>
+                <li><strong>JSONPath:</strong> <a href="https://goessner.net/articles/JsonPath/" target="_blank">https://goessner.net/articles/JsonPath/</a></li>
+            </ul>
+        </section>
+
+        <!-- Contributing -->
+        <section id="contributing" class="judo-section">
+            <h1>🤝 Contribuir</h1>
+            
+            <h2>Cómo Contribuir</h2>
+            <p>¡Damos la bienvenida a contribuciones de la comunidad! Así es como puedes ayudar:</p>
+            
+            <h3>🐛 Reportar Bugs</h3>
+            <ul>
+                <li>Revisa los issues existentes primero</li>
+                <li>Proporciona pasos detallados de reproducción</li>
+                <li>Incluye información de versión de Python y SO</li>
+                <li>Comparte fragmentos de código relevantes</li>
+            </ul>
+            
+            <h3>💡 Sugerir Características</h3>
+            <ul>
+                <li>Abre una discusión o issue</li>
+                <li>Explica el caso de uso</li>
+                <li>Proporciona ejemplos si es posible</li>
+            </ul>
+            
+            <h3>🔧 Contribuciones de Código</h3>
+            <ol>
+                <li>Haz fork del repositorio</li>
+                <li>Crea una rama de característica</li>
+                <li>Escribe pruebas para tus cambios</li>
+                <li>Asegúrate de que todas las pruebas pasen</li>
+                <li>Envía un pull request</li>
+            </ol>
+            
+            <h3>📖 Documentación</h3>
+            <ul>
+                <li>Mejora la documentación existente</li>
+                <li>Agrega ejemplos y tutoriales</li>
+                <li>Traduce a otros idiomas</li>
+            </ul>
+            
+            <h2>Configuración de Desarrollo</h2>
+            <pre><code># Clonar el repositorio
+git clone https://github.com/FelipeFariasAlfaro/Judo-Framework.git
+cd Judo-Framework
+
+# Instalar en modo desarrollo
+pip install -e .
+
+# Instalar dependencias de desarrollo
+pip install -e .[dev]
+
+# Ejecutar pruebas
+behave examples/</code></pre>
+        </section>
+        <!-- Author & CENTYC -->
+        <section id="author" class="judo-section">
+            <h1>👨‍💻 Autor y CENTYC</h1>
+            
+            <h2>Sobre el Autor</h2>
+            <p><strong>Felipe Farias</strong> - Ingeniero de Software Senior y Especialista en Pruebas de API</p>
+            <ul>
+                <li>🎓 Experto en pruebas de API y frameworks de automatización</li>
+                <li>🚀 Creador de Judo Framework</li>
+                <li>🌟 Apasionado por hacer las pruebas simples y accesibles</li>
+                <li>📧 Email: felipe.farias@centyc.cl</li>
+                <li>🔗 LinkedIn: <a href="https://www.linkedin.com/in/felipe-farias-alfaro/" target="_blank">Felipe Farias Alfaro</a></li>
+            </ul>
+            
+            <h2>Sobre CENTYC</h2>
+            <p><strong>Centro Latinoamericano de Testing y Calidad del Software</strong></p>
+            <p>CENTYC es un centro líder latinoamericano para pruebas de software y aseguramiento de calidad, dedicado a avanzar las prácticas y herramientas de testing en toda la región.</p>
+            
+            <h3>🎯 Misión</h3>
+            <p>Proporcionar soluciones de pruebas de software de clase mundial, capacitación y herramientas que ayuden a las organizaciones a entregar productos de software de alta calidad.</p>
+            
+            <h3>🌟 Servicios</h3>
+            <ul>
+                <li><strong>Frameworks de Testing:</strong> Desarrollo de herramientas de testing open-source como Judo Framework</li>
+                <li><strong>Consultoría:</strong> Estrategia e implementación de pruebas de API</li>
+                <li><strong>Capacitación:</strong> Cursos y certificaciones de pruebas de software</li>
+                <li><strong>Aseguramiento de Calidad:</strong> Soluciones integrales de QA</li>
+            </ul>
+            
+            <h3>🔗 Conecta con CENTYC</h3>
+            <ul>
+                <li><strong>Sitio Web:</strong> <a href="https://www.centyc.cl" target="_blank">https://www.centyc.cl</a></li>
+                <li><strong>Email:</strong> info@centyc.cl</li>
+                <li><strong>Ubicación:</strong> Chile, Latinoamérica</li>
+            </ul>
+            
+            <h2>🙏 Agradecimientos</h2>
+            <p>Agradecimientos especiales a:</p>
+            <ul>
+                <li><strong>Karate Framework</strong> - Por la inspiración y excelente diseño de DSL</li>
+                <li><strong>Comunidad Behave</strong> - Por el poderoso framework BDD</li>
+                <li><strong>Comunidad Python</strong> - Por el increíble ecosistema y herramientas</li>
+                <li><strong>Contribuidores</strong> - Todos los que han contribuido a hacer Judo Framework mejor</li>
+            </ul>
+            
+            <h2>📄 Licencia</h2>
+            <p>Judo Framework se publica bajo la <strong>Licencia MIT</strong>.</p>
+            <p>Esto significa que puedes usarlo libremente tanto en proyectos personales como comerciales.</p>
+            
+            <h2>🌟 Apoya el Proyecto</h2>
+            <p>Si encuentras útil Judo Framework, por favor considera:</p>
+            <ul>
+                <li>⭐ Dar estrella al repositorio en GitHub</li>
+                <li>🐛 Reportar bugs e issues</li>
+                <li>💡 Sugerir nuevas características</li>
+                <li>📖 Contribuir a la documentación</li>
+                <li>🗣️ Difundir la palabra sobre Judo Framework</li>
+            </ul>
+            
+            <div style="text-align: center; margin: 40px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                <h3>🥋 Hecho con ❤️ por CENTYC para la comunidad global de testing</h3>
+                <p><em>"Empoderando a desarrolladores para escribir mejores pruebas de API, un escenario a la vez"</em></p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+.judo-docs-container {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+}
+
+.judo-sidebar {
+    width: 280px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-radius: 8px 0 0 8px;
+}
+
+.judo-sidebar h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.5em;
+    text-align: center;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    padding-bottom: 10px;
+}
+
+.judo-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.judo-nav-list li {
+    margin: 0;
+}
+
+.nav-link {
+    display: block;
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    text-decoration: none;
+}
+
+.judo-content {
+    flex: 1;
+    padding: 30px;
+    background: white;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.judo-section {
+    display: none;
+}
+
+.judo-section.active {
+    display: block;
+}
+
+.judo-section h1 {
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+.judo-section h2 {
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.judo-section h3 {
+    color: #7f8c8d;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+pre {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+code {
+    background: #f1f3f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 12px;
+    margin-right: 8px;
+    margin-bottom: 4px;
+}
+
+.badge-primary { background: #007bff; color: white; }
+.badge-success { background: #28a745; color: white; }
+.badge-info { background: #17a2b8; color: white; }
+
+blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 20px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #555;
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 0 6px 6px 0;
+}
+
+ul, ol {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .judo-docs-container {
+        flex-direction: column;
+    }
+    
+    .judo-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .judo-content {
+        border-radius: 0 0 8px 8px;
+    }
+}
+</style>
+
+<script>
+function showSection(sectionId) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.judo-section');
+    sections.forEach(section => section.classList.remove('active'));
+    
+    // Show selected section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+    
+    // Update navigation
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    
+    const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+}
+
+// Initialize - show overview section by default
+document.addEventListener('DOMContentLoaded', function() {
+    showSection('overview');
+});
+</script>
+
+</body>
+</html>

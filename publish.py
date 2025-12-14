@@ -55,7 +55,6 @@ def main():
         sys.exit(1)
     
     print("\n🎉 ¡Publicación completada exitosamente!")
-    print("📦 Judo Framework v1.3.14 está ahora disponible en PyPI")
     print("🔗 https://pypi.org/project/judo-framework/1.3.14/")
 
 if __name__ == "__main__":

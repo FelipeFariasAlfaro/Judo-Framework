@@ -1,6 +1,10 @@
+"""
+Environment configuration for Judo Framework examples
+"""
+
 from judo.behave import *
 
-# Hooks automáticos - IMPORTANTE: usar estos hooks
+# Import all Judo hooks
 before_all = before_all_judo
 before_feature = before_feature_judo
 after_feature = after_feature_judo

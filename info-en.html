@@ -1,0 +1,1937 @@
+[section bg="5326" bg_size="original" bg_color="rgba(255, 255, 255, 0)" bg_overlay="rgba(0, 0, 0, 0)" bg_pos="40% 100%" padding="0px" height="486px"]
+
+[/section]
+[section]
+
+[row width="full-width"]
+
+[col span__sm="12"]
+
+<div class="judo-docs-container">
+    <!-- Sidebar Navigation -->
+    <nav class="judo-sidebar">
+        <h3>🥋 Judo Framework</h3>
+        <ul class="judo-nav-list">
+            <li><a href="#overview" class="nav-link active" onclick="showSection('overview')">Overview</a></li>
+            <li><a href="#whats-new" class="nav-link" onclick="showSection('whats-new')">What's New</a></li>
+            <li><a href="#why-judo" class="nav-link" onclick="showSection('why-judo')">Why Judo?</a></li>
+            <li><a href="#architecture" class="nav-link" onclick="showSection('architecture')">Architecture</a></li>
+            <li><a href="#quick-start" class="nav-link" onclick="showSection('quick-start')">Quick Start</a></li>
+            <li><a href="#project-structure" class="nav-link" onclick="showSection('project-structure')">Project Structure</a></li>
+            <li><a href="#installation" class="nav-link" onclick="showSection('installation')">Installation</a></li>
+            <li><a href="#features" class="nav-link" onclick="showSection('features')">Key Features</a></li>
+            <li><a href="#comparison" class="nav-link" onclick="showSection('comparison')">vs Karate</a></li>
+            <li><a href="#steps-config" class="nav-link" onclick="showSection('steps-config')">Steps: Configuration</a></li>
+            <li><a href="#steps-auth" class="nav-link" onclick="showSection('steps-auth')">Steps: Authentication</a></li>
+            <li><a href="#steps-http" class="nav-link" onclick="showSection('steps-http')">Steps: HTTP Requests</a></li>
+            <li><a href="#steps-validation" class="nav-link" onclick="showSection('steps-validation')">Steps: Validation</a></li>
+            <li><a href="#steps-data" class="nav-link" onclick="showSection('steps-data')">Steps: Data Extraction</a></li>
+            <li><a href="#steps-variables" class="nav-link" onclick="showSection('steps-variables')">Steps: Variables</a></li>
+            <li><a href="#steps-files" class="nav-link" onclick="showSection('steps-files')">Steps: File Operations</a></li>
+            <li><a href="#steps-arrays" class="nav-link" onclick="showSection('steps-arrays')">Steps: Arrays</a></li>
+            <li><a href="#steps-schema" class="nav-link" onclick="showSection('steps-schema')">Steps: Schema</a></li>
+            <li><a href="#steps-types" class="nav-link" onclick="showSection('steps-types')">Steps: Type Validation</a></li>
+            <li><a href="#steps-utility" class="nav-link" onclick="showSection('steps-utility')">Steps: Utility</a></li>
+            <li><a href="#patterns" class="nav-link" onclick="showSection('patterns')">Pattern Matching</a></li>
+            <li><a href="#examples" class="nav-link" onclick="showSection('examples')">Advanced Examples</a></li>
+            <li><a href="#documentation" class="nav-link" onclick="showSection('documentation')">Documentation</a></li>
+            <li><a href="#contributing" class="nav-link" onclick="showSection('contributing')">Contributing</a></li>
+            <li><a href="#author" class="nav-link" onclick="showSection('author')">Author & CENTYC</a></li>
+        </ul>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="judo-content">
+        
+        <!-- Overview Section -->
+        <section id="overview" class="judo-section active">
+            <h1>🥋 Judo Framework</h1>
+            <p><strong>A comprehensive API testing framework for Python, inspired by Karate Framework</strong></p>
+            <p>
+                <span class="badge badge-primary">Python 3.8+</span>
+                <span class="badge badge-success">MIT License</span>
+                <span class="badge badge-info">v1.3.36</span>
+            </p>
+            <blockquote style="border-left: 4px solid #007bff; padding-left: 20px; margin: 20px 0; font-style: italic; color: #555;">
+                "As simple as Karate, as powerful as Python"
+            </blockquote>
+            <p>Judo Framework brings the simplicity and elegance of Karate Framework to the Python ecosystem. Write API tests in plain English (or Spanish!), get beautiful HTML reports automatically, and enjoy the power of Python's ecosystem.</p>
+            
+            <h3>🌐 Language Support</h3>
+            <ul>
+                <li><strong>🇺🇸 English</strong> - Complete step definitions</li>
+                <li><strong>🇪🇸 Español</strong> - Definiciones completas de pasos</li>
+            </ul>
+            
+            <h3>📦 Installation</h3>
+            <pre><code>pip install judo-framework</code></pre>
+            
+            <h3>🔗 Links</h3>
+            <ul>
+                <li><strong>PyPI:</strong> <a href="https://pypi.org/project/judo-framework/" target="_blank">https://pypi.org/project/judo-framework/</a></li>
+                <li><strong>GitHub:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework" target="_blank">https://github.com/FelipeFariasAlfaro/Judo-Framework</a></li>
+                <li><strong>CENTYC:</strong> <a href="https://www.centyc.cl" target="_blank">https://www.centyc.cl</a></li>
+            </ul>
+        </section>
+        <!-- What's New Section -->
+        <section id="whats-new" class="judo-section">
+            <h1>🎉 What's New in v1.3.36</h1>
+            
+            <h3>🚀 Single Consolidated HTML Report</h3>
+            <p><strong>FIXED:</strong> Multiple features now generate a single HTML report instead of overwriting each other</p>
+            <ul>
+                <li>✅ New parameter <code>run_all_features_together=True</code> (default)</li>
+                <li>✅ All features executed in one behave call</li>
+                <li>✅ Works with mixed language features (English + Spanish)</li>
+                <li>✅ No more overwritten reports</li>
+            </ul>
+            
+            <h3>🔐 Environment Variables Support (.env)</h3>
+            <p><strong>NEW in v1.3.35:</strong> Load headers from environment variables and .env files</p>
+            <ul>
+                <li>✅ Added <code>python-dotenv>=1.0.0</code> dependency</li>
+                <li>✅ New steps for loading headers from .env files</li>
+                <li>✅ Perfect for API keys, tokens, and sensitive data</li>
+                <li>✅ Keeps credentials out of version control</li>
+            </ul>
+            
+            <h3>📊 Enhanced HTML Reports</h3>
+            <p>Professional reports with official CENTYC and Judo Framework logos</p>
+            <ul>
+                <li>✅ Modern design with gradient headers</li>
+                <li>✅ Responsive layout for all devices</li>
+                <li>✅ Professional footer with contact information</li>
+                <li>✅ Complete request/response details</li>
+            </ul>
+            
+            <h3>💾 Request/Response Logging</h3>
+            <p>Automatic saving of HTTP interactions to JSON files</p>
+            <ul>
+                <li>✅ Complete headers, body, timing, and metadata</li>
+                <li>✅ Organized by scenario with numbered files</li>
+                <li>✅ Configurable via environment variables or runner</li>
+            </ul>
+            
+            <p><a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/blob/main/CHANGELOG.md" target="_blank">See full changelog →</a></p>
+        </section>
+
+        <!-- Why Judo Section -->
+        <section id="why-judo" class="judo-section">
+            <h1>⭐ Why Judo Framework?</h1>
+            
+            <h2>✅ Simple Setup (Just 10 Lines!)</h2>
+            <pre><code># features/environment.py
+from judo.behave import *
+
+before_all = before_all_judo
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_scenario = before_scenario_judo
+after_scenario = after_scenario_judo
+before_step = before_step_judo
+after_step = after_step_judo
+after_all = after_all_judo</code></pre>
+            <p><strong>That's it!</strong> Automatic HTML reports, full test tracking, and detailed statistics included.</p>
+            
+            <h2>🚀 Write Tests in Plain Language</h2>
+            <pre><code># language: en
+Feature: User API Testing
+
+  Scenario: Create a new user
+    Given the base URL is "https://api.example.com"
+    When I send a POST request to "/users" with JSON:
+      """
+      {
+        "name": "John Doe",
+        "email": "john@example.com"
+      }
+      """
+    Then the response status should be 201
+    And the response should contain "id"
+    And the response field "name" should equal "John Doe"</code></pre>
+            
+            <h2>🇪🇸 Full Spanish Support</h2>
+            <pre><code># language: es
+Característica: Pruebas de API de Usuarios
+
+  Escenario: Crear un nuevo usuario
+    Dado que la URL base es "https://api.example.com"
+    Cuando hago una petición POST a "/users" con el cuerpo:
+      """
+      {
+        "name": "Juan Pérez",
+        "email": "juan@example.com"
+      }
+      """
+    Entonces el código de respuesta debe ser 201
+    Y la respuesta debe contener el campo "id"
+    Y el campo "name" debe ser "Juan Pérez"</code></pre>
+            
+            <h2>📊 Beautiful HTML Reports (Automatic!)</h2>
+            <p>Every test run generates a comprehensive HTML report with:</p>
+            <ul>
+                <li>✅ Complete request/response details</li>
+                <li>📋 All scenarios and steps with status</li>
+                <li>⏱️ Execution times and performance metrics</li>
+                <li>🔍 Error messages with full stack traces</li>
+                <li>📈 Success rate and statistics</li>
+                <li>🎨 Clean, modern UI with professional branding</li>
+            </ul>
+            <p><strong>No configuration needed</strong> - reports are generated automatically in <code>judo_reports/</code></p>
+        </section>
+        <!-- Architecture Section -->
+        <section id="architecture" class="judo-section">
+            <h1>🏗️ Architecture</h1>
+            
+            <h2>Core Components</h2>
+            <ul>
+                <li><strong>judo.core</strong> - Core DSL and HTTP client with Karate-like syntax</li>
+                <li><strong>judo.behave</strong> - Behave/Gherkin integration with 100+ predefined steps</li>
+                <li><strong>judo.runner</strong> - Test execution, parallel processing, and BaseRunner</li>
+                <li><strong>judo.reporting</strong> - HTML report generation with professional design</li>
+                <li><strong>judo.http</strong> - Advanced HTTP client with authentication support</li>
+                <li><strong>judo.mock</strong> - Built-in mock server for testing without dependencies</li>
+                <li><strong>judo.utils</strong> - File loaders, helpers, and utility functions</li>
+            </ul>
+            
+            <h2>Execution Flow</h2>
+            <pre><code>┌─────────────────────────────────────────────────────────┐
+│                    Feature Files (.feature)              │
+│              (Gherkin/BDD Test Scenarios)               │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Behave Framework                        │
+│            (BDD Test Runner - Python)                   │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│              Judo Behave Integration                     │
+│    • Auto Hooks (before/after scenario/step)           │
+│    • 100+ Predefined Steps (EN + ES)                   │
+│    • JudoContext (state management)                    │
+└────────────────────┬────────────────────────────────────┘
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│   HTTP   │  │ Reporter │  │Variables │
+│  Client  │  │  System  │  │ Manager  │
+└──────────┘  └──────────┘  └──────────┘
+        │            │            │
+        └────────────┼────────────┘
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Test Execution                          │
+│  • HTTP Requests → API Under Test                      │
+│  • Response Validation                                  │
+│  • Data Extraction & Storage                           │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                  HTML Report Generation                  │
+│  • Automatic after each test run                       │
+│  • Complete request/response details                   │
+│  • Statistics and metrics                              │
+└─────────────────────────────────────────────────────────┘</code></pre>
+            
+            <h2>BaseRunner Architecture</h2>
+            <p>The BaseRunner provides a Python API for running tests programmatically:</p>
+            <ul>
+                <li><strong>Feature Discovery</strong> - Finds .feature files based on tags and paths</li>
+                <li><strong>Execution Modes</strong> - Sequential, parallel, or consolidated execution</li>
+                <li><strong>Report Generation</strong> - Single or multiple HTML reports</li>
+                <li><strong>Request/Response Logging</strong> - Automatic HTTP interaction capture</li>
+                <li><strong>Environment Integration</strong> - Support for .env files and variables</li>
+            </ul>
+            
+            <pre><code>from judo.runner.base_runner import BaseRunner
+
+runner = BaseRunner(
+    features_dir="features",
+    output_dir="judo_reports",
+    run_all_features_together=True,  # Single consolidated report
+    save_requests_responses=True,
+    requests_responses_dir="api_logs"
+)
+
+results = runner.run(tags=["@smoke"])
+print(f"Passed: {results['passed']}/{results['total']}")</code></pre>
+        </section>
+
+        <!-- Quick Start Section -->
+        <section id="quick-start" class="judo-section">
+            <h1>🚀 Quick Start Guide</h1>
+            <p>Get started with Judo Framework in less than 5 minutes!</p>
+            
+            <h2>📦 Step 1: Install (30 seconds)</h2>
+            <pre><code>pip install judo-framework</code></pre>
+            
+            <h2>📝 Step 2: Create Your First Test (2 minutes)</h2>
+            
+            <h3>Create Feature File</h3>
+            <p><strong>features/my_first_test.feature:</strong></p>
+            <pre><code>Feature: My First API Test
+
+  Scenario: Get user information
+    Given I have a Judo API client
+    And the base URL is "https://jsonplaceholder.typicode.com"
+    When I send a GET request to "/users/1"
+    Then the response status should be 200
+    And the response should contain "name"
+    And the response should contain "email"</code></pre>
+            
+            <h3>Create Environment File</h3>
+            <p><strong>features/environment.py:</strong></p>
+            <pre><code>from judo.behave import *
+
+before_all = before_all_judo
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_scenario = before_scenario_judo
+after_scenario = after_scenario_judo
+before_step = before_step_judo
+after_step = after_step_judo
+after_all = after_all_judo</code></pre>
+            
+            <h2>🏃 Step 3: Run Your Test (30 seconds)</h2>
+            <pre><code>behave features/</code></pre>
+            
+            <p><strong>You'll see:</strong></p>
+            <pre><code>🥋 Judo Framework - Captura automática de reportes activada
+
+📋 Feature: My First API Test
+  📝 Scenario: Get user information
+    ✅ Given I have a Judo API client
+    ✅ And the base URL is "https://jsonplaceholder.typicode.com"
+    ✅ When I send a GET request to "/users/1"
+    ✅ Then the response status should be 200
+    ✅ And the response should contain "name"
+    ✅ And the response should contain "email"
+  ✅ Scenario completado: Get user information
+
+📊 Reporte HTML generado: judo_reports/test_execution_report.html
+
+============================================================
+📈 RESUMEN DE EJECUCIÓN
+============================================================
+Features:  1
+Scenarios: 1 (✅ 1 | ❌ 0 | ⏭️ 0)
+Steps:     6 (✅ 6 | ❌ 0 | ⏭️ 0)
+Tasa de éxito: 100.0%
+============================================================</code></pre>
+            
+            <h2>🎉 That's It!</h2>
+            <p>You now have:</p>
+            <ul>
+                <li>✅ A working API test</li>
+                <li>✅ Automatic HTML report in <code>judo_reports/</code></li>
+                <li>✅ Complete test execution tracking</li>
+                <li>✅ Beautiful console output</li>
+            </ul>
+        </section>
+        
+        <!-- Project Structure Section -->
+        <section id="project-structure" class="judo-section">
+            <h1>📁 Recommended Project Structure</h1>
+            
+            <h2>Basic Structure</h2>
+            <p>Judo Framework works best with an organized project structure. Here's the recommended structure:</p>
+            
+            <pre><code>MyAPIProject/
+├── 📁 .venv/                          # Python virtual environment
+├── 📁 features/                       # BDD test files
+│   ├── 📁 steps/                      # Custom steps (optional)
+│   ├── 🥒 user_api.feature            # Test features
+│   ├── 🥒 product_api.feature
+│   └── 🐍 environment.py              # Judo configuration
+├── 📁 Runner/                         # Custom runner (optional)
+│   ├── 📁 judo_reports/               # Generated HTML reports
+│   │   ├── 📁 api_logs/               # Request/response logs
+│   │   └── 📄 test_execution_report.html
+│   └── 🐍 runner.py                   # Custom BaseRunner
+├── 📁 test_data/                      # Test data
+│   ├── 📁 requests/                   # JSON files for requests
+│   ├── 📁 responses/                  # Expected responses
+│   └── 📁 schemas/                    # JSON schemas
+├── 📁 base_requests/                  # Request templates (optional)
+├── 📁 base_responses/                 # Response templates (optional)
+├── 📁 base_variables/                 # Base variables (optional)
+├── 📄 .env                            # Environment variables
+├── 📄 requirements.txt                # Python dependencies
+└── 📄 README.md                       # Project documentation</code></pre>
+            
+            <h2>Directory Descriptions</h2>
+            
+            <h3>📁 features/</h3>
+            <p><strong>Main BDD test directory</strong></p>
+            <ul>
+                <li><strong>*.feature</strong> - Gherkin files with test scenarios</li>
+                <li><strong>environment.py</strong> - Judo Framework hooks configuration</li>
+                <li><strong>steps/</strong> - Additional custom steps (optional)</li>
+            </ul>
+            
+            <h3>📁 Runner/ (Optional)</h3>
+            <p><strong>For projects using BaseRunner</strong></p>
+            <ul>
+                <li><strong>runner.py</strong> - Custom BaseRunner configuration</li>
+                <li><strong>judo_reports/</strong> - Auto-generated HTML reports and logs</li>
+                <li><strong>api_logs/</strong> - Detailed JSON request/response logs</li>
+            </ul>
+            
+            <h3>📁 test_data/</h3>
+            <p><strong>Organized test data</strong></p>
+            <ul>
+                <li><strong>requests/</strong> - JSON files for request bodies</li>
+                <li><strong>responses/</strong> - Expected responses for validation</li>
+                <li><strong>schemas/</strong> - JSON schemas for structure validation</li>
+            </ul>
+            
+            <h3>📁 base_* (Optional)</h3>
+            <p><strong>Templates and base configurations</strong></p>
+            <ul>
+                <li><strong>base_requests/</strong> - Reusable request templates</li>
+                <li><strong>base_responses/</strong> - Response templates</li>
+                <li><strong>base_variables/</strong> - Project base variables</li>
+            </ul>
+            
+            <h2>Key Files</h2>
+            
+            <h3>📄 features/environment.py</h3>
+            <p><strong>Minimal required configuration:</strong></p>
+            <pre><code>from judo.behave import *
+
+before_all = before_all_judo
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_scenario = before_scenario_judo
+after_scenario = after_scenario_judo
+before_step = before_step_judo
+after_step = after_step_judo
+after_all = after_all_judo</code></pre>
+            
+            <h3>📄 .env</h3>
+            <p><strong>Environment variables for sensitive data:</strong></p>
+            <pre><code># API Configuration
+API_BASE_URL=https://api.example.com
+API_TOKEN=Bearer abc123xyz789
+API_KEY=sk_test_456789
+
+# Database (if applicable)
+DB_HOST=localhost
+DB_USER=testuser
+DB_PASS=testpass
+
+# Environment
+ENVIRONMENT=testing
+DEBUG=true</code></pre>
+            
+            <h3>📄 Runner/runner.py (Optional)</h3>
+            <p><strong>Custom BaseRunner with advanced configuration:</strong></p>
+            <pre><code>from judo.runner.base_runner import BaseRunner
+import os
+
+# Enable reporter debug
+os.environ['JUDO_DEBUG_REPORTER'] = 'true'
+
+class MyRunner(BaseRunner):
+    def __init__(self):
+        # Adjust paths to your structure
+        super().__init__(
+            features_dir="../features",  # Go up one level and enter features
+            output_dir="./judo_reports",  # Reports in Runner/judo_reports
+            
+            generate_cucumber_json=False,
+            cucumber_json_dir="./judo_reports/cucumber-json",
+            
+            parallel=False,
+            max_workers=6,
+            
+            save_requests_responses=True,  # 🆕 Enable logging
+            requests_responses_dir="./judo_reports/api_logs"
+        )
+    
+    def run_smoke_tests(self):
+        features = self.find_features(tags=["@smoke"])
+        print(f"📁 Files found with @smoke:")
+        for f in features:
+            print(f"  - {f}")
+        
+        return self.run(tags=["@smoke"])
+    
+    def run_headers_tests(self):
+        features = self.find_features(tags=["@headers"])
+        print(f"📁 Files found with @headers:")
+        for f in features:
+            print(f"  - {f}")
+        
+        return self.run(tags=["@headers"])
+    
+    def run_api_tests_parallel(self):
+        self.set_parallel(True, max_workers=8)
+        return self.run(tags=["@api"], exclude_tags=["@manual"])
+
+# Usage
+if __name__ == "__main__":
+    # Change to correct directory
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    
+    runner = MyRunner()
+    
+    print("🥋 Judo Framework - Running from Runner/")
+    print(f"📁 features dir: {os.path.abspath('../features')}")
+    print(f"📊 Reports dir: {os.path.abspath('./judo_reports')}")
+    
+    try:
+        results = runner.run_smoke_tests()
+        print(f"📊 Result: {results['passed']}/{results['total']} tests passed")
+        
+        if results['total'] > 0:
+            print(f"📄 View HTML report at: Runner/judo_reports/")
+    
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        print("💡 Verify that .feature files have the correct tags")</code></pre>
+            
+            <h2>Feature Example</h2>
+            <p><strong>features/user_api.feature:</strong></p>
+            <pre><code># language: en
+@users @api
+Feature: User Management API
+  As a developer
+  I want to test the user API
+  To ensure it works correctly
+
+  Background:
+    Given I have a Judo API client
+    And the base URL is "https://api.example.com"
+    And I set the header "Authorization" from env "API_TOKEN"
+
+  @smoke @create
+  Scenario: Create a new user
+    When I POST to "/users" with JSON file "test_data/requests/new_user.json"
+    Then the response status should be 201
+    And the response should match schema file "test_data/schemas/user_schema.json"
+    And I extract "id" from the response as "userId"
+
+  @smoke @read
+  Scenario: Get created user
+    Given I set the variable "userId" to 1
+    When I send a GET request to "/users/{userId}"
+    Then the response status should be 200
+    And the response should contain "name"
+    And the response should contain "email"</code></pre>
+            
+            <h2>Execution Commands</h2>
+            
+            <h3>Direct Execution with Behave</h3>
+            <pre><code># Run all tests
+behave features/
+
+# Run by tags
+behave features/ --tags=@smoke
+behave features/ --tags=@users
+behave features/ --tags="@smoke and @users"
+
+# Run specific feature
+behave features/user_api.feature
+
+# Run with specific format
+behave features/ --format=progress</code></pre>
+            
+            <h3>Execution with BaseRunner</h3>
+            <pre><code># From Runner/ directory
+cd Runner/
+python runner.py
+
+# Or run specific methods
+python -c "from runner import MyRunner; MyRunner().run_smoke_tests()"</code></pre>
+            
+            <h2>Best Practices</h2>
+            
+            <h3>🏷️ Organization with Tags</h3>
+            <ul>
+                <li><strong>@smoke</strong> - Critical basic tests</li>
+                <li><strong>@regression</strong> - Complete regression suite</li>
+                <li><strong>@api</strong> - All API tests</li>
+                <li><strong>@users</strong> - User-specific tests</li>
+                <li><strong>@products</strong> - Product-specific tests</li>
+                <li><strong>@create, @update, @delete</strong> - By CRUD operation</li>
+            </ul>
+            
+            <h3>📂 File Organization</h3>
+            <ul>
+                <li>One feature per API module/entity</li>
+                <li>Descriptive names for data files</li>
+                <li>Reusable JSON schemas</li>
+                <li>Environment variables for sensitive data</li>
+            </ul>
+            
+            <h3>🔄 Workflow</h3>
+            <ol>
+                <li>Create/update .feature files</li>
+                <li>Prepare test data in test_data/</li>
+                <li>Configure variables in .env</li>
+                <li>Run tests with behave or BaseRunner</li>
+                <li>Review HTML reports in judo_reports/</li>
+                <li>Analyze API logs in api_logs/ if needed</li>
+            </ol>
+            
+            <div style="background-color: #e8f4fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <h4>💡 Pro Tip</h4>
+                <p>Use this structure from the beginning of your project. It will save you time in organization and long-term maintenance. The structure is scalable and works for both small and large projects.</p>
+            </div>
+        </section>
+        
+        <!-- Installation Section -->
+        <section id="installation" class="judo-section">
+            <h1>🔧 Installation Options</h1>
+            
+            <h2>Basic Installation</h2>
+            <pre><code>pip install judo-framework</code></pre>
+            
+            <h2>With Optional Features</h2>
+            
+            <h3>Cryptography support (JWT, OAuth, encryption)</h3>
+            <pre><code>pip install judo-framework[crypto]</code></pre>
+            
+            <h3>XML/SOAP testing support</h3>
+            <pre><code>pip install judo-framework[xml]</code></pre>
+            
+            <h3>Browser automation (Selenium, Playwright)</h3>
+            <pre><code>pip install judo-framework[browser]</code></pre>
+            
+            <h3>All features</h3>
+            <pre><code>pip install judo-framework[full]</code></pre>
+            
+            <h2>Requirements</h2>
+            <ul>
+                <li>Python 3.8 or higher</li>
+                <li>pip (Python package manager)</li>
+                <li>behave (installed automatically)</li>
+                <li>python-dotenv (for .env support)</li>
+            </ul>
+            
+            <h2>Verify Installation</h2>
+            <pre><code>python -c "import judo; print(f'Judo Framework v{judo.__version__} installed successfully!')"</code></pre>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="judo-section">
+            <h1>🎯 Key Features</h1>
+            
+            <h2>🥋 Karate-like DSL</h2>
+            <p>Familiar syntax for Karate Framework users with Python's power:</p>
+            <pre><code>from judo import Judo
+
+judo = Judo()
+response = judo.get("https://api.example.com/users/1")
+
+# Karate-style matching
+judo.match(response.status, 200)
+judo.match(response.json["name"], "##string")
+judo.match(response.json["email"], "##email")
+judo.match(response.json["age"], "##number")</code></pre>
+            
+            <h2>🎭 BDD Integration (Behave/Gherkin)</h2>
+            <p>Full Behave support with 100+ predefined steps in English and Spanish</p>
+            
+            <h2>🌐 Complete HTTP Testing</h2>
+            <p>All HTTP methods with full control:</p>
+            <pre><code>Scenario: Complete CRUD operations
+  Given I have a Judo API client
+  And the base URL is "https://api.example.com"
+  
+  # CREATE
+  When I send a POST request to "/users" with JSON:
+    """
+    {"name": "John", "email": "john@example.com"}
+    """
+  Then the response status should be 201
+  And I extract "id" from the response as "userId"
+  
+  # READ
+  When I send a GET request to "/users/{userId}"
+  Then the response status should be 200
+  
+  # UPDATE
+  When I send a PUT request to "/users/{userId}" with JSON:
+    """
+    {"name": "John Updated"}
+    """
+  Then the response status should be 200
+  
+  # DELETE
+  When I send a DELETE request to "/users/{userId}"
+  Then the response status should be 204</code></pre>
+            
+            <h2>🔐 Environment Variables Support</h2>
+            <p>Load sensitive data from .env files:</p>
+            <pre><code># .env file
+API_TOKEN=Bearer abc123xyz
+API_KEY=sk_test_456789
+
+# In your tests
+Given I set the header "Authorization" from env "API_TOKEN"
+And I set the header "X-API-Key" from env "API_KEY"</code></pre>
+            
+            <h2>📄 File Support (Like Karate's read())</h2>
+            <p>Load test data from JSON, YAML, or CSV files:</p>
+            <pre><code># Load test data
+user_data = judo.read("test_data/users/create_user.json")
+response = judo.post("/users", json=user_data)
+
+# In Gherkin
+Scenario: Create user from file
+  When I POST to "/users" with JSON file "test_data/users/john.json"
+  Then the response status should be 201</code></pre>
+            
+            <h2>⚡ Parallel Execution</h2>
+            <p>Run tests faster with parallel execution:</p>
+            <pre><code>from judo.runner import BaseRunner
+
+runner = BaseRunner(
+    features_dir="features",
+    parallel=True,
+    max_workers=8
+)
+
+results = runner.run(tags=["@api"])</code></pre>
+            
+            <h2>🎭 Built-in Mock Server</h2>
+            <p>Test without external dependencies:</p>
+            <pre><code>from judo import Judo
+
+judo = Judo()
+
+# Start mock server
+mock = judo.start_mock(port=8080)
+
+# Configure mock responses
+mock.when("GET", "/users/1").then(
+    status=200,
+    json={"id": 1, "name": "Mock User"}
+)
+
+# Test against mock
+response = judo.get("http://localhost:8080/users/1")
+judo.match(response.json["name"], "Mock User")</code></pre>
+            
+            <h2>✅ Schema Validation</h2>
+            <p>Validate responses against JSON schemas:</p>
+            <pre><code>Scenario: Validate user schema
+  When I send a GET request to "/users/1"
+  Then the response should match schema file "schemas/user_schema.json"</code></pre>
+        </section>
+        <!-- Comparison Section -->
+        <section id="comparison" class="judo-section">
+            <h1>🆚 Comparison with Karate</h1>
+            
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Feature</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Karate (Java)</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Judo (Python)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Language</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Java/JavaScript</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Python</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>BDD Support</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Cucumber</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Behave</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>DSL Syntax</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Karate DSL</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Similar DSL</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>HTTP Testing</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Full</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Full</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>File Support</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ read()</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ read()</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>HTML Reports</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Built-in</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Automatic</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Parallel Execution</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Yes</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Yes</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Mock Server</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Yes</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Yes</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Spanish Support</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">❌ No</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Yes</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Environment Variables</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">❌ Limited</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Full .env support</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Setup Complexity</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Medium</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Very Simple</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><strong>Python Ecosystem</strong></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">❌ No</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">✅ Full Access</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2>Migration Example</h2>
+            
+            <h3>Karate:</h3>
+            <pre><code>Feature: User API
+
+Scenario: Get user
+  Given url 'https://api.example.com'
+  And path 'users', 1
+  When method get
+  Then status 200
+  And match response.name == '#string'
+  And match response.email == '#email'</code></pre>
+            
+            <h3>Judo:</h3>
+            <pre><code>Feature: User API
+
+Scenario: Get user
+  Given I have a Judo API client
+  And the base URL is "https://api.example.com"
+  When I send a GET request to "/users/1"
+  Then the response status should be 200
+  And the response field "name" should be a string
+  And the response field "email" should be an email</code></pre>
+        </section>
+        <!-- Steps: Configuration -->
+        <section id="steps-config" class="judo-section">
+            <h1>🔧 Configuration Steps</h1>
+            
+            <h2>Initialize Judo Client</h2>
+            <p><strong>English:</strong> <code>Given I have a Judo API client</code></p>
+            <p>Initializes the Judo context for API testing.</p>
+            <pre><code>Given I have a Judo API client</code></pre>
+            
+            <h2>Set Base URL</h2>
+            <p><strong>English:</strong> <code>Given the base URL is "{url}"</code></p>
+            <p>Establishes the base URL for all subsequent API requests.</p>
+            <pre><code>Given the base URL is "https://api.example.com"
+When I send a GET request to "/users/1"
+# Will call: https://api.example.com/users/1</code></pre>
+            
+            <h2>Set Variable (String)</h2>
+            <p><strong>English:</strong> <code>Given I set the variable "{name}" to "{value}"</code></p>
+            <p>Creates or updates a string variable for later use.</p>
+            <pre><code>Given I set the variable "apiKey" to "sk_test_abc123xyz"
+And I set the header "Authorization" to "Bearer {apiKey}"</code></pre>
+            
+            <h2>Set Variable (Number)</h2>
+            <p><strong>English:</strong> <code>Given I set the variable "{name}" to {value:d}</code></p>
+            <p>Creates or updates a numeric variable.</p>
+            <pre><code>Given I set the variable "userId" to 42
+When I send a GET request to "/users/{userId}"</code></pre>
+            
+            <h2>Set Variable (JSON)</h2>
+            <p><strong>English:</strong> <code>Given I set the variable "{name}" to the JSON</code></p>
+            <p>Stores a complete JSON object in a variable.</p>
+            <pre><code>Given I set the variable "newUser" to the JSON
+  """
+  {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "age": 30
+  }
+  """
+When I send a POST request to "/users" with the variable "newUser"</code></pre>
+            
+            <h2>Set Header</h2>
+            <p><strong>English:</strong> <code>Given I set the header "{name}" to "{value}"</code></p>
+            <p>Adds a custom HTTP header to all subsequent requests.</p>
+            <pre><code>Given I set the header "X-API-Version" to "v2"
+And I set the header "Accept-Language" to "en-US"</code></pre>
+            
+            <h2>Set Query Parameter</h2>
+            <p><strong>English:</strong> <code>Given I set the query parameter "{name}" to "{value}"</code></p>
+            <p>Adds a query parameter to the next request.</p>
+            <pre><code>Given I set the query parameter "page" to "1"
+And I set the query parameter "limit" to "10"
+When I send a GET request to "/users"
+# Calls: /users?page=1&limit=10</code></pre>
+        </section>
+
+        <!-- Steps: Authentication -->
+        <section id="steps-auth" class="judo-section">
+            <h1>🔐 Authentication Steps</h1>
+            
+            <h2>Bearer Token Authentication</h2>
+            <p><strong>English:</strong> <code>Given I use bearer token "{token}"</code></p>
+            <p>Configures Bearer token authentication (JWT).</p>
+            <pre><code>Given I use bearer token "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+When I send a GET request to "/protected/profile"
+Then the response status should be 200
+
+# Using token from variable
+Given I send a POST request to "/auth/login" with JSON:
+  """
+  {"username": "user@example.com", "password": "secret"}
+  """
+And I extract "token" from the response as "authToken"
+And I use bearer token "{authToken}"
+When I send a GET request to "/protected/data"</code></pre>
+            
+            <h2>Basic Authentication</h2>
+            <p><strong>English:</strong> <code>Given I use basic authentication with username "{username}" and password "{password}"</code></p>
+            <p>Configures HTTP Basic Authentication.</p>
+            <pre><code>Given I use basic authentication with username "admin" and password "P@ssw0rd123"
+When I send a GET request to "/admin/users"
+Then the response status should be 200</code></pre>
+            
+            <h2>Set Header from Environment Variable (NEW!)</h2>
+            <p><strong>English:</strong> <code>Given I set the header "{header_name}" from env "{env_var_name}"</code></p>
+            <p>Loads a header value from environment variable or .env file.</p>
+            <pre><code># Create .env file:
+# API_TOKEN=Bearer abc123xyz
+# API_KEY=sk_test_456
+
+Given I set the header "Authorization" from env "API_TOKEN"
+And I set the header "X-API-Key" from env "API_KEY"
+When I send a GET request to "/protected/resource"
+Then the response status should be 200</code></pre>
+        </section>
+
+        <!-- Steps: HTTP Requests -->
+        <section id="steps-http" class="judo-section">
+            <h1>🌐 HTTP Request Steps</h1>
+            
+            <h2>GET Request</h2>
+            <p><strong>English:</strong> <code>When I send a GET request to "{endpoint}"</code></p>
+            <p>Sends an HTTP GET request to retrieve data.</p>
+            <pre><code>When I send a GET request to "/users/1"
+Then the response status should be 200</code></pre>
+            
+            <h2>POST Request (With JSON Body)</h2>
+            <p><strong>English:</strong> <code>When I send a POST request to "{endpoint}" with JSON</code></p>
+            <p>Sends an HTTP POST request with JSON payload.</p>
+            <pre><code>When I send a POST request to "/users" with JSON
+  """
+  {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "age": 30
+  }
+  """
+Then the response status should be 201
+And I extract "id" from the response as "newUserId"</code></pre>
+            
+            <h2>POST Request (With Variable)</h2>
+            <p><strong>English:</strong> <code>When I send a POST request to "{endpoint}" with the variable "{var_name}"</code></p>
+            <p>Sends an HTTP POST request with JSON data from a variable.</p>
+            <pre><code>Given I set the variable "userData" to the JSON
+  """
+  {"name": "John", "email": "john@example.com"}
+  """
+When I send a POST request to "/users" with the variable "userData"</code></pre>
+            
+            <h2>Request with Variable Method</h2>
+            <p><strong>English:</strong> <code>When I send a {method} request to "{endpoint}" with the variable "{var_name}"</code></p>
+            <p>Sends an HTTP request of any method with data from a variable.</p>
+            <pre><code># Works with any HTTP method
+When I send a POST request to "/users" with the variable "userData"
+When I send a PUT request to "/users/1" with the variable "updateData"
+When I send a PATCH request to "/users/1" with the variable "patchData"</code></pre>
+            
+            <h2>PUT Request</h2>
+            <p><strong>English:</strong> <code>When I send a PUT request to "{endpoint}" with JSON</code></p>
+            <p>Sends an HTTP PUT request to completely replace a resource.</p>
+            <pre><code>When I send a PUT request to "/users/1" with JSON
+  """
+  {
+    "name": "John Doe Updated",
+    "email": "john.updated@example.com",
+    "age": 31
+  }
+  """
+Then the response status should be 200</code></pre>
+            
+            <h2>PATCH Request</h2>
+            <p><strong>English:</strong> <code>When I send a PATCH request to "{endpoint}" with JSON</code></p>
+            <p>Sends an HTTP PATCH request to partially update a resource.</p>
+            <pre><code>When I send a PATCH request to "/users/1" with JSON
+  """
+  {
+    "email": "newemail@example.com"
+  }
+  """
+Then the response status should be 200</code></pre>
+            
+            <h2>DELETE Request</h2>
+            <p><strong>English:</strong> <code>When I send a DELETE request to "{endpoint}"</code></p>
+            <p>Sends an HTTP DELETE request to remove a resource.</p>
+            <pre><code>When I send a DELETE request to "/users/1"
+Then the response status should be 204</code></pre>
+        </section>
+        <!-- Steps: Validation -->
+        <section id="steps-validation" class="judo-section">
+            <h1>✅ Response Validation Steps</h1>
+            
+            <h2>Validate Status Code</h2>
+            <p><strong>English:</strong> <code>Then the response status should be {status:d}</code></p>
+            <p>Validates the HTTP response status code.</p>
+            <pre><code># Common status codes:
+# 200 - OK
+# 201 - Created
+# 204 - No Content
+# 400 - Bad Request
+# 401 - Unauthorized
+# 404 - Not Found
+# 500 - Server Error
+
+Then the response status should be 200
+Then the response status should be 201
+Then the response status should be 404</code></pre>
+            
+            <h2>Validate Successful Response</h2>
+            <p><strong>English:</strong> <code>Then the response should be successful</code></p>
+            <p>Validates that the response is successful (2xx status codes).</p>
+            <pre><code>Then the response should be successful
+# Accepts 200, 201, 202, 204, etc.</code></pre>
+            
+            <h2>Validate Response Contains Field</h2>
+            <p><strong>English:</strong> <code>Then the response should contain "{key}"</code></p>
+            <p>Validates that a field exists in the response.</p>
+            <pre><code>Then the response should contain "id"
+And the response should contain "name"
+And the response should contain "email"</code></pre>
+            
+            <h2>Validate Field Value (String)</h2>
+            <p><strong>English:</strong> <code>Then the response field "{key}" should equal "{value}"</code></p>
+            <p>Validates exact string value match (case-sensitive).</p>
+            <pre><code>Then the response field "name" should equal "John Doe"
+And the response field "email" should equal "john@example.com"</code></pre>
+            
+            <h2>Validate Field Value (Number)</h2>
+            <p><strong>English:</strong> <code>Then the response field "{key}" should equal {value:d}</code></p>
+            <p>Validates exact numeric value.</p>
+            <pre><code>Then the response field "id" should equal 1
+And the response field "age" should equal 30</code></pre>
+            
+            <h2>Validate Response Time</h2>
+            <p><strong>English:</strong> <code>Then the response time should be less than {max_time:f} seconds</code></p>
+            <p>Validates response time performance.</p>
+            <pre><code>Then the response time should be less than 2.0 seconds</code></pre>
+            
+            <h2>Validate JSON Path</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be "{expected_value}"</code></p>
+            <p>Validates a specific JSON path value.</p>
+            <pre><code>Then the response "$.user.name" should be "John Doe"
+And the response "$.user.address.city" should be "New York"</code></pre>
+        </section>
+
+        <!-- Steps: Data Extraction -->
+        <section id="steps-data" class="judo-section">
+            <h1>💾 Data Extraction Steps</h1>
+            
+            <h2>Extract Field to Variable</h2>
+            <p><strong>English:</strong> <code>When I extract "{json_path}" from the response as "{variable_name}"</code></p>
+            <p>Extracts a value from the response and stores it in a variable.</p>
+            <pre><code>When I send a POST request to "/users" with JSON:
+  """
+  {"name": "John"}
+  """
+Then the response status should be 201
+And I extract "id" from the response as "userId"
+
+# Use extracted variable
+When I send a GET request to "/users/{userId}"
+Then the response status should be 200</code></pre>
+            
+            <h2>Store Complete Response</h2>
+            <p><strong>English:</strong> <code>When I store the response as "{variable_name}"</code></p>
+            <p>Stores the entire response in a variable.</p>
+            <pre><code>When I send a GET request to "/users/1"
+And I store the response as "userResponse"</code></pre>
+        </section>
+
+        <!-- Steps: Arrays -->
+        <section id="steps-arrays" class="judo-section">
+            <h1>📊 Array/Collection Steps</h1>
+            
+            <h2>Validate Response is Array</h2>
+            <p><strong>English:</strong> <code>Then the response should be an array</code></p>
+            <p>Validates that the response is a JSON array.</p>
+            <pre><code>When I send a GET request to "/users"
+Then the response should be an array</code></pre>
+            
+            <h2>Validate Array Count</h2>
+            <p><strong>English:</strong> <code>Then the response array should have {count:d} items</code></p>
+            <p>Validates the number of items in the response array.</p>
+            <pre><code>Then the response array should have 10 items</code></pre>
+            
+            <h2>Validate Array Contains Item</h2>
+            <p><strong>English:</strong> <code>Then the response array should contain an item with "{key}" equal to "{value}"</code></p>
+            <p>Validates that the array contains an item with a specific key-value pair.</p>
+            <pre><code>Then the response array should contain an item with "name" equal to "John Doe"
+And the response array should contain an item with "email" equal to "john@example.com"</code></pre>
+            
+            <h2>Validate Nested Array Contains Item</h2>
+            <p><strong>English:</strong> <code>Then the response array "{array_path}" should contain an item with "{key}" equal to "{value}"</code></p>
+            <p>Validates that a nested array contains an item with a specific key-value pair.</p>
+            <pre><code># For response: {"users": [{"id": 1, "name": "John"}, {"id": 2, "name": "Jane"}]}
+Then the response array "users" should contain an item with "name" equal to "John"
+
+# For root-level array: [{"id": 1, "name": "John"}, {"id": 2, "name": "Jane"}]
+Then the response array "users" should contain an item with "name" equal to "John"</code></pre>
+        </section>
+        <!-- Steps: File Operations -->
+        <section id="steps-files" class="judo-section">
+            <h1>📄 File Operations Steps</h1>
+            
+            <h2>POST with JSON File</h2>
+            <p><strong>English:</strong> <code>When I POST to "{endpoint}" with JSON file "{file_path}"</code></p>
+            <p><strong>English (Alternative):</strong> <code>When I send a POST request to "{endpoint}" with JSON file "{file_path}"</code></p>
+            <p>Sends a POST request with JSON data from a file.</p>
+            <pre><code>When I POST to "/users" with JSON file "test_data/create_user.json"
+Then the response status should be 201
+
+# Alternative longer syntax
+When I send a POST request to "/users" with JSON file "test_data/create_user.json"</code></pre>
+            
+            <h2>PUT with JSON File</h2>
+            <p><strong>English:</strong> <code>When I PUT to "{endpoint}" with JSON file "{file_path}"</code></p>
+            <p><strong>English (Alternative):</strong> <code>When I send a PUT request to "{endpoint}" with JSON file "{file_path}"</code></p>
+            <p>Sends a PUT request with JSON data from a file.</p>
+            <pre><code>When I PUT to "/users/1" with JSON file "test_data/update_user.json"
+Then the response status should be 200
+
+# Alternative longer syntax
+When I send a PUT request to "/users/1" with JSON file "test_data/update_user.json"</code></pre>
+            
+            <h2>PATCH with JSON File</h2>
+            <p><strong>English:</strong> <code>When I PATCH to "{endpoint}" with JSON file "{file_path}"</code></p>
+            <p><strong>English (Alternative):</strong> <code>When I send a PATCH request to "{endpoint}" with JSON file "{file_path}"</code></p>
+            <p>Sends a PATCH request with JSON data from a file.</p>
+            <pre><code>When I PATCH to "/users/1" with JSON file "test_data/patch_user.json"
+Then the response status should be 200
+
+# Alternative longer syntax
+When I send a PATCH request to "/users/1" with JSON file "test_data/patch_user.json"</code></pre>
+            
+            <h2>Validate Response Matches Schema File</h2>
+            <p><strong>English:</strong> <code>Then the response should match schema file "{file_path}"</code></p>
+            <p>Validates the response against a JSON schema file.</p>
+            <pre><code>Then the response should match schema file "schemas/user_schema.json"</code></pre>
+            
+            <h2>Save Response to File</h2>
+            <p><strong>English:</strong> <code>When I save the response to file "{file_path}"</code></p>
+            <p>Saves the response to a file.</p>
+            <pre><code>When I save the response to file "output/user_response.json"</code></pre>
+            
+            <h2>Save Variable to File</h2>
+            <p><strong>English:</strong> <code>When I save the variable "{var_name}" to file "{file_path}"</code></p>
+            <p>Saves the content of a variable to a file.</p>
+            <pre><code>Given I extract "title" from the response as "postTitle"
+When I save the variable "postTitle" to file "output/post_title.txt"</code></pre>
+        </section>
+
+        <!-- Steps: Schema -->
+        <section id="steps-schema" class="judo-section">
+            <h1>✅ Schema Validation Steps</h1>
+            
+            <h2>Validate Against Schema</h2>
+            <p><strong>English:</strong> <code>Then the response should match the schema</code></p>
+            <p>Validates the response against a JSON schema.</p>
+            <pre><code>When I send a GET request to "/users/1"
+Then the response should match the schema
+  """
+  {
+    "type": "object",
+    "properties": {
+      "id": {"type": "number"},
+      "name": {"type": "string"},
+      "email": {"type": "string", "format": "email"}
+    },
+    "required": ["id", "name", "email"]
+  }
+  """</code></pre>
+            
+            <h2>Validate Response Structure</h2>
+            <p><strong>English:</strong> <code>Then the response should have the following structure</code></p>
+            <p>Validates the response against a JSON structure with patterns.</p>
+            <pre><code>Then the response should have the following structure
+  """
+  {
+    "id": "#number",
+    "name": "#string",
+    "email": "#email",
+    "active": "#boolean"
+  }
+  """</code></pre>
+            
+            <h2>Validate Response Matches Schema File</h2>
+            <p><strong>English:</strong> <code>Then the response should match schema file "{file_path}"</code></p>
+            <p>Validates the response against a JSON schema from a file.</p>
+            <pre><code>Then the response should match schema file "schemas/user_schema.json"</code></pre>
+            
+            <h2>JSON Schema Example</h2>
+            <p>Example schema file <code>schemas/user_schema.json</code>:</p>
+            <pre><code>{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 150
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {"type": "string"},
+        "city": {"type": "string"},
+        "zipCode": {"type": "string"}
+      },
+      "required": ["street", "city"]
+    }
+  },
+  "required": ["id", "name", "email"],
+  "additionalProperties": false
+}</code></pre>
+        </section>
+
+        <!-- Steps: Type Validation -->
+        <section id="steps-types" class="judo-section">
+            <h1>🔍 Type Validation Steps</h1>
+            
+            <h2>Validate Field is String</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be a string</code></p>
+            <p>Validates that a field is of type string.</p>
+            <pre><code>Then the response "$.user.name" should be a string
+And the response "$.user.email" should be a string</code></pre>
+            
+            <h2>Validate Field is Number</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be a number</code></p>
+            <p>Validates that a field is of type number.</p>
+            <pre><code>Then the response "$.user.age" should be a number
+And the response "$.user.id" should be a number</code></pre>
+            
+            <h2>Validate Field is Boolean</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be a boolean</code></p>
+            <p>Validates that a field is of type boolean.</p>
+            <pre><code>Then the response "$.user.active" should be a boolean
+And the response "$.user.verified" should be a boolean</code></pre>
+            
+            <h2>Validate Field is Array</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be an array</code></p>
+            <p>Validates that a field is of type array.</p>
+            <pre><code>Then the response "$.user.hobbies" should be an array
+And the response "$.user.skills" should be an array</code></pre>
+            
+            <h2>Validate Field is Object</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be an object</code></p>
+            <p>Validates that a field is of type object.</p>
+            <pre><code>Then the response "$.user.address" should be an object
+And the response "$.user.preferences" should be an object</code></pre>
+            
+            <h2>Validate Field is Null</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be null</code></p>
+            <p>Validates that a field is null.</p>
+            <pre><code>Then the response "$.user.deletedAt" should be null</code></pre>
+            
+            <h2>Validate Field is Not Null</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should not be null</code></p>
+            <p>Validates that a field is not null.</p>
+            <pre><code>Then the response "$.user.id" should not be null
+And the response "$.user.createdAt" should not be null</code></pre>
+            
+            <h2>Validate Email Format</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be a valid email</code></p>
+            <p>Validates that a field has a valid email format.</p>
+            <pre><code>Then the response "$.user.email" should be a valid email
+And the response "$.user.alternativeEmail" should be a valid email</code></pre>
+            
+            <h2>Validate UUID Format</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be a valid UUID</code></p>
+            <p>Validates that a field has a valid UUID format.</p>
+            <pre><code>Then the response "$.user.id" should be a valid UUID</code></pre>
+            
+            <h2>Validate URL Format</h2>
+            <p><strong>English:</strong> <code>Then the response "{json_path}" should be a valid URL</code></p>
+            <p>Validates that a field has a valid URL format.</p>
+            <pre><code>Then the response "$.user.website" should be a valid URL
+And the response "$.user.profilePicture" should be a valid URL</code></pre>
+            
+            <h2>Complete Type Validation Example</h2>
+            <pre><code>Scenario: Validate user data types
+  Given I have a Judo API client
+  And the base URL is "https://api.example.com"
+  When I send a GET request to "/users/1"
+  Then the response status should be 200
+  
+  # Type validations
+  And the response "$.id" should be a number
+  And the response "$.name" should be a string
+  And the response "$.email" should be a valid email
+  And the response "$.age" should be a number
+  And the response "$.active" should be a boolean
+  And the response "$.address" should be an object
+  And the response "$.hobbies" should be an array
+  And the response "$.website" should be a valid URL
+  And the response "$.uuid" should be a valid UUID
+  And the response "$.deletedAt" should be null
+  And the response "$.createdAt" should not be null</code></pre>
+        </section>
+
+        <!-- Steps: Utility -->
+        <section id="steps-utility" class="judo-section">
+            <h1>🛠️ Utility Steps</h1>
+            
+            <h2>Wait</h2>
+            <p><strong>English:</strong> <code>When I wait {seconds:f} seconds</code></p>
+            <p>Pauses execution for the specified number of seconds.</p>
+            <pre><code>When I send a POST request to "/jobs/start"
+And I wait 2.5 seconds
+When I send a GET request to "/jobs/status"</code></pre>
+            
+            <h2>Print Response</h2>
+            <p><strong>English:</strong> <code>When I print the response</code></p>
+            <p>Prints the response to the console for debugging.</p>
+            <pre><code>When I send a GET request to "/users/1"
+And I print the response</code></pre>
+            
+            <h2>Enable Request/Response Logging</h2>
+            <p><strong>English:</strong> <code>When I enable request/response logging</code></p>
+            <p>Enables automatic saving of all HTTP interactions to JSON files.</p>
+            <pre><code>When I enable request/response logging
+When I send a GET request to "/users/1"
+# Will be automatically saved to judo_reports/api_logs/</code></pre>
+            
+            <h2>Disable Request/Response Logging</h2>
+            <p><strong>English:</strong> <code>When I disable request/response logging</code></p>
+            <p>Disables automatic saving of HTTP interactions.</p>
+            <pre><code>When I disable request/response logging</code></pre>
+            
+            <h2>Enable Logging with Custom Directory</h2>
+            <p><strong>English:</strong> <code>When I enable request/response logging to directory "{directory}"</code></p>
+            <p>Enables logging with a custom directory.</p>
+            <pre><code>When I enable request/response logging to directory "logs/api_calls"</code></pre>
+            
+            <h2>Set Output Directory</h2>
+            <p><strong>English:</strong> <code>When I set the output directory to "{directory}"</code></p>
+            <p>Configures the directory where logs will be saved.</p>
+            <pre><code>When I set the output directory to "custom_logs"</code></pre>
+        </section>
+
+        <!-- Pattern Matching -->
+        <section id="patterns" class="judo-section">
+            <h1>🎯 Pattern Matching</h1>
+            <p>Judo Framework supports Karate-style pattern matching for flexible validations:</p>
+            
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Pattern</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Description</th>
+                        <th style="border: 1px solid #dee2e6; padding: 12px; text-align: left;">Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##string</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Any string</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"name": "##string"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##number</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Any number</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"age": "##number"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##boolean</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Boolean value</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"active": "##boolean"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##array</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Any array</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"items": "##array"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##object</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Any object</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"user": "##object"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##email</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">Email format</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"email": "##email"</code></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>##uuid</code></td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;">UUID format</td>
+                        <td style="border: 1px solid #dee2e6; padding: 12px;"><code>"id": "##uuid"</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2>📝 Variable Interpolation</h2>
+            <p>Variables can be used in endpoints and JSON bodies using <code>{variableName}</code> syntax:</p>
+            <pre><code>Given I set the variable "userId" to 42
+When I send a GET request to "/users/{userId}"
+
+When I send a POST request to "/posts" with JSON:
+  """
+  {
+    "userId": {userId},
+    "title": "My Post"
+  }
+  """</code></pre>
+            
+            <h2>🔐 Environment Variables</h2>
+            <p>Load sensitive data from .env files:</p>
+            <pre><code># .env file
+API_TOKEN=Bearer abc123xyz
+API_KEY=sk_test_456789
+BASE_URL=https://api.example.com
+
+# In your tests
+Given I set the header "Authorization" from env "API_TOKEN"
+And I set the header "X-API-Key" from env "API_KEY"</code></pre>
+        </section>
+        <!-- Advanced Examples -->
+        <section id="examples" class="judo-section">
+            <h1>🚀 Advanced Examples</h1>
+            
+            <h2>Complete CRUD Workflow</h2>
+            <pre><code>Feature: User Management API
+
+  Background:
+    Given I have a Judo API client
+    And the base URL is "https://api.example.com"
+    And I set the header "Authorization" from env "API_TOKEN"
+
+  Scenario: Complete user lifecycle
+    # CREATE - Create a new user
+    When I send a POST request to "/users" with JSON:
+      """
+      {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "user"
+      }
+      """
+    Then the response status should be 201
+    And the response should contain "id"
+    And I extract "id" from the response as "userId"
+    
+    # READ - Get the created user
+    When I send a GET request to "/users/{userId}"
+    Then the response status should be 200
+    And the response field "name" should equal "John Doe"
+    And the response field "email" should equal "john@example.com"
+    
+    # UPDATE - Update the user
+    When I send a PUT request to "/users/{userId}" with JSON:
+      """
+      {
+        "name": "John Doe Updated",
+        "email": "john.updated@example.com",
+        "role": "admin"
+      }
+      """
+    Then the response status should be 200
+    And the response field "name" should equal "John Doe Updated"
+    
+    # PARTIAL UPDATE - Update only email
+    When I send a PATCH request to "/users/{userId}" with JSON:
+      """
+      {
+        "email": "john.final@example.com"
+      }
+      """
+    Then the response status should be 200
+    And the response field "email" should equal "john.final@example.com"
+    
+    # DELETE - Remove the user
+    When I send a DELETE request to "/users/{userId}"
+    Then the response status should be 204
+    
+    # VERIFY DELETION - Confirm user is gone
+    When I send a GET request to "/users/{userId}"
+    Then the response status should be 404</code></pre>
+            
+            <h2>Authentication Flow</h2>
+            <pre><code>Feature: Authentication Workflow
+
+  Background:
+    Given I have a Judo API client
+    And the base URL is "https://api.example.com"
+
+  Scenario: Login and access protected resources
+    # Login to get token
+    When I send a POST request to "/auth/login" with JSON:
+      """
+      {
+        "username": "admin@example.com",
+        "password": "secure123"
+      }
+      """
+    Then the response status should be 200
+    And the response should contain "token"
+    And I extract "token" from the response as "authToken"
+    
+    # Use token for protected endpoint
+    Given I use bearer token "{authToken}"
+    When I send a GET request to "/protected/profile"
+    Then the response status should be 200
+    And the response should contain "user"
+    
+    # Test token refresh
+    When I send a POST request to "/auth/refresh" with JSON:
+      """
+      {
+        "token": "{authToken}"
+      }
+      """
+    Then the response status should be 200
+    And I extract "token" from the response as "newToken"
+    
+    # Use new token
+    Given I use bearer token "{newToken}"
+    When I send a GET request to "/protected/admin"
+    Then the response status should be 200</code></pre>
+            
+            <h2>Data-Driven Testing with Files</h2>
+            <pre><code>Feature: Data-Driven User Creation
+
+  Background:
+    Given I have a Judo API client
+    And the base URL is "https://api.example.com"
+    And I set the header "Authorization" from env "API_TOKEN"
+
+  Scenario: Create user from file
+    When I POST to "/users" with JSON file "test_data/users/john.json"
+    Then the response status should be 201
+    And the response should match schema file "schemas/user_response.json"
+    
+  Scenario: Validate user schema
+    When I send a GET request to "/users/1"
+    Then the response status should be 200
+    And the response should match schema file "schemas/user_schema.json"</code></pre>
+            
+            <h2>Array and Collection Testing</h2>
+            <pre><code>Feature: Collection Operations
+
+  Background:
+    Given I have a Judo API client
+    And the base URL is "https://jsonplaceholder.typicode.com"
+
+  Scenario: Test user collection
+    When I send a GET request to "/users"
+    Then the response status should be 200
+    And the response should be an array
+    And the response array should have 10 items
+    And the response array should contain an item with "name" equal to "Leanne Graham"
+    And the response array should contain an item with "username" equal to "Bret"
+    
+  Scenario: Test pagination
+    Given I set the query parameter "_page" to "1"
+    And I set the query parameter "_limit" to "5"
+    When I send a GET request to "/posts"
+    Then the response status should be 200
+    And the response should be an array
+    And the response array should have 5 items</code></pre>
+        </section>
+
+        <!-- Documentation -->
+        <section id="documentation" class="judo-section">
+            <h1>📚 Documentation</h1>
+            
+            <h2>🌐 Official Documentation</h2>
+            <p><strong>Complete documentation:</strong> <a href="http://centyc.cl/judo-framework/" target="_blank">http://centyc.cl/judo-framework/</a></p>
+            
+            <h2>📖 Quick Links</h2>
+            <ul>
+                <li><strong>GitHub Repository:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework" target="_blank">https://github.com/FelipeFariasAlfaro/Judo-Framework</a></li>
+                <li><strong>PyPI Package:</strong> <a href="https://pypi.org/project/judo-framework/" target="_blank">https://pypi.org/project/judo-framework/</a></li>
+                <li><strong>Changelog:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/blob/main/CHANGELOG.md" target="_blank">CHANGELOG.md</a></li>
+                <li><strong>Examples:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/tree/main/examples" target="_blank">GitHub Examples</a></li>
+            </ul>
+            
+            <h2>📋 Getting Help</h2>
+            <ul>
+                <li><strong>Issues:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/issues" target="_blank">Report bugs or request features</a></li>
+                <li><strong>Discussions:</strong> <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework/discussions" target="_blank">Ask questions and share ideas</a></li>
+                <li><strong>Email:</strong> felipe.farias@centyc.cl</li>
+            </ul>
+            
+            <h2>📚 Learning Resources</h2>
+            <ul>
+                <li><strong>Behave Documentation:</strong> <a href="https://behave.readthedocs.io/" target="_blank">https://behave.readthedocs.io/</a></li>
+                <li><strong>Gherkin Syntax:</strong> <a href="https://cucumber.io/docs/gherkin/" target="_blank">https://cucumber.io/docs/gherkin/</a></li>
+                <li><strong>JSON Schema:</strong> <a href="https://json-schema.org/" target="_blank">https://json-schema.org/</a></li>
+                <li><strong>JSONPath:</strong> <a href="https://goessner.net/articles/JsonPath/" target="_blank">https://goessner.net/articles/JsonPath/</a></li>
+            </ul>
+        </section>
+
+        <!-- Contributing -->
+        <section id="contributing" class="judo-section">
+            <h1>🤝 Contributing</h1>
+            
+            <h2>How to Contribute</h2>
+            <p>We welcome contributions from the community! Here's how you can help:</p>
+            
+            <h3>🐛 Report Bugs</h3>
+            <ul>
+                <li>Check existing issues first</li>
+                <li>Provide detailed reproduction steps</li>
+                <li>Include Python version and OS information</li>
+                <li>Share relevant code snippets</li>
+            </ul>
+            
+            <h3>💡 Suggest Features</h3>
+            <ul>
+                <li>Open a discussion or issue</li>
+                <li>Explain the use case</li>
+                <li>Provide examples if possible</li>
+            </ul>
+            
+            <h3>🔧 Code Contributions</h3>
+            <ol>
+                <li>Fork the repository</li>
+                <li>Create a feature branch</li>
+                <li>Write tests for your changes</li>
+                <li>Ensure all tests pass</li>
+                <li>Submit a pull request</li>
+            </ol>
+            
+            <h3>📖 Documentation</h3>
+            <ul>
+                <li>Improve existing documentation</li>
+                <li>Add examples and tutorials</li>
+                <li>Translate to other languages</li>
+            </ul>
+            
+            <h2>Development Setup</h2>
+            <pre><code># Clone the repository
+git clone https://github.com/FelipeFariasAlfaro/Judo-Framework.git
+cd Judo-Framework
+
+# Install in development mode
+pip install -e .
+
+# Install development dependencies
+pip install -e .[dev]
+
+# Run tests
+behave examples/</code></pre>
+        </section>
+        <!-- Author & CENTYC -->
+        <section id="author" class="judo-section">
+            <h1>👨‍💻 Author & CENTYC</h1>
+            
+            <h2>About the Author</h2>
+            <p><strong>Felipe Farias</strong> - Senior Software Engineer and API Testing Specialist</p>
+            <ul>
+                <li>🎓 Expert in API testing and automation frameworks</li>
+                <li>🚀 Creator of Judo Framework</li>
+                <li>🌟 Passionate about making testing simple and accessible</li>
+                <li>📧 Email: felipe.farias@centyc.cl</li>
+                <li>🔗 LinkedIn: <a href="https://www.linkedin.com/in/felipe-farias-alfaro/" target="_blank">Felipe Farias Alfaro</a></li>
+            </ul>
+            
+            <h2>About CENTYC</h2>
+            <p><strong>Centro Latinoamericano de Testing y Calidad del Software</strong></p>
+            <p>CENTYC is a leading Latin American center for software testing and quality assurance, dedicated to advancing testing practices and tools across the region.</p>
+            
+            <h3>🎯 Mission</h3>
+            <p>To provide world-class software testing solutions, training, and tools that help organizations deliver high-quality software products.</p>
+            
+            <h3>🌟 Services</h3>
+            <ul>
+                <li><strong>Testing Frameworks:</strong> Development of open-source testing tools like Judo Framework</li>
+                <li><strong>Consulting:</strong> API testing strategy and implementation</li>
+                <li><strong>Training:</strong> Software testing courses and certifications</li>
+                <li><strong>Quality Assurance:</strong> Comprehensive QA solutions</li>
+            </ul>
+            
+            <h3>🔗 Connect with CENTYC</h3>
+            <ul>
+                <li><strong>Website:</strong> <a href="https://www.centyc.cl" target="_blank">https://www.centyc.cl</a></li>
+                <li><strong>Email:</strong> info@centyc.cl</li>
+                <li><strong>Location:</strong> Chile, Latin America</li>
+            </ul>
+            
+            <h2>🙏 Acknowledgments</h2>
+            <p>Special thanks to:</p>
+            <ul>
+                <li><strong>Karate Framework</strong> - For the inspiration and excellent DSL design</li>
+                <li><strong>Behave Community</strong> - For the powerful BDD framework</li>
+                <li><strong>Python Community</strong> - For the amazing ecosystem and tools</li>
+                <li><strong>Contributors</strong> - Everyone who has contributed to making Judo Framework better</li>
+            </ul>
+            
+            <h2>📄 License</h2>
+            <p>Judo Framework is released under the <strong>MIT License</strong>.</p>
+            <p>This means you can use it freely in both personal and commercial projects.</p>
+            
+            <h2>🌟 Support the Project</h2>
+            <p>If you find Judo Framework useful, please consider:</p>
+            <ul>
+                <li>⭐ Starring the repository on GitHub</li>
+                <li>🐛 Reporting bugs and issues</li>
+                <li>💡 Suggesting new features</li>
+                <li>📖 Contributing to documentation</li>
+                <li>🗣️ Spreading the word about Judo Framework</li>
+            </ul>
+            
+            <div style="text-align: center; margin: 40px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                <h3>🥋 Made with ❤️ by CENTYC for the global testing community</h3>
+                <p><em>"Empowering developers to write better API tests, one scenario at a time"</em></p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+.judo-docs-container {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+}
+
+.judo-sidebar {
+    width: 280px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-radius: 8px 0 0 8px;
+}
+
+.judo-sidebar h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.5em;
+    text-align: center;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    padding-bottom: 10px;
+}
+
+.judo-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.judo-nav-list li {
+    margin: 0;
+}
+
+.nav-link {
+    display: block;
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    text-decoration: none;
+}
+
+.judo-content {
+    flex: 1;
+    padding: 30px;
+    background: white;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.judo-section {
+    display: none;
+}
+
+.judo-section.active {
+    display: block;
+}
+
+.judo-section h1 {
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+.judo-section h2 {
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.judo-section h3 {
+    color: #7f8c8d;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+pre {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+code {
+    background: #f1f3f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 12px;
+    margin-right: 8px;
+    margin-bottom: 4px;
+}
+
+.badge-primary { background: #007bff; color: white; }
+.badge-success { background: #28a745; color: white; }
+.badge-info { background: #17a2b8; color: white; }
+
+blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 20px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #555;
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 0 6px 6px 0;
+}
+
+ul, ol {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .judo-docs-container {
+        flex-direction: column;
+    }
+    
+    .judo-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .judo-content {
+        border-radius: 0 0 8px 8px;
+    }
+}
+</style>
+
+<script>
+function showSection(sectionId) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.judo-section');
+    sections.forEach(section => section.classList.remove('active'));
+    
+    // Show selected section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+    
+    // Update navigation
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    
+    const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+}
+
+// Initialize - show overview section by default
+document.addEventListener('DOMContentLoaded', function() {
+    showSection('overview');
+});
+</script>
+
+[/col]
+
+[/row]
+
+[/section]
+
+[cjtoolbox name='judo page']
