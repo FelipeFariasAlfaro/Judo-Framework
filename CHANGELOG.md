@@ -2,6 +2,40 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.3.38] - 2024-12-13
+
+### 🎯 IMPROVED USER EXPERIENCE - Playwright Included by Default
+
+**Simplified installation and setup for browser testing**
+
+#### ✨ What's New
+- **Playwright Included**: No more `[browser]` extra - Playwright comes with standard installation
+- **Simplified Setup**: Just `pip install judo-framework` + `playwright install`
+- **Zero Friction**: Removed installation complexity for browser testing
+- **Better UX**: One command to get full API + UI testing capabilities
+
+#### 🔧 Breaking Changes
+- None! Existing installations continue to work exactly the same
+
+#### 📦 Installation
+```bash
+# Before (complex)
+pip install 'judo-framework[browser]'
+playwright install
+
+# Now (simple)
+pip install judo-framework
+playwright install
+```
+
+#### 🎯 Benefits
+- **Easier Onboarding**: New users get full capabilities immediately
+- **Less Confusion**: No need to understand extras syntax
+- **Consistent Experience**: All users have same feature set available
+- **Better Documentation**: Simpler installation instructions
+
+---
+
 ## [1.3.37] - 2024-12-13
 
 ### 🎭 MAJOR NEW FEATURE - Playwright Integration

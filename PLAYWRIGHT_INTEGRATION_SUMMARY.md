@@ -31,9 +31,11 @@ Tu código funciona **exactamente igual** que antes. Cero breaking changes.
 
 #### Paso 1: Instalar (una sola vez)
 ```bash
-pip install 'judo-framework[browser]'
+pip install --upgrade judo-framework
 playwright install
 ```
+
+> **🎯 Mejora v1.3.38**: Playwright ahora viene incluido por defecto. ¡Sin `[browser]` extras!
 
 #### Paso 2: Crear .env
 ```bash
