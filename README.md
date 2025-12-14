@@ -15,17 +15,27 @@
 
 Judo Framework brings the simplicity and elegance of Karate Framework to the Python ecosystem. Write API tests in plain English (or Spanish!), get beautiful HTML reports automatically, and enjoy the power of Python's ecosystem.
 
-## 🎉 What's New in v1.3.18
+## 🎉 What's New in v1.3.39
 
-- 📊 **Enhanced HTML Reports** - Professional reports with official CENTYC and Judo Framework logos
-- 🎨 **Modern Report Design** - Beautiful gradient headers, responsive layout, and professional footer
-- 💾 **Request/Response Logging** - Automatic saving of HTTP interactions to JSON files with complete headers
-- 📁 **Organized by Scenario** - Each scenario gets its own directory with numbered files
-- 🔧 **Flexible Configuration** - Enable/disable via environment variables, runner, or feature files
-- 🌐 **Bilingual Support** - English and Spanish steps for logging configuration
-- 🏷️ **Tag Support with Hyphens** - Full support for Jira-style tags like `@PROJ-123`, `@API-456`
-- 📖 **Official Documentation** - Complete docs now available at http://centyc.cl/judo-framework/
-- 🎨 **Professional Branding** - Official logos and visual identity by CENTYC
+### 📸 Screenshot Integration in HTML Reports (NEW!)
+- **Automatic Screenshot Embedding** - Playwright screenshots automatically appear in HTML reports
+- **Base64 Encoding** - Self-contained reports with no external file dependencies
+- **Fullscreen View** - Click any screenshot to view it fullscreen
+- **Failure Capture** - Automatic screenshots on test failures
+- **Manual Control** - Take screenshots programmatically when needed
+
+### 🎭 Playwright Browser Testing
+- **Hybrid Testing** - Combine API and UI testing in the same scenario
+- **50+ Browser Steps** - Complete browser automation in English and Spanish
+- **Multi-page Support** - Handle multiple browser tabs and windows
+- **Visual Testing** - Screenshot comparison and visual validation
+- **100% Backward Compatible** - Existing API tests work unchanged
+
+### 📊 Enhanced HTML Reports
+- Professional reports with official CENTYC and Judo Framework logos
+- Beautiful gradient headers, responsive layout, and professional footer
+- Request/Response logging with complete headers
+- Organized by scenario with numbered files
 
 [See full changelog](CHANGELOG.md)
 
@@ -273,11 +283,13 @@ Scenario: Create user from file
   Then the response status should be 201
 ```
 
-### 📊 Professional HTML Reports
+### 📊 Professional HTML Reports with Screenshots
 Zero configuration, maximum insight with professional branding:
 
 - **🏢 Official Branding**: CENTYC and Judo Framework logos in header and footer
 - **🎨 Modern Design**: Beautiful gradient headers and responsive layout
+- **📸 Screenshot Integration**: Playwright screenshots embedded directly in reports (v1.3.39+)
+- **🖼️ Fullscreen View**: Click any screenshot to view it fullscreen
 - **📋 Request Details**: Method, URL, headers, body with syntax highlighting
 - **📥 Response Details**: Status, headers, body, timing with color-coded status
 - **✅ Assertions**: All validations with expected vs actual comparisons
@@ -285,6 +297,38 @@ Zero configuration, maximum insight with professional branding:
 - **📊 Statistics**: Success rate, timing, error tracking with visual indicators
 - **🔗 Professional Footer**: Creator information and links to documentation
 - **📱 Responsive Design**: Works perfectly on desktop and mobile devices
+
+#### 📸 Screenshot Features (v1.3.39+)
+
+**Automatic Screenshots:**
+```python
+# In environment.py - screenshots on failures
+import os
+os.environ['JUDO_SCREENSHOT_ON_STEP_FAILURE'] = 'true'
+```
+
+**Manual Screenshots:**
+```python
+# In your step definitions
+@when('I verify the dashboard')
+def step_impl(context):
+    context.judo_context.take_screenshot("dashboard_view")
+    # Screenshot automatically appears in HTML report!
+```
+
+**In Gherkin:**
+```gherkin
+Scenario: Visual verification
+  Given I navigate to "https://example.com"
+  When I take a screenshot named "homepage"
+  Then I should see "Welcome"
+```
+
+Screenshots are:
+- ✅ Embedded as base64 (no external files needed)
+- ✅ Clickable for fullscreen view
+- ✅ Automatically attached to steps
+- ✅ Captured on failures by default
 
 ### 💾 Advanced Request/Response Logging
 Automatically save all HTTP interactions to JSON files with complete details:
@@ -496,6 +540,316 @@ Scenario: Basic authentication
 
 ---
 
+## 🎯 Real-World Examples
+
+### Complete Project Setup
+
+Here's a real production setup combining API and UI testing:
+
+#### Project Structure
+```
+my-project/
+├── features/
+│   ├── api_tests.feature          # API tests
+│   ├── ui_tests.feature           # Browser tests
+│   ├── environment.py             # Configuration
+│   └── steps/                     # Custom steps
+├── Runner/
+│   ├── runner.py                  # Custom runner
+│   └── judo_reports/              # Generated reports
+├── base_requests/                 # JSON test data
+├── .env                           # Environment variables
+└── requirements.txt
+```
+
+#### Environment Configuration with Screenshots
+```python
+# features/environment.py
+from judo.behave import *
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+PLAYWRIGHT_ENABLED = False
+
+try:
+    from judo.playwright import PLAYWRIGHT_AVAILABLE
+    from judo.playwright.browser_context import JudoBrowserContext
+    
+    if PLAYWRIGHT_AVAILABLE and os.getenv('JUDO_USE_BROWSER', 'false').lower() == 'true':
+        PLAYWRIGHT_ENABLED = True
+except ImportError:
+    PLAYWRIGHT_ENABLED = False
+
+def before_all(context):
+    before_all_judo(context)
+
+def before_scenario(context, scenario):
+    before_scenario_judo(context, scenario)
+    
+    # Initialize Playwright for @test-front tagged scenarios
+    if PLAYWRIGHT_ENABLED and any(tag in scenario.tags for tag in ['test-front', 'front']):
+        from playwright.sync_api import sync_playwright
+        from judo.playwright.browser_context import JudoBrowserContext
+        
+        if not hasattr(context.judo_context, 'page'):
+            old_context = context.judo_context
+            context.judo_context = JudoBrowserContext(context)
+            
+            # Copy variables
+            if hasattr(old_context, 'variables'):
+                context.judo_context.variables = old_context.variables
+            
+            # Start Playwright
+            context.judo_context.playwright = sync_playwright().start()
+            
+            # Full screen browser
+            browser_options = {
+                'headless': False,
+                'args': ['--start-maximized']
+            }
+            context.judo_context.browser = context.judo_context.playwright.chromium.launch(**browser_options)
+            context.judo_context.browser_context = context.judo_context.browser.new_context(no_viewport=True)
+            context.judo_context.page = context.judo_context.browser_context.new_page()
+
+def after_step(context, step):
+    """Take screenshot after EVERY step (pass or fail)"""
+    if hasattr(context.judo_context, 'page') and context.judo_context.page:
+        try:
+            step_name_clean = step.name.replace(' ', '_').replace('"', '').replace("'", '')
+            screenshot_name = f"{step.status}_{step_name_clean}"
+            
+            screenshot_path = context.judo_context.take_screenshot(screenshot_name)
+            
+            # Attach to HTML report
+            from judo.reporting.reporter import get_reporter
+            reporter = get_reporter()
+            if reporter and reporter.current_step:
+                reporter.attach_screenshot(screenshot_path)
+        except Exception as e:
+            print(f"⚠️ Screenshot failed: {e}")
+    
+    after_step_judo(context, step)
+
+def after_scenario(context, scenario):
+    if hasattr(context.judo_context, 'page') and context.judo_context.page:
+        try:
+            context.judo_context.page.close()
+            context.judo_context.page = None
+        except:
+            pass
+    after_scenario_judo(context, scenario)
+
+def after_all(context):
+    if hasattr(context.judo_context, 'browser') and context.judo_context.browser:
+        try:
+            if hasattr(context.judo_context, 'browser_context'):
+                context.judo_context.browser_context.close()
+            context.judo_context.browser.close()
+            if hasattr(context.judo_context, 'playwright'):
+                context.judo_context.playwright.stop()
+        except:
+            pass
+    after_all_judo(context)
+
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_step = before_step_judo
+```
+
+#### Environment Variables (.env)
+```bash
+# API Configuration
+API_BASE_URL=https://api.example.com
+API_TOKEN=Bearer your-token-here
+TIMEOUT_SECONDS=30
+
+# Playwright Configuration
+JUDO_USE_BROWSER=true
+JUDO_BROWSER=chromium
+JUDO_HEADLESS=false
+JUDO_SCREENSHOT_DIR=screenshots
+
+# Debug
+JUDO_DEBUG_REPORTER=false
+```
+
+#### Custom Runner
+```python
+# Runner/runner.py
+from judo.runner.base_runner import BaseRunner
+import os
+
+os.environ['JUDO_DEBUG_REPORTER'] = 'false'
+
+class MyRunner(BaseRunner):
+    basedir = "./judo_reports"
+    
+    def __init__(self):
+        super().__init__(
+            features_dir="../features",
+            output_dir=self.basedir,
+            generate_cucumber_json=True,
+            cucumber_json_dir=f"{self.basedir}/cucumber-json",
+            parallel=False,
+            save_requests_responses=True,
+            requests_responses_dir=f"{self.basedir}/api_logs"
+        )
+    
+    def run_tests(self):
+        return self.run(tags=["@smoke"])
+
+if __name__ == "__main__":
+    runner = MyRunner()
+    results = runner.run_tests()
+    print(f"✅ Tests completed: {results['passed']}/{results['total']} passed")
+```
+
+### Mixed API + UI Testing
+
+```gherkin
+Feature: E-commerce Complete Flow
+
+  @mix
+  Scenario: Create product via API and verify in UI
+    # API: Create product
+    Given the base URL is "https://api.shop.com"
+    And I use bearer token "{API_TOKEN}"
+    When I send a POST request to "/products" with JSON:
+      """
+      {
+        "name": "Laptop Pro",
+        "price": 1299.99,
+        "category": "electronics"
+      }
+      """
+    Then the response status should be 201
+    And I extract "$.id" from the response as "productId"
+    
+    # UI: Verify product appears
+    Given I navigate to "https://shop.com/products/{productId}"
+    Then I should see "Laptop Pro"
+    And I should see "$1,299.99"
+    When I take a screenshot named "product_page"
+    
+    # UI: Add to cart
+    When I click "#add-to-cart"
+    Then I should see "Added to cart"
+    When I take a screenshot named "cart_confirmation"
+```
+
+### Frontend Testing with Full Screenshots
+
+```gherkin
+@test-front
+Feature: Website Navigation
+
+  Scenario: Homepage verification with screenshots
+    Given I navigate to "https://www.centyc.cl"
+    # Screenshot automatically captured after each step
+    When I click "a[href='/services']"
+    Then I should see "Our Services"
+    # All screenshots embedded in HTML report
+```
+
+### Complete CRUD Workflow
+
+```gherkin
+Feature: User Management
+
+  Background:
+    Given the base URL is "https://api.example.com"
+    And I use bearer token "{API_TOKEN}"
+
+  Scenario: Complete user lifecycle
+    # CREATE
+    When I send a POST request to "/users" with JSON:
+      """
+      {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "admin"
+      }
+      """
+    Then the response status should be 201
+    And I extract "$.id" from the response as "userId"
+    And I extract "$.email" from the response as "userEmail"
+    
+    # READ
+    When I send a GET request to "/users/{userId}"
+    Then the response status should be 200
+    And the response field "name" should equal "John Doe"
+    And the response field "email" should equal "{userEmail}"
+    
+    # UPDATE
+    When I send a PUT request to "/users/{userId}" with JSON:
+      """
+      {
+        "name": "John Doe Updated",
+        "email": "john.updated@example.com",
+        "role": "user"
+      }
+      """
+    Then the response status should be 200
+    And the response field "name" should equal "John Doe Updated"
+    
+    # VERIFY UPDATE
+    When I send a GET request to "/users/{userId}"
+    Then the response field "role" should equal "user"
+    
+    # DELETE
+    When I send a DELETE request to "/users/{userId}"
+    Then the response status should be 204
+    
+    # VERIFY DELETION
+    When I send a GET request to "/users/{userId}"
+    Then the response status should be 404
+```
+
+### Using External JSON Files
+
+```gherkin
+Feature: Data-Driven Testing
+
+  Scenario: Create multiple posts from files
+    Given the base URL is "https://api.example.com"
+    
+    # Load from file
+    When I POST to "/posts" with JSON file "test_data/posts/post1.json"
+    Then the response status should be 201
+    And I save the response to file "responses/post1_response.json"
+    
+    # Validate against schema
+    When I POST to "/posts" with JSON file "test_data/posts/post2.json"
+    Then the response should match schema file "schemas/post_schema.json"
+```
+
+**test_data/posts/post1.json:**
+```json
+{
+  "title": "Judo Framework Test",
+  "body": "Testing with external files",
+  "userId": 1
+}
+```
+
+**schemas/post_schema.json:**
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": {"type": "number"},
+    "title": {"type": "string"},
+    "body": {"type": "string"},
+    "userId": {"type": "number"}
+  },
+  "required": ["id", "title", "body", "userId"]
+}
+```
+
+---
+
 ## 🎓 Advanced Examples
 
 ### Example 1: Data-Driven Testing
@@ -588,6 +942,97 @@ Feature: API Contract Testing
         "required": ["id", "name", "email"]
       }
       """
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Playwright Not Working
+```bash
+# Reinstall Playwright
+pip uninstall playwright
+pip install playwright
+playwright install chromium
+
+# Verify installation
+playwright --version
+```
+
+#### Screenshots Not Appearing in Reports
+```python
+# 1. Check reporter is active
+from judo.reporting.reporter import get_reporter
+reporter = get_reporter()
+print(f"Reporter active: {reporter is not None}")
+
+# 2. Verify screenshot was taken
+screenshot_path = context.judo_context.take_screenshot("test")
+print(f"Screenshot saved: {screenshot_path}")
+
+# 3. Check runner configuration
+runner = BaseRunner(
+    generate_cucumber_json=True  # ✅ Must be True
+)
+```
+
+#### "WinError 123" When Saving Screenshots
+```bash
+# Cause: Invalid characters in filename (: / \ | ? *)
+# Solution: Framework normalizes names automatically
+# If persists, avoid special characters in step names
+```
+
+#### "Playwright Sync API inside asyncio loop"
+```bash
+# Solution: Only initialize Playwright for @test-front tagged scenarios
+# The framework detects automatically and avoids conflicts with API tests
+```
+
+#### Browser Not Starting
+```bash
+# Check environment variables
+echo $JUDO_USE_BROWSER  # Should be 'true'
+
+# Check scenario has correct tag
+@test-front  # or @front
+Scenario: My browser test
+```
+
+#### Reports Not Generated
+```python
+# Verify runner configuration
+runner = BaseRunner(
+    features_dir="features",
+    output_dir="judo_reports",
+    generate_cucumber_json=True  # ✅ Required for reports
+)
+```
+
+### Debug Mode
+
+Enable detailed logging:
+
+```python
+# In environment.py
+import os
+os.environ['JUDO_DEBUG_REPORTER'] = 'true'
+os.environ['JUDO_LOG_LEVEL'] = 'DEBUG'
+```
+
+### Verify Installation
+
+```bash
+# Check Judo Framework
+python -c "import judo; print(f'Judo: {judo.__version__}')"
+
+# Check Playwright
+python -c "from judo.playwright import PLAYWRIGHT_AVAILABLE; print(f'Playwright: {PLAYWRIGHT_AVAILABLE}')"
+
+# Check all dependencies
+pip list | grep -E "judo|behave|playwright|requests"
 ```
 
 ---

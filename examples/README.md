@@ -8,11 +8,24 @@ This directory contains essential examples demonstrating Judo Framework capabili
 
 ## 📁 Files Overview
 
+### 🏗️ Complete Project Setup
+- **`complete_project_setup.md`** - **⭐ START HERE!** Production-ready project structure
+  - Full environment.py with Playwright + Screenshots
+  - Custom runner configuration
+  - Real-world examples (API + UI + Mixed)
+  - Best practices and troubleshooting
+
 ### 🎪 Complete Showcases
 - **`complete_showcase.feature`** - Comprehensive English examples with 30+ scenarios
 - **`showcase_completo.feature`** - Comprehensive Spanish examples with 30+ scenarios
 
 These files demonstrate ALL Judo Framework features with detailed explanations.
+
+### 🎭 Playwright Integration
+- **`playwright_integration.feature`** - English browser testing examples
+- **`playwright_integration_es.feature`** - Spanish browser testing examples
+- **`environment_playwright.py`** - Playwright environment configuration
+- **`quick_test_playwright.py`** - Quick Playwright test script
 
 ### 💾 Request/Response Logging Examples
 - **`logging_demo.feature`** - English demo of automatic request/response logging

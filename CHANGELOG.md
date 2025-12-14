@@ -2,6 +2,58 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.3.39] - 2024-12-14
+
+### 📸 NEW FEATURE - Screenshot Integration in HTML Reports
+
+**Playwright screenshots now automatically appear in HTML reports**
+
+#### ✨ What's New
+- **Automatic Screenshot Embedding**: Screenshots taken during tests are automatically embedded in HTML reports
+- **Base64 Encoding**: Screenshots are embedded as base64 data URLs (no external file dependencies)
+- **Fullscreen View**: Click any screenshot to view it in fullscreen mode
+- **Step-Level Attachment**: Screenshots are attached to individual steps for precise debugging
+- **Failure Screenshots**: Automatic screenshots on step/scenario failures appear in reports
+- **Manual Screenshots**: Use `context.judo_context.take_screenshot()` to capture and attach screenshots
+
+#### 🔧 Technical Implementation
+- Added `screenshot_path` field to `StepReport` class
+- New `attach_screenshot()` method in `JudoReporter`
+- Enhanced `take_screenshot()` with automatic report attachment
+- New `_generate_screenshot_section()` in HTML reporter
+- CSS styling for screenshot display with hover effects
+- JavaScript for fullscreen screenshot viewing
+
+#### 📝 Usage Examples
+
+**Automatic (on failure):**
+```python
+# In environment.py
+os.environ['JUDO_SCREENSHOT_ON_STEP_FAILURE'] = 'true'
+```
+
+**Manual (in steps):**
+```python
+@when('I take a screenshot')
+def step_impl(context):
+    context.judo_context.take_screenshot("my_screenshot")
+    # Automatically attached to HTML report!
+```
+
+**After every step:**
+```python
+# In environment.py
+os.environ['JUDO_SCREENSHOT_AFTER_STEP'] = 'true'
+```
+
+#### 🎯 Benefits
+- **Better Debugging**: Visual evidence of test failures
+- **Self-Contained Reports**: No need to manage separate screenshot files
+- **Professional Presentation**: Clean, integrated screenshot display
+- **Easy Sharing**: Single HTML file contains everything
+
+---
+
 ## [1.3.38] - 2024-12-13
 
 ### 🎯 IMPROVED USER EXPERIENCE - Playwright Included by Default

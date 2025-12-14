@@ -234,6 +234,8 @@
             <li><a href="#project-structure" class="nav-link" onclick="showSection('project-structure')">Estructura de Proyecto</a></li>
             <li><a href="#installation" class="nav-link" onclick="showSection('installation')">Instalación</a></li>
             <li><a href="#features" class="nav-link" onclick="showSection('features')">Características</a></li>
+            <li><a href="#playwright" class="nav-link" onclick="showSection('playwright')">🎭 Integración Playwright</a></li>
+            <li><a href="#screenshots" class="nav-link" onclick="showSection('screenshots')">📸 Capturas de Pantalla</a></li>
             <li><a href="#comparison" class="nav-link" onclick="showSection('comparison')">vs Karate</a></li>
             <li><a href="#steps-config" class="nav-link" onclick="showSection('steps-config')">Pasos: Configuración</a></li>
             <li><a href="#steps-auth" class="nav-link" onclick="showSection('steps-auth')">Pasos: Autenticación</a></li>
@@ -943,6 +945,505 @@ judo.match(response.json["name"], "Usuario Mock")</code></pre>
   Cuando hago una petición GET a "/users/1"
   Entonces la respuesta debe coincidir con el archivo de esquema "schemas/user_schema.json"</code></pre>
         </section>
+        
+        <!-- Playwright Integration Section -->
+        <section id="playwright" class="judo-section">
+            <h1>🎭 Integración con Playwright</h1>
+            <p><strong>Versión 1.3.37+</strong> - Automatización completa de navegadores integrada con pruebas de API</p>
+            
+            <h2>Descripción General</h2>
+            <p>Judo Framework integra Playwright de manera fluida para automatización de navegadores, permitiéndote combinar pruebas de API y UI en los mismos escenarios. Este enfoque híbrido proporciona capacidades completas de pruebas end-to-end.</p>
+            
+            <div style="background-color: #e8f4fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <h4>✨ Beneficios Clave</h4>
+                <ul>
+                    <li><strong>Pruebas Híbridas</strong> - Mezcla pasos de API y UI en el mismo escenario</li>
+                    <li><strong>50+ Pasos de Navegador</strong> - Automatización completa en inglés y español</li>
+                    <li><strong>100% Compatible</strong> - Las pruebas de API existentes funcionan sin cambios</li>
+                    <li><strong>Screenshots Automáticos</strong> - Incrustados en reportes HTML</li>
+                    <li><strong>Soporte Multi-página</strong> - Maneja múltiples pestañas y ventanas</li>
+                </ul>
+            </div>
+            
+            <h2>Instalación</h2>
+            <pre><code># Instalar Judo Framework (Playwright incluido por defecto)
+pip install judo-framework
+
+# Instalar motores de navegador (configuración única)
+playwright install chromium</code></pre>
+            
+            <h2>Configuración</h2>
+            
+            <h3>Variables de Entorno (.env)</h3>
+            <pre><code># Habilitar Playwright
+JUDO_USE_BROWSER=true
+JUDO_BROWSER=chromium
+JUDO_HEADLESS=false
+
+# Configuración de screenshots
+JUDO_SCREENSHOT_ON_STEP_FAILURE=true
+JUDO_SCREENSHOT_DIR=screenshots
+
+# Viewport
+JUDO_VIEWPORT_WIDTH=1920
+JUDO_VIEWPORT_HEIGHT=1080</code></pre>
+            
+            <h3>Configuración de Environment (features/environment.py)</h3>
+            <pre><code>from judo.behave import *
+from judo.playwright.hooks import *
+import os
+
+# Configurar Playwright
+os.environ['JUDO_USE_BROWSER'] = 'true'
+os.environ['JUDO_BROWSER'] = 'chromium'
+os.environ['JUDO_HEADLESS'] = 'false'
+
+# Usar hooks de Playwright
+before_all = before_all_playwright
+before_scenario = before_scenario_playwright
+after_scenario = after_scenario_playwright
+after_all = after_all_playwright
+
+# Hooks estándar
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_step = before_step_judo
+after_step = after_step_judo</code></pre>
+            
+            <h2>Pasos de Navegador (Español)</h2>
+            
+            <h3>Navegación</h3>
+            <pre><code>Dado que inicio un navegador
+Dado que inicio un navegador "chromium"
+Dado que navego a "https://ejemplo.com"
+Cuando voy atrás
+Cuando voy adelante
+Cuando recargo la página
+Cuando cierro el navegador</code></pre>
+            
+            <h3>Interacción</h3>
+            <pre><code>Cuando hago clic en "#boton-enviar"
+Cuando lleno "#usuario" con "juan_perez"
+Cuando selecciono "opcion1" de "#desplegable"
+Cuando marco el checkbox "#terminos"
+Cuando desmarco el checkbox "#newsletter"
+Cuando presiono "Enter"
+Cuando paso el mouse sobre ".menu-item"</code></pre>
+            
+            <h3>Validación</h3>
+            <pre><code>Entonces el elemento "#mensaje" debe ser visible
+Entonces el elemento "#cargando" no debe ser visible
+Entonces el elemento "#titulo" debe contener "Bienvenido"
+Entonces el título de la página debe ser "Página Principal"
+Entonces la URL debe contener "/tablero"</code></pre>
+            
+            <h3>Espera</h3>
+            <pre><code>Cuando espero 2 segundos
+Cuando espero a que el elemento "#resultado" sea visible
+Cuando espero a que el elemento "#cargando" desaparezca</code></pre>
+            
+            <h2>Ejemplo de Prueba Híbrida</h2>
+            <pre><code>@mix
+Característica: Flujo Completo de E-commerce
+
+  Escenario: Crear producto vía API y verificar en UI
+    # API: Crear producto
+    Dado que la URL base es "https://api.tienda.com"
+    Y que uso el token bearer "{API_TOKEN}"
+    Cuando hago una petición POST a "/products" con el cuerpo:
+      """
+      {
+        "name": "Laptop Pro",
+        "price": 1299.99,
+        "category": "electronics"
+      }
+      """
+    Entonces el código de respuesta debe ser 201
+    Y guardo el valor del campo "$.id" en la variable "productId"
+    
+    # UI: Verificar que el producto aparece
+    Dado que navego a "https://tienda.com/products/{productId}"
+    Entonces debo ver "Laptop Pro"
+    Y debo ver "$1,299.99"
+    Cuando tomo una captura de pantalla llamada "pagina_producto"
+    
+    # UI: Agregar al carrito
+    Cuando hago clic en "#agregar-al-carrito"
+    Entonces debo ver "Agregado al carrito"
+    Cuando tomo una captura de pantalla llamada "confirmacion_carrito"</code></pre>
+            
+            <h2>Configuración Avanzada</h2>
+            
+            <h3>Navegador en Pantalla Completa</h3>
+            <pre><code># En environment.py
+from playwright.sync_api import sync_playwright
+
+def before_scenario(context, scenario):
+    before_scenario_judo(context, scenario)
+    
+    if 'ui' in scenario.tags or 'test-front' in scenario.tags:
+        from judo.playwright.browser_context import JudoBrowserContext
+        
+        context.judo_context = JudoBrowserContext(context)
+        context.judo_context.playwright = sync_playwright().start()
+        
+        # Configuración de pantalla completa
+        browser_options = {
+            'headless': False,
+            'args': ['--start-maximized']
+        }
+        context.judo_context.browser = context.judo_context.playwright.chromium.launch(**browser_options)
+        
+        # Sin viewport = pantalla completa
+        context.judo_context.browser_context = context.judo_context.browser.new_context(
+            no_viewport=True
+        )
+        
+        context.judo_context.page = context.judo_context.browser_context.new_page()</code></pre>
+            
+            <h3>Soporte Multi-página</h3>
+            <pre><code>Dado que creo una nueva página llamada "checkout"
+Cuando cambio a la página "checkout"
+Cuando navego a "https://tienda.com/checkout"
+Entonces debo ver "Checkout"
+
+Cuando cambio a la página "main"
+Entonces debo ver "Productos"</code></pre>
+            
+            <h2>Cómo Funciona</h2>
+            
+            <h3>Arquitectura</h3>
+            <pre><code>┌─────────────────────────────────────────────────────────┐
+│              Archivos Feature (.feature)                 │
+│           (Escenarios de Prueba Gherkin/BDD)            │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│           Integración Judo Behave                        │
+│    • Pasos de API (100+)                                │
+│    • Pasos de Navegador (50+)                           │
+│    • JudoContext / JudoBrowserContext                   │
+└────────────────────┬────────────────────────────────────┘
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│ Cliente  │  │ Motor    │  │ Sistema  │
+│   HTTP   │  │Playwright│  │ Reporter │
+└──────────┘  └──────────┘  └──────────┘
+        │            │            │
+        └────────────┼────────────┘
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│           Reporte HTML con Screenshots                   │
+│  • Detalles de Request/Response de API                 │
+│  • Screenshots de navegador incrustados                │
+│  • Flujo completo de ejecución de pruebas              │
+└─────────────────────────────────────────────────────────┘</code></pre>
+            
+            <h3>Cambio de Contexto</h3>
+            <p>Judo cambia automáticamente entre <code>JudoContext</code> (API) y <code>JudoBrowserContext</code> (UI) basándose en los tags del escenario:</p>
+            <ul>
+                <li><strong>@api</strong> - Usa JudoContext (solo API)</li>
+                <li><strong>@ui, @test-front, @front</strong> - Usa JudoBrowserContext (Navegador + API)</li>
+                <li><strong>@mix</strong> - Usa JudoBrowserContext (Pruebas híbridas)</li>
+            </ul>
+            
+            <h2>Mejores Prácticas</h2>
+            
+            <h3>1. Organización con Tags</h3>
+            <pre><code>@api
+Escenario: Prueba solo de API
+  # Solo pasos de API, sin inicialización de navegador
+
+@ui
+Escenario: Prueba solo de UI
+  # Pasos de navegador, pasos de API también disponibles
+
+@mix
+Escenario: Prueba híbrida
+  # Mezcla pasos de API y UI libremente</code></pre>
+            
+            <h3>2. Estrategia de Screenshots</h3>
+            <pre><code># Automático en fallos
+os.environ['JUDO_SCREENSHOT_ON_STEP_FAILURE'] = 'true'
+
+# Manual en puntos clave
+Cuando tomo una captura de pantalla llamada "antes_pago"
+Cuando hago clic en "#pagar-ahora"
+Cuando tomo una captura de pantalla llamada "despues_pago"</code></pre>
+            
+            <h3>3. Rendimiento</h3>
+            <ul>
+                <li>Usa tag <code>@api</code> para pruebas solo de API (más rápido)</li>
+                <li>Usa tag <code>@ui</code> solo cuando se necesite navegador</li>
+                <li>Cierra el navegador después del escenario para ahorrar recursos</li>
+                <li>Usa modo headless en CI/CD</li>
+            </ul>
+            
+            <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <h4>💡 Consejo Pro</h4>
+                <p>La integración de Playwright es <strong>completamente opcional</strong>. Si no usas pasos de navegador, Playwright nunca se inicializa, asegurando cero impacto en el rendimiento de pruebas solo de API.</p>
+            </div>
+        </section>
+        
+        <!-- Screenshots Section -->
+        <section id="screenshots" class="judo-section">
+            <h1>📸 Integración de Capturas de Pantalla</h1>
+            <p><strong>Versión 1.3.39+</strong> - Incrustación automática de screenshots en reportes HTML</p>
+            
+            <h2>Descripción General</h2>
+            <p>Judo Framework incrusta automáticamente las capturas de pantalla de Playwright en los reportes HTML, proporcionando evidencia visual de la ejecución de pruebas y fallos. Los screenshots se codifican en base64 y se incrustan directamente en el HTML, creando reportes autocontenidos sin dependencias externas.</p>
+            
+            <div style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <h4>✨ Características Clave</h4>
+                <ul>
+                    <li><strong>Incrustación Automática</strong> - Screenshots codificados en base64 en HTML</li>
+                    <li><strong>Vista de Pantalla Completa</strong> - Clic en cualquier screenshot para ver en pantalla completa</li>
+                    <li><strong>Precisión a Nivel de Paso</strong> - Screenshots adjuntos a pasos específicos</li>
+                    <li><strong>Captura en Fallos</strong> - Screenshots automáticos en fallos de pruebas</li>
+                    <li><strong>Control Manual</strong> - Toma screenshots programáticamente en cualquier momento</li>
+                    <li><strong>Cero Configuración</strong> - Funciona desde el primer momento</li>
+                    <li><strong>Autocontenido</strong> - Un solo archivo HTML con todo incrustado</li>
+                </ul>
+            </div>
+            
+            <h2>Configuración</h2>
+            
+            <h3>Screenshots Automáticos (En Fallos)</h3>
+            <pre><code># En environment.py
+import os
+os.environ['JUDO_SCREENSHOT_ON_STEP_FAILURE'] = 'true'</code></pre>
+            
+            <h3>Screenshots Después de Cada Paso</h3>
+            <pre><code># En environment.py
+import os
+os.environ['JUDO_SCREENSHOT_AFTER_STEP'] = 'true'</code></pre>
+            
+            <h3>Directorio Personalizado de Screenshots</h3>
+            <pre><code># En environment.py
+import os
+os.environ['JUDO_SCREENSHOT_DIR'] = 'mis_screenshots'</code></pre>
+            
+            <h2>Uso</h2>
+            
+            <h3>Screenshots Manuales en Pasos</h3>
+            <pre><code>from behave import given, when, then
+
+@when('verifico el tablero')
+def step_impl(context):
+    # Tomar screenshot - automáticamente adjunto al reporte
+    context.judo_context.take_screenshot("vista_tablero")
+    
+    # Tu lógica de verificación
+    assert context.judo_context.page.locator(".dashboard").is_visible()</code></pre>
+            
+            <h3>En Gherkin</h3>
+            <pre><code>Escenario: Verificación visual
+  Dado que navego a "https://ejemplo.com"
+  Cuando tomo una captura de pantalla llamada "pagina_inicio"
+  Entonces debo ver "Bienvenido"
+  Cuando hago clic en "Productos"
+  Y tomo una captura de pantalla llamada "pagina_productos"
+  Entonces debo ver "Catálogo de Productos"</code></pre>
+            
+            <h3>Screenshots de Elementos</h3>
+            <pre><code>@when('capturo el mensaje de error')
+def step_impl(context):
+    # Screenshot solo del elemento específico
+    context.judo_context.take_element_screenshot(
+        ".error-message", 
+        name="detalle_error"
+    )</code></pre>
+            
+            <h2>Configuración Completa de Environment con Screenshots</h2>
+            <pre><code>from judo.behave import *
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+PLAYWRIGHT_ENABLED = False
+
+try:
+    from judo.playwright import PLAYWRIGHT_AVAILABLE
+    from judo.playwright.browser_context import JudoBrowserContext
+    
+    if PLAYWRIGHT_AVAILABLE and os.getenv('JUDO_USE_BROWSER', 'false').lower() == 'true':
+        PLAYWRIGHT_ENABLED = True
+except ImportError:
+    PLAYWRIGHT_ENABLED = False
+
+def before_all(context):
+    before_all_judo(context)
+
+def before_scenario(context, scenario):
+    before_scenario_judo(context, scenario)
+    
+    # Inicializar Playwright para pruebas de UI
+    if PLAYWRIGHT_ENABLED and any(tag in scenario.tags for tag in ['test-front', 'front', 'ui']):
+        from playwright.sync_api import sync_playwright
+        from judo.playwright.browser_context import JudoBrowserContext
+        
+        if not hasattr(context.judo_context, 'page'):
+            old_context = context.judo_context
+            context.judo_context = JudoBrowserContext(context)
+            
+            # Copiar variables
+            if hasattr(old_context, 'variables'):
+                context.judo_context.variables = old_context.variables
+            
+            # Iniciar Playwright
+            context.judo_context.playwright = sync_playwright().start()
+            
+            # Navegador en pantalla completa
+            browser_options = {
+                'headless': False,
+                'args': ['--start-maximized']
+            }
+            context.judo_context.browser = context.judo_context.playwright.chromium.launch(**browser_options)
+            context.judo_context.browser_context = context.judo_context.browser.new_context(no_viewport=True)
+            context.judo_context.page = context.judo_context.browser_context.new_page()
+
+def after_step(context, step):
+    """Tomar screenshot después de CADA paso y adjuntar al reporte"""
+    if hasattr(context.judo_context, 'page') and context.judo_context.page:
+        try:
+            step_name_clean = step.name.replace(' ', '_').replace('"', '').replace("'", '')
+            screenshot_name = f"{step.status}_{step_name_clean}"
+            
+            screenshot_path = context.judo_context.take_screenshot(screenshot_name)
+            
+            # ✅ Adjuntar al reporte HTML
+            from judo.reporting.reporter import get_reporter
+            reporter = get_reporter()
+            if reporter and reporter.current_step:
+                reporter.attach_screenshot(screenshot_path)
+        except Exception as e:
+            print(f"⚠️ Fallo en screenshot: {e}")
+    
+    after_step_judo(context, step)
+
+def after_scenario(context, scenario):
+    if hasattr(context.judo_context, 'page') and context.judo_context.page:
+        try:
+            context.judo_context.page.close()
+            context.judo_context.page = None
+        except:
+            pass
+    after_scenario_judo(context, scenario)
+
+def after_all(context):
+    if hasattr(context.judo_context, 'browser') and context.judo_context.browser:
+        try:
+            if hasattr(context.judo_context, 'browser_context'):
+                context.judo_context.browser_context.close()
+            context.judo_context.browser.close()
+            if hasattr(context.judo_context, 'playwright'):
+                context.judo_context.playwright.stop()
+        except:
+            pass
+    after_all_judo(context)
+
+before_feature = before_feature_judo
+after_feature = after_feature_judo
+before_step = before_step_judo</code></pre>
+            
+            <h2>Visualización en Reporte HTML</h2>
+            <p>Los screenshots aparecen en el reporte HTML como una sección dedicada dentro de cada paso:</p>
+            <pre><code>📸 Screenshot
+┌─────────────────────────────────────┐
+│                                     │
+│     [Imagen del Screenshot]         │
+│     (Clic para ver pantalla         │
+│      completa)                      │
+│                                     │
+└─────────────────────────────────────┘
+  nombre_screenshot.png
+  Clic para ver en pantalla completa</code></pre>
+            
+            <h3>Características</h3>
+            <ul>
+                <li><strong>Efecto Hover</strong> - Los screenshots se escalan ligeramente al pasar el mouse</li>
+                <li><strong>Clic para Expandir</strong> - Clic en cualquier screenshot para ver en pantalla completa</li>
+                <li><strong>Mostrar Nombre de Archivo</strong> - Muestra el nombre del archivo debajo de la imagen</li>
+                <li><strong>Responsive</strong> - Los screenshots se escalan para ajustarse al ancho del reporte</li>
+                <li><strong>Alta Calidad</strong> - Resolución completa preservada en codificación base64</li>
+            </ul>
+            
+            <h2>Mejores Prácticas</h2>
+            
+            <h3>1. Ubicación Estratégica de Screenshots</h3>
+            <pre><code># ✅ BUENO: Tomar screenshots en momentos clave
+@when('completo el proceso de checkout')
+def step_impl(context):
+    context.judo_context.fill("#card-number", "4111111111111111")
+    context.judo_context.take_screenshot("info_pago_ingresada")
+    
+    context.judo_context.click("#submit-payment")
+    context.judo_context.wait_for_selector(".success-message")
+    context.judo_context.take_screenshot("pago_exitoso")
+
+# ❌ MALO: Demasiados screenshots
+@when('escribo mi nombre')
+def step_impl(context):
+    context.judo_context.take_screenshot("antes_escribir")
+    context.judo_context.fill("#name", "Juan")
+    context.judo_context.take_screenshot("despues_escribir")  # Innecesario</code></pre>
+            
+            <h3>2. Nombres Descriptivos</h3>
+            <pre><code># ✅ BUENO: Nombres claros y descriptivos
+context.judo_context.take_screenshot("pagina_login_cargada")
+context.judo_context.take_screenshot("mensaje_error_mostrado")
+context.judo_context.take_screenshot("pagina_confirmacion_orden")
+
+# ❌ MALO: Nombres genéricos
+context.judo_context.take_screenshot("screenshot1")
+context.judo_context.take_screenshot("prueba")
+context.judo_context.take_screenshot("pagina")</code></pre>
+            
+            <h3>3. Consideraciones de Rendimiento</h3>
+            <pre><code># Para CI/CD: Solo screenshot en fallos
+JUDO_SCREENSHOT_ON_STEP_FAILURE=true
+JUDO_SCREENSHOT_AFTER_STEP=false
+
+# Para debugging local: Screenshot de todo
+JUDO_SCREENSHOT_ON_STEP_FAILURE=true
+JUDO_SCREENSHOT_AFTER_STEP=true</code></pre>
+            
+            <h2>Solución de Problemas</h2>
+            
+            <h3>Screenshots No Aparecen en el Reporte</h3>
+            <pre><code># 1. Verificar que los hooks de Playwright están habilitados
+from judo.playwright.hooks import after_step_playwright
+
+def after_step(context, step):
+    after_step_playwright(context, step)  # ¡Requerido!
+
+# 2. Verificar que el screenshot fue tomado
+screenshot_path = context.judo_context.take_screenshot("prueba")
+print(f"Screenshot guardado en: {screenshot_path}")
+
+# 3. Asegurar que el reporter está activo
+from judo.reporting.reporter import get_reporter
+reporter = get_reporter()
+print(f"Reporter activo: {reporter is not None}")</code></pre>
+            
+            <h3>Archivos HTML Grandes</h3>
+            <p>Si los reportes HTML son muy grandes debido a los screenshots:</p>
+            <ul>
+                <li>Reduce la frecuencia de screenshots (solo en fallos)</li>
+                <li>Usa screenshots de elementos en lugar de página completa</li>
+                <li>Considera almacenamiento externo de screenshots para CI/CD</li>
+            </ul>
+            
+            <div style="background-color: #e8f4fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <h4>💡 Consejo Pro</h4>
+                <p>Los screenshots se adjuntan automáticamente al reporte HTML cuando usas <code>context.judo_context.take_screenshot()</code>. ¡No se necesita configuración adicional - solo toma el screenshot y aparecerá en tu reporte!</p>
+            </div>
+        </section>
+        
         <!-- Comparison Section -->
         <section id="comparison" class="judo-section">
             <h1>🆚 Comparación con Karate</h1>

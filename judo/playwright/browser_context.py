@@ -456,8 +456,18 @@ class JudoBrowserContext(JudoContext):
         self.log(f"Waited for URL pattern: {url_pattern}")
     
     # Screenshots and Visual Testing
-    def take_screenshot(self, name: str = None, **options):
-        """Take a screenshot"""
+    def take_screenshot(self, name: str = None, attach_to_report: bool = True, **options):
+        """
+        Take a screenshot
+        
+        Args:
+            name: Screenshot name (auto-generated if not provided)
+            attach_to_report: If True, automatically attach to HTML report
+            **options: Additional Playwright screenshot options
+        
+        Returns:
+            str: Path to the screenshot file
+        """
         if not self.page:
             raise RuntimeError("No page available. Create a page first.")
         
@@ -478,6 +488,17 @@ class JudoBrowserContext(JudoContext):
         # Take screenshot
         self.page.screenshot(path=filepath, **options)
         self.log(f"Screenshot saved: {filepath}")
+        
+        # Attach to reporter if enabled
+        if attach_to_report:
+            try:
+                from ..reporting.reporter import get_reporter
+                reporter = get_reporter()
+                if reporter and reporter.current_step:
+                    reporter.attach_screenshot(filepath)
+                    self.log(f"Screenshot attached to report")
+            except Exception as e:
+                self.log(f"Warning: Could not attach screenshot to report: {e}")
         
         return filepath
     
