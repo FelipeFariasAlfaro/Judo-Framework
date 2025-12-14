@@ -6,7 +6,7 @@ Extends existing Behave hooks to support browser automation
 import os
 from typing import Optional
 from ..behave.hooks import *  # Import all existing hooks
-from . import PLAYWRIGHT_AVAILABLE, check_playwright_availability
+from . import PLAYWRIGHT_AVAILABLE
 
 if PLAYWRIGHT_AVAILABLE:
     from .browser_context import JudoBrowserContext
@@ -22,7 +22,8 @@ def setup_playwright_context(context):
     
     if use_browser or hasattr(context, 'config') and getattr(context.config, 'use_browser', False):
         try:
-            check_playwright_availability()
+            if not PLAYWRIGHT_AVAILABLE:
+                raise ImportError("Playwright not available")
             
             # Replace regular JudoContext with JudoBrowserContext
             from ..behave.context import JudoContext

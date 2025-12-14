@@ -662,3 +662,16 @@ def step_get_env_value_and_store(context, env_var_name, variable_name):
 # Also ensure steps are available when imported with *
 __all__ = [name for name, obj in globals().items() 
            if callable(obj) and hasattr(obj, '_behave_step_registry')]
+
+@step('I should have variable "{variable_name}" with value "{expected_value}"')
+def step_validate_variable_value(context, variable_name, expected_value):
+    """Validate that a variable has the expected value"""
+    # Interpolate the expected value in case it contains variables
+    expected_value = context.judo_context.interpolate_string(expected_value)
+    
+    # Get the actual value
+    actual_value = context.judo_context.get_variable(variable_name)
+    
+    # Compare values
+    assert actual_value == expected_value, \
+        f"Variable '{variable_name}': expected '{expected_value}', but got '{actual_value}'"

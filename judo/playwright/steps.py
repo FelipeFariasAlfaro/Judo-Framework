@@ -4,7 +4,12 @@ Browser automation steps that integrate seamlessly with API testing
 """
 
 from behave import step
-from . import PLAYWRIGHT_AVAILABLE
+# Check Playwright availability
+try:
+    import playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
 
 if not PLAYWRIGHT_AVAILABLE:
     # If Playwright is not available, create dummy steps that raise helpful errors
@@ -243,7 +248,7 @@ def step_take_element_screenshot(context, selector):
     """Take a screenshot of a specific element"""
     context.judo_context.take_element_screenshot(selector)
 
-@step('I take a screenshot of element "{selector}" named "{name}"')
+@step('I take an element screenshot of "{selector}" named "{name}"')
 def step_take_named_element_screenshot(context, selector, name):
     """Take a screenshot of a specific element with a name"""
     context.judo_context.take_element_screenshot(selector, name)

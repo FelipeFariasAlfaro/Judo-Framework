@@ -10,14 +10,14 @@ from .context import JudoContext
 from .hooks import *
 
 # Optional Playwright integration
+# Note: Steps are imported automatically when Playwright is used
+# This avoids circular import issues during module initialization
 try:
     from ..playwright import PLAYWRIGHT_AVAILABLE
     if PLAYWRIGHT_AVAILABLE:
-        from ..playwright import steps as playwright_steps
-        from ..playwright import steps_es as playwright_steps_es
         from ..playwright.browser_context import JudoBrowserContext
         from ..playwright.hooks import *
-        print("🎭 Playwright steps loaded successfully")
+        # Steps will be imported when needed to avoid circular imports
 except ImportError:
     PLAYWRIGHT_AVAILABLE = False
 
