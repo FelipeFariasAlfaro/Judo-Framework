@@ -82,6 +82,7 @@ class StepReport:
     variables_used: Dict[str, Any] = field(default_factory=dict)
     variables_set: Dict[str, Any] = field(default_factory=dict)
     assertions: List[Dict[str, Any]] = field(default_factory=list)
+    screenshot_path: Optional[str] = None
     
     def finish(self, status: StepStatus, error_message: str = None, error_traceback: str = None):
         """Mark step as finished"""
@@ -140,7 +141,8 @@ class StepReport:
             "response_data": self.response_data.to_dict() if self.response_data else None,
             "variables_used": self.variables_used,
             "variables_set": self.variables_set,
-            "assertions": self.assertions
+            "assertions": self.assertions,
+            "screenshot_path": self.screenshot_path
         }
 
 

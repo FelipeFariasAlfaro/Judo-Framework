@@ -93,6 +93,11 @@ class JudoReporter:
         if self.current_step:
             self.current_step.variables_set[name] = value
     
+    def attach_screenshot(self, screenshot_path: str):
+        """Attach screenshot to current step"""
+        if self.current_step:
+            self.current_step.screenshot_path = screenshot_path
+    
     def finish_step(self, status: StepStatus = StepStatus.PASSED, 
                    error_message: str = None, error_traceback: str = None):
         """Finish current step"""

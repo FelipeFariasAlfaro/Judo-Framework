@@ -192,6 +192,8 @@ def after_step_playwright(context, step):
     """
     # Playwright-specific step cleanup
     if hasattr(context.judo_context, 'page') and context.judo_context.page:
+        screenshot_path = None
+        
         # Take screenshot after step if enabled
         if os.getenv('JUDO_SCREENSHOT_AFTER_STEP', 'false').lower() == 'true':
             try:
@@ -207,24 +209,19 @@ def after_step_playwright(context, step):
                 step_name = context.judo_context._sanitize_filename(step.name)
                 screenshot_path = context.judo_context.take_screenshot(f"step_failure_{step_name}")
                 print(f"📸 Step failure screenshot: {screenshot_path}")
-                
-                # Add to reporter if available
-                try:
-                    from ..reporting.reporter import get_reporter
-                    reporter = get_reporter()
-                    if reporter and reporter.current_step:
-                        if not hasattr(reporter.current_step, 'screenshots'):
-                            reporter.current_step.screenshots = []
-                        reporter.current_step.screenshots.append({
-                            'type': 'step_failure',
-                            'path': screenshot_path,
-                            'timestamp': context.judo_context._get_timestamp()
-                        })
-                except Exception as e:
-                    print(f"⚠️ Could not add step screenshot to report: {e}")
-                    
             except Exception as e:
                 print(f"⚠️ Failed to take step failure screenshot: {e}")
+        
+        # Attach screenshot to reporter if we took one
+        if screenshot_path:
+            try:
+                from ..reporting.reporter import get_reporter
+                reporter = get_reporter()
+                if reporter and reporter.current_step:
+                    reporter.attach_screenshot(screenshot_path)
+                    print(f"✅ Screenshot attached to report: {screenshot_path}")
+            except Exception as e:
+                print(f"⚠️ Could not attach screenshot to report: {e}")
     
     # Call original after_step if it exists
     try:

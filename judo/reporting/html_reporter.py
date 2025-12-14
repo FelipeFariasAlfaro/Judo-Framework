@@ -434,6 +434,12 @@ class HTMLReporter:
             </div>
             """
         
+        # ✅ SCREENSHOTS
+        if hasattr(step, 'screenshot_path') and step.screenshot_path:
+            screenshot_html = self._generate_screenshot_section(step.screenshot_path)
+            if screenshot_html:
+                details_html += screenshot_html
+        
         return details_html
     
     def _generate_headers_section(self, title: str, headers: Dict) -> str:
@@ -512,7 +518,62 @@ class HTMLReporter:
             </div>
             """
         
-        return assertions_html  
+        return assertions_html
+    
+    def _generate_screenshot_section(self, screenshot_path: str) -> str:
+        """Generate screenshot section with embedded image"""
+        if not screenshot_path:
+            return ""
+        
+        try:
+            # Convert screenshot to base64
+            from pathlib import Path
+            screenshot_file = Path(screenshot_path)
+            
+            if not screenshot_file.exists():
+                return f"""
+                <div class="detail-section">
+                    <h4>📸 Screenshot</h4>
+                    <div class="screenshot-error">Screenshot file not found: {screenshot_path}</div>
+                </div>
+                """
+            
+            with open(screenshot_file, 'rb') as f:
+                screenshot_data = f.read()
+                screenshot_b64 = base64.b64encode(screenshot_data).decode('utf-8')
+            
+            # Determine image type from extension
+            ext = screenshot_file.suffix.lower()
+            mime_type = {
+                '.png': 'image/png',
+                '.jpg': 'image/jpeg',
+                '.jpeg': 'image/jpeg',
+                '.gif': 'image/gif',
+                '.webp': 'image/webp'
+            }.get(ext, 'image/png')
+            
+            return f"""
+            <div class="detail-section screenshot-section">
+                <h4>📸 Screenshot</h4>
+                <div class="screenshot-container">
+                    <img src="data:{mime_type};base64,{screenshot_b64}" 
+                         alt="Step Screenshot" 
+                         class="screenshot-image"
+                         onclick="toggleScreenshotFullscreen(this)">
+                    <div class="screenshot-info">
+                        <span class="screenshot-filename">{screenshot_file.name}</span>
+                        <span class="screenshot-hint">Click to view fullscreen</span>
+                    </div>
+                </div>
+            </div>
+            """
+        except Exception as e:
+            return f"""
+            <div class="detail-section">
+                <h4>📸 Screenshot</h4>
+                <div class="screenshot-error">Error loading screenshot: {str(e)}</div>
+            </div>
+            """
   
     def _get_css_styles(self) -> str:
         """Get CSS styles for the report"""
@@ -1079,6 +1140,85 @@ class HTMLReporter:
             font-size: 0.8em;
         }
         
+        /* Screenshot Section */
+        .screenshot-section {
+            border-left: 4px solid #2196F3;
+        }
+        
+        .screenshot-container {
+            text-align: center;
+        }
+        
+        .screenshot-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .screenshot-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .screenshot-info {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .screenshot-filename {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .screenshot-hint {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .screenshot-error {
+            color: #f44336;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        /* Screenshot Fullscreen Modal */
+        .screenshot-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            cursor: pointer;
+        }
+        
+        .screenshot-fullscreen.active {
+            display: flex;
+        }
+        
+        .screenshot-fullscreen img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+        
         /* Toggle Icons */
         .toggle-icon {
             transition: transform 0.3s ease;
@@ -1268,6 +1408,31 @@ class HTMLReporter:
                 content.classList.add('expanded');
                 icon.classList.remove('rotated');
             }
+        }
+        
+        // Screenshot fullscreen functionality
+        function toggleScreenshotFullscreen(img) {
+            // Create fullscreen modal if it doesn't exist
+            let modal = document.getElementById('screenshot-fullscreen-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'screenshot-fullscreen-modal';
+                modal.className = 'screenshot-fullscreen';
+                modal.onclick = function() {
+                    this.classList.remove('active');
+                };
+                document.body.appendChild(modal);
+            }
+            
+            // Clone the image and show in fullscreen
+            const fullscreenImg = img.cloneNode(true);
+            fullscreenImg.onclick = function(e) {
+                e.stopPropagation();
+            };
+            
+            modal.innerHTML = '';
+            modal.appendChild(fullscreenImg);
+            modal.classList.add('active');
         }
         
         // Initialize collapsed state
