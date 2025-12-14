@@ -227,7 +227,7 @@ JUDO_SCREENSHOTS=false behave
 
 **Para empezar**: Usa **Opción 2** (Variables de entorno)
 
-1. **Instala Playwright**: `pip install 'judo-framework[browser]' && playwright install`
+1. **Actualiza Judo**: `pip install --upgrade judo-framework && playwright install`
 2. **Crea .env**: Con las variables mostradas arriba
 3. **No cambies environment.py**: Mantén tu código actual
 4. **Prueba**: Ejecuta tus tests existentes (deben funcionar igual)
@@ -277,10 +277,12 @@ JUDO_OUTPUT_DIRECTORY=judo_reports
 **Para seguir igual**: No hagas nada ❌
 
 **Para agregar UI testing**: 
-1. Instalar: `pip install 'judo-framework[browser]' && playwright install`
+1. Instalar: `pip install --upgrade judo-framework && playwright install`
 2. Crear .env con `JUDO_USE_BROWSER=true`
 3. Mantener tu environment.py sin cambios ✅
 
 **Resultado**: Todas tus funcionalidades actuales + nuevas capacidades de UI testing, sin riesgo ni breaking changes.
+
+> **🎯 Nota**: A partir de v1.3.38, Playwright viene incluido por defecto. ¡No más `[browser]` extras!
 
 ¡Es así de simple! 🚀

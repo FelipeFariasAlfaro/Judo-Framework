@@ -110,8 +110,14 @@ Every test run generates a comprehensive HTML report with:
 ### Installation
 
 ```bash
+# Install Judo Framework (includes browser testing capabilities)
 pip install judo-framework
+
+# Install browser engines (one-time setup for UI testing)
+playwright install
 ```
+
+> **🎭 Browser Testing Included**: Playwright comes pre-installed! No need for `[browser]` extras.
 
 ### 1. Create Your First Test
 

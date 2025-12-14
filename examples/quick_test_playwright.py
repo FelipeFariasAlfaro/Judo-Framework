@@ -191,7 +191,7 @@ def check_playwright_installation():
                 print(f"   Browser check failed: ❌ {e}")
                 return False
         else:
-            print(f"   Install with: pip install 'judo-framework[browser]'")
+            print(f"   Install with: pip install --upgrade judo-framework")
             return False
             
     except Exception as e:
@@ -316,7 +316,7 @@ def main():
             print("   4. Use @hybrid tags for API + UI tests")
         else:
             print("\n🎭 To enable Playwright integration:")
-            print("   1. Install: pip install 'judo-framework[browser]'")
+            print("   1. Update: pip install --upgrade judo-framework")
             print("   2. Install browsers: playwright install")
             print("   3. Add JUDO_USE_BROWSER=true to .env")
             print("   4. Your current environment.py will work without changes")
@@ -325,7 +325,7 @@ def main():
         
         if not playwright_available:
             print("\n🔧 To fix Playwright issues:")
-            print("   1. Install: pip install 'judo-framework[browser]'")
+            print("   1. Update: pip install --upgrade judo-framework")
             print("   2. Install browsers: playwright install")
         
         print("\n🔧 To fix API issues:")
