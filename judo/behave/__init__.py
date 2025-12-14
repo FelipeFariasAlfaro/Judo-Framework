@@ -9,6 +9,18 @@ from . import steps_es  # Steps en español
 from .context import JudoContext
 from .hooks import *
 
+# Optional Playwright integration
+try:
+    from ..playwright import PLAYWRIGHT_AVAILABLE
+    if PLAYWRIGHT_AVAILABLE:
+        from ..playwright import steps as playwright_steps
+        from ..playwright import steps_es as playwright_steps_es
+        from ..playwright.browser_context import JudoBrowserContext
+        from ..playwright.hooks import *
+        print("🎭 Playwright steps loaded successfully")
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+
 # Import auto hooks for easy access
 from .auto_hooks import (
     before_all_judo,

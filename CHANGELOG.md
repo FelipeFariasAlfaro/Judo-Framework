@@ -2,6 +2,310 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.3.37] - 2024-12-13
+
+### 🎭 MAJOR NEW FEATURE - Playwright Integration
+
+**Complete browser automation integration while maintaining 100% API testing compatibility**
+
+#### ✨ What's New
+- **Hybrid Testing**: Combine API and UI testing in the same scenario
+- **Optional Integration**: Completely optional - existing API tests work unchanged
+- **Bilingual Support**: Browser steps available in English and Spanish
+- **Unified Reporting**: Screenshots and browser actions integrate with existing HTML reports
+- **Advanced Features**: Multi-page support, JavaScript execution, visual testing
+
+#### 🚀 Key Features
+- **JudoBrowserContext**: Enhanced context with full Playwright capabilities
+- **50+ Browser Steps**: Complete step library in both languages
+- **Page Management**: Advanced multi-page and page pool support
+- **Screenshot Integration**: Automatic failure screenshots, manual screenshots
+- **Hybrid Data Flow**: Share data between API responses and UI elements
+- **Environment Configuration**: Extensive configuration via environment variables
+
+#### 📦 Installation
+```bash
+# Install with browser support
+pip install 'judo-framework[browser]'
+playwright install
+```
+
+#### 🔧 Quick Setup
+```python
+# environment.py
+from judo.playwright.hooks import integrate_playwright_hooks
+
+def before_all(context):
+    setup_judo_context(context)
+    integrate_playwright_hooks(context, 'before_all')
+```
+
+```bash
+# Enable browser testing
+export JUDO_USE_BROWSER=true
+export JUDO_BROWSER=chromium
+export JUDO_HEADLESS=false
+```
+
+#### 🎯 Example Usage
+```gherkin
+@hybrid
+Scenario: API + UI Testing
+  # API Testing
+  When I send a POST request to "/users" with JSON:
+    """
+    {"name": "John Doe", "email": "john@example.com"}
+    """
+  Then the response status should be 201
+  And I extract "$.name" from the API response and store it as "userName"
+  
+  # UI Testing with API data
+  Given I start a browser
+  When I navigate to "https://app.com/form"
+  And I fill "#name" with "{userName}"
+  And I click on "#submit"
+  Then the element "#success" should be visible
+  And I take a screenshot named "form_submitted"
+```
+
+#### 📁 New Files Added
+- `judo/playwright/` - Complete Playwright integration module
+- `judo/playwright/__init__.py` - Module initialization with availability check
+- `judo/playwright/browser_context.py` - Enhanced context with browser capabilities
+- `judo/playwright/steps.py` - 50+ English browser steps
+- `judo/playwright/steps_es.py` - 50+ Spanish browser steps
+- `judo/playwright/hooks.py` - Integration hooks for seamless setup
+- `judo/playwright/page_manager.py` - Advanced page management utilities
+- `examples/playwright_integration.feature` - Comprehensive examples (English)
+- `examples/playwright_integration_es.feature` - Comprehensive examples (Spanish)
+- `examples/environment_playwright.py` - Example environment setup
+- `examples/.env.playwright` - Environment variables reference
+- `.kiro/playwright-integration.md` - Complete integration documentation
+
+#### 🔄 Backward Compatibility
+- ✅ **Zero breaking changes** - all existing API tests work unchanged
+- ✅ **Optional dependency** - Playwright only loads if installed and enabled
+- ✅ **Same reporting system** - existing HTML reports enhanced with browser data
+- ✅ **Same variable system** - variables work across API and UI domains
+- ✅ **Same configuration** - environment variables and setup patterns maintained
+
+#### 🎭 Browser Steps Available
+
+**Lifecycle**: Start/stop browsers, create/manage pages
+**Navigation**: Navigate, reload, back/forward
+**Interaction**: Click, fill, type, select, check/uncheck
+**Validation**: Visibility, text content, attributes
+**Waiting**: Element states, URL patterns, timeouts
+**Screenshots**: Full page, element-specific, named screenshots
+**JavaScript**: Execute scripts, store results
+**Storage**: LocalStorage, cookies, session data
+**Advanced**: Drag & drop, file upload, alerts, multi-tab
+
+#### 🌍 Bilingual Support
+All steps available in both languages with identical functionality:
+- English: `When I click on "#submit"`
+- Spanish: `Cuando hago clic en "#submit"`
+
+#### 📊 Enhanced Reporting
+- Screenshots automatically included in HTML reports
+- Browser navigation events logged
+- Element interactions captured
+- Performance metrics available
+- Request/response data alongside UI actions
+
+#### 🔧 Configuration Options
+25+ environment variables for complete customization:
+- Browser type (Chromium, Firefox, WebKit)
+- Headless/headed mode
+- Screenshot settings
+- Viewport configuration
+- Performance optimization
+- Debug and logging options
+
+#### 🎯 Use Cases
+- **E2E Testing**: Complete user workflows
+- **Form Validation**: UI form testing with API validation
+- **Data Verification**: API data consistency in UI
+- **Visual Testing**: Screenshot-based validation
+- **Performance Testing**: Page load and interaction timing
+- **Cross-browser Testing**: Multiple browser support
+
+#### 📈 Performance Optimized
+- Browser reuse between scenarios
+- Page pooling for performance
+- Headless mode for CI/CD
+- Selective screenshot capture
+- Memory-efficient page management
+
+---
+
+## [1.3.36] - 2024-12-13
+
+### 🚀 New Feature - Single Report for Multiple Features
+- **NEW**: Added `run_all_features_together` parameter to BaseRunner (default: True)
+- **FIXED**: Multiple features now generate a single HTML report instead of overwriting each other
+- **Benefit**: See all your test results in one consolidated report
+
+### 🔧 Technical Details
+- Added `run_all_features_together` parameter to `BaseRunner.__init__()`
+- New method `run_all_features_in_one_execution()` executes all features in a single behave call
+- When enabled, all features are passed to behave at once, generating one unified report
+- When disabled (or when using parallel execution), behaves like before (one feature at a time)
+
+### 💡 Usage
+
+**Default behavior (single report):**
+```python
+runner = BaseRunner(
+    features_dir="features",
+    output_dir="judo_reports"
+    # run_all_features_together=True by default
+)
+results = runner.run(tags=["@smoke"])
+# ✅ Generates ONE report with all features
+```
+
+**Old behavior (separate reports):**
+```python
+runner = BaseRunner(
+    features_dir="features",
+    output_dir="judo_reports",
+    run_all_features_together=False  # Execute features separately
+)
+results = runner.run(tags=["@smoke"])
+# Each feature generates its own report (last one wins)
+```
+
+### ✅ Benefits
+- ✅ Single consolidated HTML report with all features
+- ✅ Works with mixed language features (English + Spanish)
+- ✅ No more overwritten reports
+- ✅ Better overview of all test results
+- ✅ Backward compatible (can disable if needed)
+
+### 📝 Notes
+- Parallel execution (`parallel=True`) still runs features separately (required for parallelism)
+- The new behavior is the default for better user experience
+- Set `run_all_features_together=False` to get the old behavior
+
+## [1.3.35] - 2024-12-13
+
+### 🚀 New Feature - Environment Variables Support (.env)
+- **NEW**: Added support for loading headers from environment variables and .env files
+- **Dependency**: Added `python-dotenv>=1.0.0` to dependencies
+- **Use Case**: Perfect for API keys, tokens, and sensitive data that shouldn't be in code
+
+### 📝 New Steps Available
+
+#### English Steps
+```gherkin
+Given I set the header "Authorization" from env "API_TOKEN"
+Given I set the header "X-API-Key" from env "MY_API_KEY"
+```
+
+#### Spanish Steps
+```gherkin
+Dado que establezco el header "Authorization" desde env "API_TOKEN"
+Dado que agrego el header "X-API-Key" desde env "MI_API_KEY"
+```
+
+### 🔧 Technical Implementation
+- Added `set_header_from_env()` method to `JudoContext`
+- Automatically loads `.env` file if `python-dotenv` is installed
+- Falls back to system environment variables if `.env` not found
+- Clear error message if environment variable doesn't exist
+
+### 💡 Usage Example
+
+**Create a .env file:**
+```env
+API_TOKEN=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+API_KEY=sk_test_1234567890abcdef
+BASE_URL=https://api.example.com
+```
+
+**Use in your feature files:**
+```gherkin
+# language: es
+Característica: API con autenticación desde .env
+
+  Escenario: Consultar API con token desde .env
+    Dado que tengo un cliente Judo API
+    Y que la URL base es "https://api.example.com"
+    Y que agrego el header "Authorization" desde env "API_TOKEN"
+    Y que agrego el header "X-API-Key" desde env "API_KEY"
+    Cuando hago una petición GET a "/users"
+    Entonces el código de respuesta debe ser 200
+```
+
+### ✅ Benefits
+- ✅ Keep sensitive data out of version control
+- ✅ Easy configuration per environment (dev, staging, prod)
+- ✅ Works with both .env files and system environment variables
+- ✅ Clear error messages when variables are missing
+- ✅ Available in both English and Spanish
+
+## [1.3.34] - 2024-12-12
+
+### 🐛 Bug Fix - Response Time Validation in Spanish
+- **FIXED**: Spanish step for response time validation now works correctly
+- **Issue**: Step used `response.elapsed_time` which doesn't exist
+- **Correct**: Changed to `response.elapsed` (property that exists in JudoResponse)
+
+### 🔧 Technical Details
+- Fixed `step_validate_response_time_es` in `steps_es.py`
+- Changed from `elapsed_time` to `elapsed`
+- Improved error message to show time in 3 decimal places
+- English step was already correct
+
+### ✅ What's Fixed
+- ✅ Spanish step now executes correctly (no longer pending/undefined)
+- ✅ Shows proper timing validation
+- ✅ Better error messages with formatted time
+
+### 📝 Example Usage
+```gherkin
+# Español (ahora funciona!)
+Cuando hago una petición GET a "/users/1"
+Entonces el código de respuesta debe ser 200
+Y el tiempo de respuesta debe ser menor a 5.0 segundos
+
+# English (always worked)
+When I send a GET request to "/users/1"
+Then the response status should be 200
+And the response time should be less than 5.0 seconds
+```
+
+## [1.3.33] - 2024-12-12
+
+### 🐛 Bug Fix - Array Validation for Root-Level Arrays
+- **FIXED**: Array validation steps now work with root-level arrays (when response is directly an array)
+- **Issue**: Steps failed when response was `[{...}, {...}]` instead of `{"users": [{...}, {...}]}`
+- **Error**: `AssertionError: No se puede navegar a 'users' - ruta inválida`
+
+### 🔧 Technical Details
+- Modified `step_validate_nested_array_contains_item` (English)
+- Modified `step_validate_nested_array_contains_item_es` (Spanish)
+- Added check: if `response.json` is already a list, use it directly
+- Only navigate through object properties if response is a dict
+
+### ✅ What's Fixed
+- ✅ Works with root-level arrays: `GET /users` → `[{id: 1, ...}, {id: 2, ...}]`
+- ✅ Works with nested arrays: `GET /data` → `{"users": [{id: 1, ...}]}`
+- ✅ Better error messages when path not found
+- ✅ Both English and Spanish steps fixed
+
+### 📝 Example Usage
+```gherkin
+# Root-level array (now works!)
+When I send a GET request to "/users"
+Then the response array "users" should contain an item with "id" equal to "1"
+
+# Nested array (still works)
+When I send a GET request to "/data"
+Then the response array "data.users" should contain an item with "id" equal to "1"
+```
+
 ## [1.3.32] - 2024-12-12
 
 ### 🐛 Critical Fix - Steps Not Executing & Request/Response Data

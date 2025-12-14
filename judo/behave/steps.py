@@ -75,6 +75,12 @@ def step_set_header(context, name, value):
     context.judo_context.set_header(name, value)
 
 
+@step('I set the header "{header_name}" from env "{env_var_name}"')
+def step_set_header_from_env(context, header_name, env_var_name):
+    """Set a request header from environment variable (.env file)"""
+    context.judo_context.set_header_from_env(header_name, env_var_name)
+
+
 @step('I set the query parameter "{name}" to "{value}"')
 def step_set_query_param_string(context, name, value):
     """Set a query parameter (string)"""
@@ -403,16 +409,25 @@ def step_validate_nested_array_contains_item(context, array_path, key, value):
     response = context.judo_context.response
     value = context.judo_context.interpolate_string(value)
     
-    # Navigate to the nested array
+    # Get the array
     array_data = response.json
-    for path_part in array_path.split('.'):
-        if isinstance(array_data, dict):
-            array_data = array_data.get(path_part)
-        else:
-            assert False, f"Cannot navigate to '{array_path}' - invalid path"
+    
+    # If response is already an array directly, use it
+    if isinstance(array_data, list):
+        # Response is directly the array
+        pass
+    else:
+        # Navigate to the nested array
+        for path_part in array_path.split('.'):
+            if isinstance(array_data, dict):
+                array_data = array_data.get(path_part)
+                if array_data is None:
+                    assert False, f"Path '{array_path}' not found in response"
+            else:
+                assert False, f"Cannot navigate to '{array_path}' - invalid path"
     
     # Validate it's an array
-    assert isinstance(array_data, list), f"'{array_path}' is not an array"
+    assert isinstance(array_data, list), f"'{array_path}' is not an array, it's {type(array_data).__name__}"
     
     # Try to convert to int if it's a numeric string
     try:
@@ -618,6 +633,27 @@ def step_enable_request_response_logging_with_directory(context, directory):
 def step_set_output_directory(context, directory):
     """Set the output directory for request/response logging"""
     context.judo_context.output_directory = directory
+
+
+# Generic Environment Variable Steps
+
+@step('I get the value "{env_var_name}" from env and store it in "{variable_name}"')
+def step_get_env_value_and_store(context, env_var_name, variable_name):
+    """Get value from environment variable and store it in a variable"""
+    import os
+    from dotenv import load_dotenv
+    
+    # Load environment variables from .env file if it exists
+    load_dotenv()
+    
+    # Get the value from environment variable
+    env_value = os.getenv(env_var_name)
+    
+    if env_value is None:
+        raise ValueError(f"Environment variable '{env_var_name}' not found")
+    
+    # Store in context variable
+    context.judo_context.set_variable(variable_name, env_value)
 
 
 
