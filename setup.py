@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="judo-framework",
-    version="1.3.37",
+    version="1.3.38",
     author="Felipe Farias - CENTYC",
     author_email="felipe.farias@centyc.cl",
     description="A comprehensive API testing framework for Python, inspired by Karate Framework",
@@ -39,6 +39,7 @@ setup(
         "websocket-client>=1.5.0",
         "beautifulsoup4>=4.12.0",
         "python-dotenv>=1.0.0",
+        "playwright>=1.32.0",
     ],
     extras_require={
         "dev": [
