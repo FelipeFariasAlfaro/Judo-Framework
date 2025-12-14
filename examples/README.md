@@ -19,6 +19,11 @@ These files demonstrate ALL Judo Framework features with detailed explanations.
 - **`demo_logging_es.feature`** - Spanish demo of automatic request/response logging
 - **`request_response_logging_example.py`** - Python configuration examples
 
+### 🔐 Environment Variables Examples (.env)
+- **`env_variables_example.feature`** - English examples using .env files
+- **`env_variables_ejemplo_es.feature`** - Spanish examples using .env files
+- **`.env.example`** - Template for environment variables configuration
+
 ### 📊 Test Data
 - **`test_data/`** - Directory with sample JSON files and schemas
 - **`output/`** - Directory for generated output files
@@ -42,8 +47,26 @@ behave examples/complete_showcase.feature --tags=@http
 # Run only file operation examples
 behave examples/complete_showcase.feature --tags=@files
 
+# Run environment variables examples
+behave examples/complete_showcase.feature --tags=@env
+
 # Run logging demos
 behave examples/logging_demo.feature --tags=@demo
+```
+
+### Test Environment Variables Features
+```bash
+# 1. Copy the example .env file
+cp examples/.env.example examples/.env
+
+# 2. Edit examples/.env with your values (optional for showcase)
+# The showcase works with the default example values
+
+# 3. Run environment variable scenarios
+behave examples/complete_showcase.feature --tags=@env
+
+# Spanish version
+behave examples/showcase_completo.feature --tags=@env
 ```
 
 ### Enable Request/Response Logging
@@ -76,6 +99,13 @@ behave examples/logging_demo.feature
 - ✅ File organization and naming conventions
 - ✅ Debugging failed tests with logged data
 - ✅ Using logs for API documentation
+
+### From Environment Variables Examples
+- ✅ How to use .env files for sensitive data
+- ✅ Loading API tokens and keys from environment
+- ✅ Setting headers from environment variables
+- ✅ Managing different environments (dev, staging, prod)
+- ✅ Keeping secrets out of version control
 
 ## 🎓 Learning Path
 

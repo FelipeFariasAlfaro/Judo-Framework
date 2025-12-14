@@ -18,7 +18,20 @@ from .runner.base_runner import BaseRunner
 from .runner.test_suite import TestSuite, CommonSuites
 from .utils.helpers import *
 
-__version__ = "1.3.32"
+# Optional Playwright integration
+try:
+    from .playwright import PLAYWRIGHT_AVAILABLE
+    if PLAYWRIGHT_AVAILABLE:
+        from .playwright.browser_context import JudoBrowserContext
+        from .playwright.page_manager import PageManager, PagePool
+        __all__.extend(["JudoBrowserContext", "PageManager", "PagePool", "PLAYWRIGHT_AVAILABLE"])
+    else:
+        __all__.append("PLAYWRIGHT_AVAILABLE")
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+    __all__.append("PLAYWRIGHT_AVAILABLE")
+
+__version__ = "1.3.37"
 __author__ = "Judo Framework Team"
 
 # Main exports

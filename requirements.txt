@@ -9,6 +9,7 @@ behave>=1.2.6
 jinja2>=3.1.0
 websocket-client>=1.5.0
 beautifulsoup4>=4.12.0
+python-dotenv>=1.0.0
 
 # Dependencias opcionales (instalar según necesidad)
 # Para criptografía: pip install judo-framework[crypto]

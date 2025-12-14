@@ -487,6 +487,37 @@ Feature: Judo Framework Complete Showcase
     And the response time should be less than 5.0 seconds
 
   # ============================================
+  # ENVIRONMENT VARIABLES (.env)
+  # ============================================
+
+  @env @security
+  Scenario: Use environment variables for authentication
+    # Load sensitive data like API tokens from .env file
+    # This keeps credentials out of version control
+    # Create a .env file with: API_TOKEN=Bearer test123
+    # Create a .env file with: API_KEY=your_api_key_here
+    Given I set the header "Authorization" from env "API_TOKEN"
+    And I set the header "X-API-Key" from env "API_KEY"
+    When I send a GET request to "/users/1"
+    Then the response status should be 200
+    And the response should contain "id"
+
+  @env @multiple-headers
+  Scenario: Multiple headers from environment variables
+    # Load multiple headers from .env for complex authentication
+    # Useful for APIs requiring multiple authentication headers
+    # Example .env:
+    #   API_TOKEN=Bearer eyJhbGc...
+    #   API_KEY=sk_test_123
+    #   TENANT_ID=tenant_abc
+    Given I set the header "Authorization" from env "API_TOKEN"
+    And I set the header "X-API-Key" from env "API_KEY"
+    And I set the header "X-Tenant-ID" from env "TENANT_ID"
+    When I send a GET request to "/posts/1"
+    Then the response status should be 200
+    And the response should contain "title"
+
+  # ============================================
   # ERROR HANDLING
   # ============================================
 

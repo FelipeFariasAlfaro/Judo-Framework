@@ -444,6 +444,29 @@ class JudoContext:
         value = self.interpolate_string(value)
         self.judo.header(name, value)
     
+    def set_header_from_env(self, header_name: str, env_var_name: str):
+        """
+        Set request header from environment variable (.env file)
+        
+        Args:
+            header_name: Name of the header to set
+            env_var_name: Name of the environment variable to read from
+        """
+        import os
+        try:
+            from dotenv import load_dotenv
+            # Load .env file if it exists
+            load_dotenv()
+        except ImportError:
+            # python-dotenv not installed, just use os.getenv
+            pass
+        
+        value = os.getenv(env_var_name)
+        if value is None:
+            raise ValueError(f"Environment variable '{env_var_name}' not found in .env file or environment")
+        
+        self.judo.header(header_name, value)
+    
     def set_query_param(self, name: str, value: Any):
         """Set query parameter"""
         self.judo.param(name, value)
