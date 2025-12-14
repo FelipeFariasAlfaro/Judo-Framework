@@ -6,10 +6,14 @@ Extends JudoContext with Playwright browser capabilities
 import os
 from typing import Any, Dict, Optional, Union
 from ..behave.context import JudoContext
-from . import PLAYWRIGHT_AVAILABLE, check_playwright_availability
 
-if PLAYWRIGHT_AVAILABLE:
+# Check Playwright availability
+try:
+    import playwright
     from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page, Playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
 
 
 class JudoBrowserContext(JudoContext):
@@ -84,7 +88,12 @@ class JudoBrowserContext(JudoContext):
             headless: True for headless mode, False for headed
             **options: Additional browser options
         """
-        check_playwright_availability()
+        if not PLAYWRIGHT_AVAILABLE:
+            raise ImportError(
+                "Playwright is not installed. Install it with:\n"
+                "pip install 'judo-framework[browser]' or pip install playwright\n"
+                "Then run: playwright install"
+            )
         
         if self.playwright is None:
             self.playwright = sync_playwright().start()

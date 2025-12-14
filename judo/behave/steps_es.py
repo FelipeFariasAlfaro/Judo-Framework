@@ -551,3 +551,15 @@ def step_get_env_value_and_store_es(context, env_var_name, variable_name):
     
     # Almacenar en variable de contexto
     context.judo_context.set_variable(variable_name, env_value)
+@step('debo tener la variable "{variable_name}" con valor "{expected_value}"')
+def step_validate_variable_value_es(context, variable_name, expected_value):
+    """Validar que una variable tenga el valor esperado"""
+    # Interpolar el valor esperado en caso de que contenga variables
+    expected_value = context.judo_context.interpolate_string(expected_value)
+    
+    # Obtener el valor actual
+    actual_value = context.judo_context.get_variable(variable_name)
+    
+    # Comparar valores
+    assert actual_value == expected_value, \
+        f"Variable '{variable_name}': esperado '{expected_value}', pero obtuve '{actual_value}'"

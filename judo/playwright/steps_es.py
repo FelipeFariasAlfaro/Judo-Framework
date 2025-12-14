@@ -4,7 +4,12 @@ Pasos de automatización de navegador que se integran perfectamente con pruebas 
 """
 
 from behave import step
-from . import PLAYWRIGHT_AVAILABLE
+# Check Playwright availability
+try:
+    import playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
 
 if not PLAYWRIGHT_AVAILABLE:
     # Si Playwright no está disponible, crear pasos dummy que muestren errores útiles
@@ -243,7 +248,7 @@ def step_take_element_screenshot_es(context, selector):
     """Tomar una captura de pantalla de un elemento específico"""
     context.judo_context.take_element_screenshot(selector)
 
-@step('tomo una captura de pantalla del elemento "{selector}" llamada "{name}"')
+@step('tomo una captura del elemento "{selector}" llamada "{name}"')
 def step_take_named_element_screenshot_es(context, selector, name):
     """Tomar una captura de pantalla de un elemento específico con un nombre"""
     context.judo_context.take_element_screenshot(selector, name)
