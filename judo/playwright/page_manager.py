@@ -4,10 +4,14 @@ Manages multiple pages and provides utilities for complex UI testing scenarios
 """
 
 from typing import Dict, List, Optional, Any
-from . import PLAYWRIGHT_AVAILABLE
 
-if PLAYWRIGHT_AVAILABLE:
+# Check Playwright availability
+try:
+    import playwright
     from playwright.sync_api import Page, BrowserContext
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
 
 
 class PageManager:
