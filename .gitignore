@@ -42,6 +42,7 @@ ENV/
 htmlcov/
 .tox/
 .hypothesis/
+test_playwright_local/
 
 # Behave
 judo_reports/
@@ -56,5 +57,31 @@ Thumbs.db
 *.log
 *.tmp
 
+# Environment variables (keep .env.example)
+.env
+.env.local
+.env.*.local
+!.env.example
+!examples/.env.example
+!examples/.env.playwright
+
 # Internal documentation (technical docs for development)
 .kiro/
+
+# Publishing scripts (internal use only)
+publish.py
+
+# Cleanup scripts (internal use only)
+cleanup_sensitive_files.sh
+cleanup_sensitive_files.ps1
+CLEANUP_INSTRUCTIONS.md
+
+# Internal HTML documentation
+info-en.html
+info-es.html
+
+# Release notes (internal tracking)
+RELEASE_NOTES_*.md
+
+# Steps directory (if it's for internal testing)
+steps/

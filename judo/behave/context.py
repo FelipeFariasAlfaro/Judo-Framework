@@ -4,8 +4,47 @@ Provides Judo Framework integration with Behave context
 """
 
 import os
+from pathlib import Path
 from judo import Judo
 from typing import Any, Dict, Optional
+
+
+def _load_env_file():
+    """
+    Load .env file from project root first, then from current directory.
+    By convention, .env files are always in the project root.
+    """
+    try:
+        from dotenv import load_dotenv
+        
+        # Try to find project root by looking for common markers
+        current_dir = Path.cwd()
+        project_root = None
+        
+        # Look for project root markers (features/, setup.py, pyproject.toml, .git/)
+        for parent in [current_dir] + list(current_dir.parents):
+            if any([
+                (parent / 'features').exists(),
+                (parent / 'setup.py').exists(),
+                (parent / 'pyproject.toml').exists(),
+                (parent / '.git').exists(),
+            ]):
+                project_root = parent
+                break
+        
+        # Try loading from project root first
+        if project_root:
+            env_path = project_root / '.env'
+            if env_path.exists():
+                load_dotenv(dotenv_path=env_path)
+                return
+        
+        # Fallback: load from current directory
+        load_dotenv()
+        
+    except ImportError:
+        # python-dotenv not installed, just use os.getenv
+        pass
 
 
 class JudoContext:
@@ -453,13 +492,9 @@ class JudoContext:
             env_var_name: Name of the environment variable to read from
         """
         import os
-        try:
-            from dotenv import load_dotenv
-            # Load .env file if it exists
-            load_dotenv()
-        except ImportError:
-            # python-dotenv not installed, just use os.getenv
-            pass
+        
+        # Load .env file from project root
+        _load_env_file()
         
         value = os.getenv(env_var_name)
         if value is None:

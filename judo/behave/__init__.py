@@ -4,8 +4,8 @@ Provides step definitions and utilities for BDD testing with Behave
 """
 
 # Import all steps to register them automatically
-from . import steps
-from . import steps_es  # Steps en español
+from . import steps  # English steps (use @step, work with any keyword)
+from . import steps_es  # Spanish steps (use @step, work with any keyword including Given/When/Then)
 from .context import JudoContext
 from .hooks import *
 
@@ -40,11 +40,17 @@ import importlib
 def _ensure_steps_loaded():
     """Ensure all step definitions are loaded and registered"""
     try:
-        # Force reload of steps module to ensure registration
+        # Force reload of English steps module to ensure registration
         if 'judo.behave.steps' in sys.modules:
             importlib.reload(sys.modules['judo.behave.steps'])
         else:
             from . import steps
+        
+        # Force reload of Spanish steps module to ensure registration
+        if 'judo.behave.steps_es' in sys.modules:
+            importlib.reload(sys.modules['judo.behave.steps_es'])
+        else:
+            from . import steps_es
     except Exception as e:
         print(f"Warning: Could not load Judo steps: {e}")
 

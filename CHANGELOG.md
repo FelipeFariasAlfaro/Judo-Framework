@@ -2,6 +2,140 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.3.42] - 2024-12-14
+
+### 🐛 BUG FIX - .env File Loading from Project Root
+
+**Fixed .env file loading to always search in project root first**
+
+#### Problem
+- Framework was loading `.env` from the directory where the test runner was executed
+- By convention, `.env` files are always in the project root
+- This caused issues when running tests from subdirectories
+
+#### Solution
+- Created `_load_env_file()` helper function in `context.py`
+- Searches for project root by looking for markers: `features/`, `setup.py`, `pyproject.toml`, `.git/`
+- Loads `.env` from project root first, then falls back to current directory
+- Updated all `load_dotenv()` calls to use the new helper
+
+#### Impact
+- ✅ `.env` files are now loaded from project root by convention
+- ✅ Tests work correctly regardless of execution directory
+- ✅ Fallback to current directory if project root not found
+- ✅ No breaking changes
+
+#### Files Modified
+- `judo/behave/context.py` - Added `_load_env_file()` helper
+- `judo/behave/steps.py` - Updated env loading
+- `judo/behave/steps_es.py` - Updated env loading
+
+## [1.3.41] - 2024-12-14
+
+### 🐛 BUG FIX - Mixed Mode Step Registration
+
+**Critical fix for Mixed Mode step definitions not being recognized by Behave**
+
+#### Problem
+- Spanish steps with "que" prefix (e.g., `que agrego el header`) were not working with English keywords
+- When using `Given agrego el header...`, Behave couldn't find the step (marked as skipped)
+- The `@step()` decorator was registering steps with the exact text including "que"
+
+#### Solution
+- Added duplicate `@step()` decorators without "que" prefix for all Spanish steps
+- Now both versions work: `Dado que agrego el header` AND `Given agrego el header`
+- Added auto-registration mechanism to `steps_es.py` (similar to `steps.py`)
+- Improved `__init__.py` to force reload of both English and Spanish steps
+
+#### Impact
+- ✅ Mixed Mode now works correctly
+- ✅ Spanish steps work with both Spanish and English keywords
+- ✅ No breaking changes - all existing tests continue to work
+- ✅ Better step discovery and registration
+
+## [1.3.40] - 2024-12-14
+
+### 📚 DOCUMENTATION - Mixed Mode (Modo Mixto)
+
+**Official documentation for writing tests with English keywords and Spanish descriptions!**
+
+#### ✨ What's New
+- **Mixed Mode Documentation**: Complete guide on using `Given/When/Then` keywords with Spanish step descriptions
+- **Natural for LATAM**: Reflects how Latin American developers actually write code
+- **Already Available**: Spanish steps have always used `@step()`, making them work with any keyword
+- **Zero Configuration**: Works automatically, no setup needed
+- **Examples Added**: New example files demonstrating mixed mode usage
+
+#### 📝 Example
+
+**Spanish mode (with language tag):**
+```gherkin
+# language: es
+Dado que tengo un cliente Judo API
+Cuando hago una petición GET a "/users"
+Entonces el código de respuesta debe ser 200
+```
+
+**Mixed mode (no language tag needed):**
+```gherkin
+Given tengo un cliente Judo API
+When hago una petición GET a "/users"
+Then el código de respuesta debe ser 200
+```
+
+**How it works:** Spanish steps use `@step()` decorator, which accepts any keyword (Given/When/Then/And/But).
+
+#### 🎯 Benefits
+- **More Natural**: Shorter English keywords, clear Spanish descriptions
+- **Better Readability**: Easier to scan and understand test scenarios
+- **Team Friendly**: Perfect for bilingual teams in Latin America
+- **Flexible**: Mix with pure English or Spanish steps as needed
+- **No Extra Code**: Uses existing Spanish steps with `@step()` decorator
+
+#### 📚 Documentation
+- New file: `examples/mixed_mode_example.feature` - Working example
+- New guide: `examples/README_mixed_mode.md` - Complete documentation
+- Updated: `examples/README.md` - Added mixed mode reference
+
+### 🔧 BREAKING CHANGE - Playwright Steps Removed
+
+**Playwright integration now provides infrastructure only, not pre-built steps**
+
+#### What Changed
+- ❌ Removed `judo/playwright/steps.py`
+- ❌ Removed `judo/playwright/steps_es.py`
+- ✅ Kept `JudoBrowserContext` and all browser automation infrastructure
+- ✅ Users create their own custom Playwright steps based on their needs
+
+#### Why This Change?
+- **More Flexible**: Every project has different UI testing needs
+- **Less Opinionated**: Users define their own step patterns
+- **Cleaner Separation**: Judo provides API steps, users provide UI steps
+- **Better Maintenance**: No need to maintain 50+ browser steps
+
+#### Migration Guide
+If you were using pre-built Playwright steps, create your own in `features/steps/`:
+
+```python
+from behave import given, when, then
+
+@when('navego a "{url}"')
+def step_navigate(context, url):
+    context.judo_context.navigate_to(url)
+
+@when('hago clic en "{selector}"')
+def step_click(context, selector):
+    context.judo_context.click_element(selector)
+
+@then('el elemento "{selector}" debe ser visible')
+def step_visible(context, selector):
+    assert context.judo_context.is_element_visible(selector)
+```
+
+All `JudoBrowserContext` methods remain available and unchanged.
+
+---
+
 ## [1.3.39] - 2024-12-14
 
 ### 📸 NEW FEATURE - Screenshot Integration in HTML Reports

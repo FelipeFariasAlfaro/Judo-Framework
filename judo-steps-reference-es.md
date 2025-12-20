@@ -1,8 +1,10 @@
 # Referencia Completa de Pasos - Judo Framework (Español)
 
-Esta es la referencia completa de todos los pasos **VERIFICADOS** disponibles en Judo Framework v1.3.36 en español.
+Esta es la referencia completa de todos los pasos **VERIFICADOS** disponibles en Judo Framework v1.3.40 en español.
 
 **⚠️ IMPORTANTE**: Esta documentación ha sido verificada contra el código fuente del framework. Solo incluye pasos que realmente existen y funcionan.
+
+**💡 Nota**: Todos los pasos usan el decorador `@step()`, lo que significa que funcionan con cualquier keyword (Given, When, Then, And, But, Dado, Cuando, Entonces, Y, Pero). Esto proporciona máxima flexibilidad al escribir tus escenarios de prueba.
 
 ## 📋 Índice
 

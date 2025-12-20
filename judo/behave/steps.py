@@ -641,10 +641,10 @@ def step_set_output_directory(context, directory):
 def step_get_env_value_and_store(context, env_var_name, variable_name):
     """Get value from environment variable and store it in a variable"""
     import os
-    from dotenv import load_dotenv
+    from judo.behave.context import _load_env_file
     
-    # Load environment variables from .env file if it exists
-    load_dotenv()
+    # Load environment variables from .env file (project root first)
+    _load_env_file()
     
     # Get the value from environment variable
     env_value = os.getenv(env_var_name)

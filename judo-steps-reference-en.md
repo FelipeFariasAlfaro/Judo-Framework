@@ -1,8 +1,10 @@
 # Complete Steps Reference - Judo Framework (English)
 
-This is the complete reference of all **VERIFIED** steps available in Judo Framework v1.3.36 in English.
+This is the complete reference of all **VERIFIED** steps available in Judo Framework v1.3.40 in English.
 
 **⚠️ IMPORTANT**: This documentation has been verified against the framework source code. It only includes steps that actually exist and work.
+
+**💡 Note**: All steps use the `@step()` decorator, which means they work with any keyword (Given, When, Then, And, But). This provides maximum flexibility in writing your test scenarios.
 
 ## 📋 Table of Contents
 

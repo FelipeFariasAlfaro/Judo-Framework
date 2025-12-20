@@ -13,6 +13,7 @@ import yaml
 # ============================================================
 
 @step('que la URL base es "{base_url}"')
+@step('la URL base es "{base_url}"')
 def step_url_base_es(context, base_url):
     """Establecer la URL base para las peticiones"""
     if not hasattr(context, 'judo_context'):
@@ -22,6 +23,7 @@ def step_url_base_es(context, base_url):
 
 
 @step('que tengo un cliente Judo API')
+@step('tengo un cliente Judo API')
 def step_setup_judo_es(context):
     """Inicializar contexto Judo"""
     if not hasattr(context, 'judo_context'):
@@ -30,18 +32,21 @@ def step_setup_judo_es(context):
 
 
 @step('que establezco la variable "{nombre}" a "{valor}"')
+@step('establezco la variable "{nombre}" a "{valor}"')
 def step_set_variable_es(context, nombre, valor):
     """Establecer una variable"""
     context.judo_context.set_variable(nombre, valor)
 
 
 @step('que establezco la variable "{nombre}" a {valor:d}')
+@step('establezco la variable "{nombre}" a {valor:d}')
 def step_set_variable_int_es(context, nombre, valor):
     """Establecer una variable numérica"""
     context.judo_context.set_variable(nombre, valor)
 
 
 @step('que establezco la variable "{nombre}" al JSON')
+@step('establezco la variable "{nombre}" al JSON')
 def step_set_variable_json_es(context, nombre):
     """Establecer una variable con datos JSON del texto del paso"""
     import json
@@ -54,6 +59,7 @@ def step_set_variable_json_es(context, nombre):
 # ============================================================
 
 @step('que uso el token bearer "{token}"')
+@step('uso el token bearer "{token}"')
 def step_bearer_token_es(context, token):
     """Establecer token bearer"""
     token = context.judo_context.interpolate_string(token)
@@ -61,12 +67,14 @@ def step_bearer_token_es(context, token):
 
 
 @step('que uso autenticación básica con usuario "{usuario}" y contraseña "{password}"')
+@step('uso autenticación básica con usuario "{usuario}" y contraseña "{password}"')
 def step_basic_auth_es(context, usuario, password):
     """Establecer autenticación básica"""
     context.judo_context.set_basic_auth(usuario, password)
 
 
 @step('que establezco el header "{nombre}" a "{valor}"')
+@step('establezco el header "{nombre}" a "{valor}"')
 def step_set_header_es(context, nombre, valor):
     """Establecer un header"""
     valor = context.judo_context.interpolate_string(valor)
@@ -75,12 +83,15 @@ def step_set_header_es(context, nombre, valor):
 
 @step('que establezco el header "{nombre_header}" desde env "{nombre_var_env}"')
 @step('que agrego el header "{nombre_header}" desde env "{nombre_var_env}"')
+@step('establezco el header "{nombre_header}" desde env "{nombre_var_env}"')
+@step('agrego el header "{nombre_header}" desde env "{nombre_var_env}"')
 def step_set_header_from_env_es(context, nombre_header, nombre_var_env):
     """Establecer un header desde variable de entorno (archivo .env)"""
     context.judo_context.set_header_from_env(nombre_header, nombre_var_env)
 
 
 @step('que establezco el parámetro "{nombre}" a "{valor}"')
+@step('establezco el parámetro "{nombre}" a "{valor}"')
 def step_set_param_es(context, nombre, valor):
     """Establecer un parámetro de query"""
     valor = context.judo_context.interpolate_string(valor)
@@ -538,10 +549,10 @@ def step_validate_json_path_uuid_es(context, ruta_json):
 def step_get_env_value_and_store_es(context, env_var_name, variable_name):
     """Obtener valor de variable de entorno y almacenarlo en una variable"""
     import os
-    from dotenv import load_dotenv
+    from judo.behave.context import _load_env_file
     
-    # Cargar variables de entorno desde archivo .env si existe
-    load_dotenv()
+    # Cargar variables de entorno desde archivo .env (primero desde raíz del proyecto)
+    _load_env_file()
     
     # Obtener el valor de la variable de entorno
     env_value = os.getenv(env_var_name)
@@ -563,3 +574,26 @@ def step_validate_variable_value_es(context, variable_name, expected_value):
     # Comparar valores
     assert actual_value == expected_value, \
         f"Variable '{variable_name}': esperado '{expected_value}', pero obtuve '{actual_value}'"
+
+
+# Auto-registration mechanism for Spanish steps
+def _register_all_steps_es():
+    """Force registration of all Spanish step definitions"""
+    import inspect
+    import behave
+    
+    # Get all functions in this module that are step definitions
+    current_module = inspect.getmodule(inspect.currentframe())
+    
+    for name, obj in inspect.getmembers(current_module):
+        if inspect.isfunction(obj) and hasattr(obj, '_behave_step_registry'):
+            # This is a step definition, ensure it's registered
+            pass
+
+# Call registration when module is imported
+_register_all_steps_es()
+
+
+# Also ensure steps are available when imported with *
+__all__ = [name for name, obj in globals().items() 
+           if callable(obj) and hasattr(obj, '_behave_step_registry')]

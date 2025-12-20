@@ -15,6 +15,11 @@ This directory contains essential examples demonstrating Judo Framework capabili
   - Real-world examples (API + UI + Mixed)
   - Best practices and troubleshooting
 
+### 🌎 Mixed Mode (NEW!)
+- **`mixed_mode_example.feature`** - Mixed mode examples (English keywords + Spanish descriptions)
+- **`README_mixed_mode.md`** - Complete mixed mode guide
+- **`env_variables_ejemplo_mix.feature`** - Environment variables in mixed mode
+
 ### 🎪 Complete Showcases
 - **`complete_showcase.feature`** - Comprehensive English examples with 30+ scenarios
 - **`showcase_completo.feature`** - Comprehensive Spanish examples with 30+ scenarios
@@ -35,6 +40,7 @@ These files demonstrate ALL Judo Framework features with detailed explanations.
 ### 🔐 Environment Variables Examples (.env)
 - **`env_variables_example.feature`** - English examples using .env files
 - **`env_variables_ejemplo_es.feature`** - Spanish examples using .env files
+- **`env_variables_ejemplo_mix.feature`** - **Mixed mode** examples (English keywords + Spanish descriptions)
 - **`.env.example`** - Template for environment variables configuration
 
 ### 📊 Test Data

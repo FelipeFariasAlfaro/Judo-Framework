@@ -98,6 +98,31 @@ Característica: Pruebas de API de Usuarios
       """
     Entonces el código de respuesta debe ser 201
     Y la respuesta debe contener el campo "id"
+```
+
+### 🌎 Mixed Mode (NEW!)
+
+Perfect for Latin American developers! Use English keywords with Spanish descriptions:
+
+```gherkin
+Feature: Pruebas de API de Usuarios
+
+  Scenario: Crear un nuevo usuario
+    Given la URL base es "https://api.example.com"
+    When hago una petición POST a "/users" con el cuerpo:
+      """
+      {
+        "name": "Juan Pérez",
+        "email": "juan@example.com"
+      }
+      """
+    Then el código de respuesta debe ser 201
+    And la respuesta debe contener el campo "id"
+```
+
+**No language tag needed!** Spanish steps use `@step()` decorator, working with any keyword (Given/When/Then/And/But).
+
+📚 [Complete Mixed Mode Guide](examples/README_mixed_mode.md) | [Mixed Mode Reference](judo-steps-reference-mixed.md)
     Y el campo "name" debe ser "Juan Pérez"
 ```
 
