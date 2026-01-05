@@ -2,6 +2,24 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.5.1] - 2025-01-04
+
+### 🐛 BUG FIX - Duplicate Step Definitions
+
+**Judo Framework v1.5.1 fixes critical issue with duplicate step definitions that prevented test execution.**
+
+#### Fixed Issues
+- ✅ Removed duplicate `circuit breaker "{name}" should be in state {state}` step definition
+- ✅ Removed duplicate `I should have performance metrics` step definition
+- ✅ All step definitions are now unique and non-conflicting
+- ✅ Tests can now execute without AmbiguousStep errors
+
+#### Changes
+- Fixed `judo/behave/steps.py` - Removed duplicate step definitions (lines 1268-1281 and 1419-1427)
+- All 100+ step definitions are now properly registered without conflicts
+
+---
+
 ## [1.5.0] - 2025-01-04
 
 ### 🚀 MAJOR RELEASE - Complete Feature Suite

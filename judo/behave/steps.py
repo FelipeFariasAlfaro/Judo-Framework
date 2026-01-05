@@ -1265,21 +1265,6 @@ def step_create_circuit_breaker_advanced(context, name, failure_threshold, succe
     )
 
 
-@step('circuit breaker "{name}" should be in state {state}')
-def step_validate_circuit_breaker_state_fixed(context, name, state):
-    """Validate circuit breaker state (fixed syntax)"""
-    if not hasattr(context.judo_context, 'circuit_breakers'):
-        raise AssertionError("No circuit breakers created")
-    
-    cb = context.judo_context.circuit_breakers.get(name)
-    if not cb:
-        raise AssertionError(f"Circuit breaker '{name}' not found")
-    
-    expected_state = state.upper()
-    actual_state = cb.state.value.upper()
-    
-    assert actual_state == expected_state, \
-        f"Circuit breaker '{name}' is in state {actual_state}, expected {expected_state}"
 
 
 @step('I add a logging interceptor')
@@ -1429,16 +1414,6 @@ def step_validate_error_rate(context, percentage):
     
     assert error_rate < percentage, \
         f"Error rate {error_rate}% exceeds {percentage}%"
-
-
-@step('I should have performance metrics')
-def step_validate_performance_metrics_alt(context):
-    """Validate performance metrics collected (alternative syntax)"""
-    if not hasattr(context.judo_context, 'performance_monitor'):
-        raise AssertionError("Performance monitoring not enabled")
-    
-    metrics = context.judo_context.performance_monitor.get_metrics()
-    assert metrics['total_requests'] > 0, "No requests recorded"
 
 
 @step('I disconnect from WebSocket')
