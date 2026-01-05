@@ -1466,3 +1466,154 @@ def step_validate_logging_to_file_es(context):
     
     logs = context.judo_context.request_logger.get_logs()
     assert len(logs) > 0, "No se encontraron logs"
+
+
+# ============================================================
+# PASOS ADICIONALES FALTANTES PARA COMPATIBILIDAD CON SHOWCASE
+# ============================================================
+
+@step('el array de respuesta debe tener más de {count:d} elementos')
+def step_validate_array_more_than_count_es(context, count):
+    """Validar que array tiene más de cantidad especificada de elementos"""
+    response = context.judo_context.response
+    actual_count = len(response.json)
+    assert actual_count > count, \
+        f"Se esperaban más de {count} elementos, pero se obtuvieron {actual_count}"
+
+
+@step('la respuesta debe contener todos los campos: {fields}')
+def step_validate_response_contains_all_fields_es(context, fields):
+    """Validar que respuesta contiene todos los campos especificados"""
+    import ast
+    response = context.judo_context.response
+    
+    # Parsear la cadena de lista
+    field_list = ast.literal_eval(fields)
+    
+    for field in field_list:
+        assert field in response.json, \
+            f"La respuesta no contiene el campo '{field}'"
+
+
+@step('ambas respuestas deben tener estado {status:d}')
+def step_validate_both_responses_status_es(context, status):
+    """Validar que ambas respuestas tienen el mismo estado"""
+    context.judo_context.validate_status(status)
+
+
+@step('el campo "{field}" debe estar en rango {min_val:d} a {max_val:d}')
+def step_validate_field_in_range_es(context, field, min_val, max_val):
+    """Validar que campo de respuesta está dentro del rango"""
+    response = context.judo_context.response
+    actual_value = response.json.get(field)
+    
+    assert actual_value is not None, f"Campo '{field}' no encontrado en respuesta"
+    assert min_val <= actual_value <= max_val, \
+        f"Valor del campo '{field}' {actual_value} no está en rango [{min_val}, {max_val}]"
+
+
+@step('el campo "{field}" debe coincidir con patrón "{pattern}"')
+def step_validate_field_matches_pattern_es(context, field, pattern):
+    """Validar que campo de respuesta coincide con patrón regex"""
+    import re
+    response = context.judo_context.response
+    actual_value = response.json.get(field)
+    
+    assert actual_value is not None, f"Campo '{field}' no encontrado en respuesta"
+    assert re.match(pattern, str(actual_value)), \
+        f"Valor del campo '{field}' '{actual_value}' no coincide con patrón '{pattern}'"
+
+
+@step('el tiempo de respuesta debe ser menor a {milliseconds:d} milisegundos')
+def step_validate_response_time_ms_es(context, milliseconds):
+    """Validar tiempo de respuesta en milisegundos"""
+    response = context.judo_context.response
+    actual_time_ms = response.elapsed * 1000
+    assert actual_time_ms < milliseconds, \
+        f"Tiempo de respuesta {actual_time_ms:.0f}ms excede máximo de {milliseconds}ms"
+
+
+@step('métricas de rendimiento deben ser recopiladas')
+def step_validate_performance_metrics_collected_es(context):
+    """Validar que métricas de rendimiento fueron recopiladas"""
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        raise AssertionError("Monitoreo de rendimiento no habilitado")
+    
+    metrics = context.judo_context.performance_monitor.get_metrics()
+    assert metrics is not None, "No se recopilaron métricas de rendimiento"
+    assert metrics['total_requests'] > 0, "No se registraron solicitudes en métricas"
+
+
+@step('caché debe contener {count:d} entrada')
+def step_validate_cache_single_entry_es(context, count):
+    """Validar que caché contiene número específico de entradas"""
+    if not hasattr(context.judo_context, 'response_cache'):
+        raise AssertionError("Caché de respuestas no habilitado")
+    
+    stats = context.judo_context.response_cache.get_stats()
+    actual_count = stats['total_entries']
+    
+    assert actual_count == count, \
+        f"Caché tiene {actual_count} entradas, se esperaban {count}"
+
+
+@step('agrego un interceptor de timestamp con nombre de encabezado "{header_name}"')
+def step_add_timestamp_interceptor_alt_es(context, header_name):
+    """Agregar interceptor de timestamp (sintaxis alternativa)"""
+    from judo.features.interceptors import TimestampInterceptor, InterceptorChain
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = TimestampInterceptor(header_name=header_name)
+    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+
+
+@step('agrego un interceptor de autorización con token "{token}"')
+def step_add_auth_interceptor_alt_es(context, token):
+    """Agregar interceptor de autorización (sintaxis alternativa)"""
+    from judo.features.interceptors import AuthorizationInterceptor, InterceptorChain
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = AuthorizationInterceptor(token=token)
+    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+
+
+@step('establezco alerta de rendimiento para umbral de response_time de {threshold:d} milisegundos')
+def step_set_performance_alert_response_time_es(context, threshold):
+    """Establecer alerta de rendimiento para tiempo de respuesta"""
+    from judo.features.performance import PerformanceAlert, PerformanceMonitor
+    
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        context.judo_context.performance_monitor = PerformanceMonitor()
+    
+    alert = PerformanceAlert(metric='response_time', threshold=threshold)
+    context.judo_context.performance_monitor.add_alert(alert)
+
+
+@step('creo circuit breaker con failure_threshold={threshold:d}')
+def step_create_circuit_breaker_simple_es(context, threshold):
+    """Crear circuit breaker (sintaxis simplificada)"""
+    from judo.features.retry import CircuitBreaker
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'circuit_breakers'):
+        context.judo_context.circuit_breakers = {}
+    
+    context.judo_context.circuit_breakers['default'] = CircuitBreaker(
+        failure_threshold=threshold,
+        name='default'
+    )

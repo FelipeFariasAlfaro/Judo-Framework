@@ -2,6 +2,43 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.5.2] - 2025-01-04
+
+### ✨ ENHANCEMENT - Missing Step Definitions Implementation
+
+**Judo Framework v1.5.2 adds missing step definitions required by showcase examples.**
+
+#### Added Steps
+- ✅ `the response array should have more than {count} items` - Array validation with count threshold
+- ✅ `the response should contain all fields: {fields}` - Multi-field validation
+- ✅ `both responses should have status {status}` - Dual response validation
+- ✅ `the response field "{field}" should be in range {min} to {max}` - Range validation
+- ✅ `the response field "{field}" should match pattern "{pattern}"` - Regex pattern matching
+- ✅ `the response time should be less than {milliseconds} milliseconds` - Millisecond-based timing
+- ✅ `performance metrics should be collected` - Metrics collection validation
+- ✅ `cache should contain {count} entry` - Cache entry count validation
+- ✅ `I add a timestamp interceptor with header name "{header_name}"` - Alternative interceptor syntax
+- ✅ `I add an authorization interceptor with token "{token}"` - Alternative auth interceptor syntax
+- ✅ `I set performance alert for response_time threshold {threshold} milliseconds` - Performance alerting
+- ✅ `I create a circuit breaker with failure_threshold={threshold}` - Simplified circuit breaker creation
+
+#### Spanish Translations
+- ✅ All new steps translated to Spanish with proper Gherkin syntax
+- ✅ Consistent naming conventions across English and Spanish versions
+
+#### Changes
+- Updated `judo/behave/steps.py` - Added 12 new step definitions
+- Updated `judo/behave/steps_es.py` - Added 12 Spanish translations
+- Updated `setup.py` - Version bumped to 1.5.2
+- Updated `pyproject.toml` - Version bumped to 1.5.2
+
+#### Compatibility
+- All showcase examples now have complete step implementations
+- No more missing step errors when running showcase features
+- Full support for English, Spanish, and mixed-mode scenarios
+
+---
+
 ## [1.5.1] - 2025-01-04
 
 ### 🐛 BUG FIX - Duplicate Step Definitions

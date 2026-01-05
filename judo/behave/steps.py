@@ -1578,3 +1578,151 @@ def step_validate_logging_to_file(context):
     
     logs = context.judo_context.request_logger.get_logs()
     assert len(logs) > 0, "No logs found"
+
+
+# ============================================================
+# ADDITIONAL MISSING STEPS FOR SHOWCASE COMPATIBILITY
+# ============================================================
+
+@step('the response array should have more than {count:d} items')
+def step_validate_array_more_than_count(context, count):
+    """Validate array has more than specified count of items"""
+    response = context.judo_context.response
+    actual_count = len(response.json)
+    assert actual_count > count, \
+        f"Expected more than {count} items, but got {actual_count}"
+
+
+@step('the response should contain all fields: {fields}')
+def step_validate_response_contains_all_fields(context, fields):
+    """Validate response contains all specified fields"""
+    import ast
+    response = context.judo_context.response
+    
+    # Parse the list string
+    field_list = ast.literal_eval(fields)
+    
+    for field in field_list:
+        assert field in response.json, \
+            f"Response does not contain field '{field}'"
+
+
+@step('both responses should have status {status:d}')
+def step_validate_both_responses_status(context, status):
+    """Validate both responses have same status"""
+    context.judo_context.validate_status(status)
+
+
+@step('the response field "{field}" should be in range {min_val:d} to {max_val:d}')
+def step_validate_field_in_range(context, field, min_val, max_val):
+    """Validate response field is within range"""
+    response = context.judo_context.response
+    actual_value = response.json.get(field)
+    
+    assert actual_value is not None, f"Field '{field}' not found in response"
+    assert min_val <= actual_value <= max_val, \
+        f"Field '{field}' value {actual_value} is not in range [{min_val}, {max_val}]"
+
+
+@step('the response field "{field}" should match pattern "{pattern}"')
+def step_validate_field_matches_pattern(context, field, pattern):
+    """Validate response field matches regex pattern"""
+    import re
+    response = context.judo_context.response
+    actual_value = response.json.get(field)
+    
+    assert actual_value is not None, f"Field '{field}' not found in response"
+    assert re.match(pattern, str(actual_value)), \
+        f"Field '{field}' value '{actual_value}' does not match pattern '{pattern}'"
+
+
+@step('the response time should be less than {milliseconds:d} milliseconds')
+def step_validate_response_time_ms(context, milliseconds):
+    """Validate response time in milliseconds"""
+    response = context.judo_context.response
+    actual_time_ms = response.elapsed * 1000
+    assert actual_time_ms < milliseconds, \
+        f"Response time {actual_time_ms:.0f}ms exceeds maximum {milliseconds}ms"
+
+
+@step('performance metrics should be collected')
+def step_validate_performance_metrics_collected(context):
+    """Validate performance metrics were collected"""
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        raise AssertionError("Performance monitoring not enabled")
+    
+    metrics = context.judo_context.performance_monitor.get_metrics()
+    assert metrics is not None, "No performance metrics collected"
+    assert metrics['total_requests'] > 0, "No requests recorded in metrics"
+
+
+@step('cache should contain {count:d} entry')
+def step_validate_cache_single_entry(context, count):
+    """Validate cache contains specific number of entries"""
+    if not hasattr(context.judo_context, 'response_cache'):
+        raise AssertionError("Response cache not enabled")
+    
+    stats = context.judo_context.response_cache.get_stats()
+    actual_count = stats['total_entries']
+    
+    assert actual_count == count, \
+        f"Cache has {actual_count} entries, expected {count}"
+
+
+@step('I add a timestamp interceptor with header name "{header_name}"')
+def step_add_timestamp_interceptor_alt(context, header_name):
+    """Add timestamp interceptor (alternative syntax)"""
+    from judo.features.interceptors import TimestampInterceptor, InterceptorChain
+    
+    if not hasattr(context, 'judo_context'):
+        context.judo_context = JudoContext(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = TimestampInterceptor(header_name=header_name)
+    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+
+
+@step('I add an authorization interceptor with token "{token}"')
+def step_add_auth_interceptor_alt(context, token):
+    """Add authorization interceptor (alternative syntax)"""
+    from judo.features.interceptors import AuthorizationInterceptor, InterceptorChain
+    
+    if not hasattr(context, 'judo_context'):
+        context.judo_context = JudoContext(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = AuthorizationInterceptor(token=token)
+    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+
+
+@step('I set performance alert for response_time threshold {threshold:d} milliseconds')
+def step_set_performance_alert_response_time(context, threshold):
+    """Set performance alert for response time"""
+    from judo.features.performance import PerformanceAlert, PerformanceMonitor
+    
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        context.judo_context.performance_monitor = PerformanceMonitor()
+    
+    alert = PerformanceAlert(metric='response_time', threshold=threshold)
+    context.judo_context.performance_monitor.add_alert(alert)
+
+
+@step('I create a circuit breaker with failure_threshold={threshold:d}')
+def step_create_circuit_breaker_simple(context, threshold):
+    """Create circuit breaker (simplified syntax)"""
+    from judo.features.retry import CircuitBreaker
+    
+    if not hasattr(context, 'judo_context'):
+        context.judo_context = JudoContext(context)
+    
+    if not hasattr(context.judo_context, 'circuit_breakers'):
+        context.judo_context.circuit_breakers = {}
+    
+    context.judo_context.circuit_breakers['default'] = CircuitBreaker(
+        failure_threshold=threshold,
+        name='default'
+    )
