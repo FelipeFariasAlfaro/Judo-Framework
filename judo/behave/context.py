@@ -208,6 +208,31 @@ class JudoContext:
         # Interpolate endpoint
         endpoint = self.interpolate_string(endpoint)
         
+        # Apply chaos engineering if enabled
+        if hasattr(self, 'chaos_injector') and self.chaos_injector.enabled:
+            # Apply latency
+            self.chaos_injector.apply_latency()
+            
+            # Check if error should be injected
+            if self.chaos_injector.should_inject_error():
+                raise Exception(f"Chaos Engineering: Simulated error (error rate: {self.chaos_injector.error_rate * 100}%)")
+            
+            # Check if timeout should be injected
+            if self.chaos_injector.should_inject_timeout():
+                raise TimeoutError(f"Chaos Engineering: Simulated timeout")
+        
+        # Apply rate limiting if configured
+        if hasattr(self, 'rate_limiter'):
+            self.rate_limiter.wait_if_needed()
+        
+        # Apply throttling if configured
+        if hasattr(self, 'throttle'):
+            self.throttle.wait_if_needed()
+        
+        # Apply adaptive rate limiting if configured
+        if hasattr(self, 'adaptive_rate_limiter'):
+            self.adaptive_rate_limiter.wait_if_needed()
+        
         # Prepare request data for logging
         request_data = None
         if self.save_requests_responses:
@@ -253,19 +278,52 @@ class JudoContext:
                 request_data['body'] = None
                 request_data['body_type'] = None
         
-        # Make request based on method
-        if method == 'GET':
-            self.response = self.judo.get(endpoint, **kwargs)
-        elif method == 'POST':
-            self.response = self.judo.post(endpoint, **kwargs)
-        elif method == 'PUT':
-            self.response = self.judo.put(endpoint, **kwargs)
-        elif method == 'PATCH':
-            self.response = self.judo.patch(endpoint, **kwargs)
-        elif method == 'DELETE':
-            self.response = self.judo.delete(endpoint, **kwargs)
-        else:
-            raise ValueError(f"Unsupported HTTP method: {method}")
+        # Check cache for GET requests
+        if method == 'GET' and hasattr(self, 'response_cache'):
+            cached_response = self.response_cache.get(method, endpoint, kwargs.get('params'))
+            if cached_response:
+                self.response = cached_response
+                return
+        
+        # Make request based on method (with retry if configured)
+        try:
+            if method == 'GET':
+                if hasattr(self, 'retry_policy'):
+                    self.response = self.retry_policy.execute(self.judo.get, endpoint, **kwargs)
+                else:
+                    self.response = self.judo.get(endpoint, **kwargs)
+            elif method == 'POST':
+                if hasattr(self, 'retry_policy'):
+                    self.response = self.retry_policy.execute(self.judo.post, endpoint, **kwargs)
+                else:
+                    self.response = self.judo.post(endpoint, **kwargs)
+            elif method == 'PUT':
+                if hasattr(self, 'retry_policy'):
+                    self.response = self.retry_policy.execute(self.judo.put, endpoint, **kwargs)
+                else:
+                    self.response = self.judo.put(endpoint, **kwargs)
+            elif method == 'PATCH':
+                if hasattr(self, 'retry_policy'):
+                    self.response = self.retry_policy.execute(self.judo.patch, endpoint, **kwargs)
+                else:
+                    self.response = self.judo.patch(endpoint, **kwargs)
+            elif method == 'DELETE':
+                if hasattr(self, 'retry_policy'):
+                    self.response = self.retry_policy.execute(self.judo.delete, endpoint, **kwargs)
+                else:
+                    self.response = self.judo.delete(endpoint, **kwargs)
+            else:
+                raise ValueError(f"Unsupported HTTP method: {method}")
+        except Exception as e:
+            # If chaos engineering injected an error, re-raise it
+            if "Chaos Engineering" in str(e):
+                raise
+            # Otherwise, let it propagate
+            raise
+        
+        # Cache GET responses
+        if method == 'GET' and hasattr(self, 'response_cache') and self.response:
+            self.response_cache.set(method, endpoint, self.response, kwargs.get('params'))
         
         # Always capture request/response data for HTML reports (regardless of file logging)
         if self.response:
@@ -408,6 +466,18 @@ class JudoContext:
             # Save to files if logging is enabled
             if self.save_requests_responses and request_data:
                 self._save_request_response(method, endpoint, request_data, html_response_data)
+            
+            # Record performance metrics if performance monitor is enabled
+            if hasattr(self, 'performance_monitor'):
+                elapsed_ms = html_response_data.get('elapsed_ms', 0)
+                status_code = self.response.status
+                error = None
+                
+                # Check if there was an error
+                if status_code >= 400:
+                    error = f"HTTP {status_code}"
+                
+                self.performance_monitor.record_request(elapsed_ms, status_code, error)
         
         return self.response
     

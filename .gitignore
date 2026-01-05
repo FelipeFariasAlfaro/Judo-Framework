@@ -42,7 +42,6 @@ ENV/
 htmlcov/
 .tox/
 .hypothesis/
-test_playwright_local/
 
 # Behave
 judo_reports/
@@ -63,7 +62,6 @@ Thumbs.db
 .env.*.local
 !.env.example
 !examples/.env.example
-!examples/.env.playwright
 
 # Internal documentation (technical docs for development)
 .kiro/

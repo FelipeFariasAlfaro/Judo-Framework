@@ -18,7 +18,7 @@ from .runner.base_runner import BaseRunner
 from .runner.test_suite import TestSuite, CommonSuites
 from .utils.helpers import *
 
-__version__ = "1.3.37"
+__version__ = "1.5.0"
 __author__ = "Judo Framework Team"
 
 # Main exports
@@ -35,19 +35,6 @@ __all__ = [
     "TestSuite",
     "CommonSuites"
 ]
-
-# Optional Playwright integration
-try:
-    import playwright
-    PLAYWRIGHT_AVAILABLE = True
-    
-    # Only import if Playwright is available
-    from .playwright.browser_context import JudoBrowserContext
-    from .playwright.page_manager import PageManager, PagePool
-    __all__.extend(["JudoBrowserContext", "PageManager", "PagePool", "PLAYWRIGHT_AVAILABLE"])
-except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
-    __all__.append("PLAYWRIGHT_AVAILABLE")
 
 # Behave integration is available via judo.behave module
 # Reporting is available via judo.reporting module

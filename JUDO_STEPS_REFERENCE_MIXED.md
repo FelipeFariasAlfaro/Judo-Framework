@@ -1,6 +1,6 @@
 # Referencia Completa de Pasos - Judo Framework (Modo Mixto)
 
-Esta es la referencia completa de todos los pasos **VERIFICADOS** disponibles en Judo Framework v1.3.40 en **Modo Mixto** (keywords en inglés + descripciones en español).
+Esta es la referencia completa de todos los pasos **VERIFICADOS** disponibles en Judo Framework v1.5.0 en **Modo Mixto** (keywords en inglés + descripciones en español).
 
 **⚠️ IMPORTANTE**: Esta documentación ha sido verificada contra el código fuente del framework. Solo incluye pasos que realmente existen y funcionan.
 
@@ -20,6 +20,9 @@ Esta es la referencia completa de todos los pasos **VERIFICADOS** disponibles en
 - [Logging](#logging)
 - [Validación de Esquemas](#validación-de-esquemas)
 - [Validación de Tipos](#validación-de-tipos)
+- [Características Avanzadas - Tier 1](#características-avanzadas---tier-1-robustez-y-confiabilidad)
+- [Características Avanzadas - Tier 2](#características-avanzadas---tier-2-rendimiento-y-apis-modernas)
+- [Características Avanzadas - Tier 3](#características-avanzadas---tier-3-características-empresariales)
 
 ---
 
@@ -725,6 +728,302 @@ Feature: API de Gestión de Usuarios
 
 ---
 
-**Versión**: 1.3.40  
-**Fecha**: 14 de Diciembre, 2024  
+## Características Avanzadas - Tier 1: Robustez y Confiabilidad
+
+### Política de Reintentos
+
+#### `Given establezco la política de reintentos con max_retries={count:d} y backoff_strategy="{estrategia}"`
+Configura la política automática de reintentos para peticiones fallidas con estrategia de backoff especificada.
+
+**Estrategias Soportadas:**
+- `lineal` - El retraso aumenta linealmente
+- `exponencial` - El retraso aumenta exponencialmente (por defecto)
+- `fibonacci` - El retraso sigue la secuencia de Fibonacci
+- `aleatorio` - Retraso aleatorio entre mín y máx
+
+#### `Given establezco la política de reintentos con max_retries={count:d}, initial_delay={delay:f}, y max_delay={max_delay:f}`
+Configura la política de reintentos con parámetros de retraso personalizados.
+
+### Circuit Breaker
+
+#### `Given creo un circuit breaker llamado "{nombre}" con failure_threshold={threshold:d}`
+Crea un circuit breaker para prevenir fallos en cascada.
+
+#### `Given creo un circuit breaker llamado "{nombre}" con failure_threshold={threshold:d}, success_threshold={success:d}, y timeout={timeout:d}`
+Crea un circuit breaker con umbral de éxito y timeout personalizados.
+
+#### `Then el circuit breaker "{nombre}" debe estar en estado {estado}`
+Valida el estado actual de un circuit breaker (CLOSED, OPEN, HALF_OPEN).
+
+### Interceptores de Solicitud
+
+#### `Given agrego un interceptor de timestamp con nombre de encabezado "{nombre_encabezado}"`
+Agrega un timestamp a todas las solicitudes con el nombre de encabezado especificado.
+
+#### `Given agrego un interceptor de autorización con token "{token}"`
+Agrega autorización Bearer token a todas las solicitudes.
+
+#### `Given agrego un interceptor de autorización con token "{token}" y esquema "{esquema}"`
+Agrega esquema de autorización personalizado a todas las solicitudes.
+
+#### `Given agrego un interceptor de registro`
+Habilita el registro de todas las solicitudes.
+
+#### `Given agrego un interceptor de registro de respuestas`
+Habilita el registro de todas las respuestas.
+
+### Limitador de Velocidad y Acelerador
+
+#### `Given establezco el límite de velocidad a {solicitudes:d} solicitudes por segundo`
+Configura el limitador de velocidad con token bucket.
+
+#### `Given establezco el acelerador con retraso {retraso:d} milisegundos`
+Configura el acelerador de retraso fijo entre solicitudes.
+
+#### `Given establezco el límite de velocidad adaptativo con inicial {rps:d} solicitudes por segundo`
+Configura limitación de velocidad adaptativa que respeta encabezados de API.
+
+#### `Then el limitador de velocidad debe tener {restantes:d} solicitudes restantes`
+Valida las solicitudes restantes en el limitador de velocidad.
+
+### Aserciones Avanzadas
+
+#### `Then el tiempo de respuesta debe ser menor a {max_time:d} milisegundos`
+Valida que el tiempo de respuesta esté por debajo del umbral en milisegundos.
+
+#### `Then la respuesta debe coincidir con el esquema JSON`
+Valida la respuesta contra esquema JSON definido en el texto del paso.
+
+#### `Then el array de respuesta debe tener más de {count:d} elementos`
+Valida que el array tenga más elementos que los especificados.
+
+#### `Then el array de respuesta debe tener menos de {count:d} elementos`
+Valida que el array tenga menos elementos que los especificados.
+
+#### `Then la respuesta debe contener todos los campos: {campos}`
+Valida que la respuesta contenga todos los campos especificados.
+
+#### `Then el campo de respuesta "{campo}" debe ser de tipo "{tipo}"`
+Valida que el campo sea del tipo especificado (string, number, boolean, array, object).
+
+#### `Then el campo de respuesta "{campo}" debe coincidir con patrón "{patrón}"`
+Valida que el campo coincida con patrón regex.
+
+#### `Then el campo de respuesta "{campo}" debe estar en rango {min:d} a {max:d}`
+Valida que el campo numérico esté dentro del rango.
+
+---
+
+## Características Avanzadas - Tier 2: Rendimiento y APIs Modernas
+
+### Pruebas Dirigidas por Datos
+
+#### `Given cargo datos de prueba del archivo "{ruta_archivo}"`
+Carga datos de prueba desde archivo CSV, JSON o Excel.
+
+#### `When ejecuto prueba dirigida por datos para cada fila`
+Ejecuta escenario de prueba para cada fila en datos cargados.
+
+#### `Then todas las pruebas deben completarse exitosamente`
+Valida que todas las pruebas dirigidas por datos se completaron sin errores.
+
+### Monitoreo de Rendimiento
+
+#### `When envío {count:d} solicitudes GET a "{endpoint}"`
+Envía múltiples solicitudes GET para pruebas de rendimiento.
+
+#### `Then debo tener métricas de rendimiento`
+Valida que métricas de rendimiento fueron recopiladas (usado con tabla).
+
+#### `Then el tiempo promedio de respuesta debe ser menor a {max_time:d} milisegundos`
+Valida el tiempo promedio de respuesta entre solicitudes.
+
+#### `Then el tiempo de respuesta p95 debe ser menor a {max_time:d} milisegundos`
+Valida el percentil 95 del tiempo de respuesta.
+
+#### `Then la tasa de error debe ser menor al {porcentaje:d} por ciento`
+Valida que la tasa de error esté por debajo del umbral.
+
+### Caché de Respuestas
+
+#### `Given habilito el caché de respuestas con TTL de {ttl:d} segundos`
+Habilita el almacenamiento automático en caché de respuestas GET con tiempo de vida.
+
+#### `When envío la misma solicitud GET a "{endpoint}" nuevamente`
+Envía solicitud GET idéntica (usado para probar caché).
+
+#### `Then la segunda respuesta debe provenir del caché`
+Valida que la respuesta fue servida desde caché.
+
+#### `Then el caché debe contener {count:d} entradas`
+Valida el número de entradas en caché.
+
+### GraphQL
+
+#### `Given establezco la URL base a "{url}"`
+Establece la URL base para endpoint GraphQL.
+
+#### `When ejecuto consulta GraphQL`
+Ejecuta consulta GraphQL definida en el texto del paso.
+
+#### `When ejecuto mutación GraphQL`
+Ejecuta mutación GraphQL definida en el texto del paso.
+
+#### `Then la respuesta debe contener "{campo}"`
+Valida que la respuesta GraphQL contenga campo.
+
+### WebSocket
+
+#### `Given me conecto a WebSocket "{url}"`
+Establece conexión WebSocket.
+
+#### `When envío mensaje WebSocket`
+Envía mensaje a través de WebSocket (mensaje en texto del paso).
+
+#### `Then debo recibir un mensaje WebSocket dentro de {segundos:d} segundos`
+Valida que mensaje WebSocket fue recibido dentro del timeout.
+
+#### `When me desconecto de WebSocket`
+Cierra conexión WebSocket.
+
+### Autenticación OAuth2
+
+#### `Given configuro OAuth2 con`
+Configura autenticación OAuth2 (usado con tabla de client_id, client_secret, token_url).
+
+#### `Then la solicitud debe incluir encabezado Authorization`
+Valida que encabezado Authorization está presente en solicitud.
+
+#### `Then el token OAuth2 debe ser válido`
+Valida que token OAuth2 es válido.
+
+### Autenticación JWT
+
+#### `Given configuro JWT con secreto "{secreto}" y algoritmo "{algoritmo}"`
+Configura JWT con secreto y algoritmo (HS256, RS256, etc.).
+
+#### `When creo token JWT con payload`
+Crea token JWT con payload del texto del paso.
+
+#### `Then el token debe ser válido`
+Valida que token JWT es válido y está correctamente firmado.
+
+#### `Then el token debe contener claim "{claim}" con valor "{valor}"`
+Valida que token JWT contiene claim específico.
+
+---
+
+## Características Avanzadas - Tier 3: Características Empresariales
+
+### Reportes
+
+#### `When ejecuto suite de pruebas`
+Ejecuta suite de pruebas completa para reportes.
+
+#### `Then debo generar reportes en formatos`
+Genera reportes en formatos especificados (usado con tabla).
+
+#### `Then el reporte debe ser generado en formato "{formato}"`
+Valida que reporte fue generado en formato especificado (html, json, junit, allure).
+
+### Validación de Contrato
+
+#### `Given cargo especificación OpenAPI desde "{ruta_archivo}"`
+Carga especificación OpenAPI para validación de contrato.
+
+#### `Then la respuesta debe coincidir con contrato OpenAPI para {método} {endpoint}`
+Valida que respuesta coincide con contrato OpenAPI.
+
+#### `Given cargo especificación AsyncAPI desde "{ruta_archivo}"`
+Carga especificación AsyncAPI para validación de contrato.
+
+### Ingeniería del Caos
+
+#### `Given habilito ingeniería del caos`
+Habilita características de ingeniería del caos.
+
+#### `Given inyecto latencia entre {min:d} y {max:d} milisegundos`
+Inyecta latencia aleatoria en solicitudes.
+
+#### `Given inyecto tasa de error del {porcentaje:d} por ciento`
+Inyecta errores aleatorios en solicitudes.
+
+#### `When envío una solicitud GET a "{endpoint}"`
+Envía solicitud con ingeniería del caos habilitada.
+
+#### `Then la respuesta debe completarse a pesar de la latencia inyectada`
+Valida que solicitud se completó a pesar de inyección de latencia.
+
+#### `Then algunas solicitudes pueden fallar debido a errores inyectados`
+Valida que algunas solicitudes fallaron debido a inyección de errores.
+
+#### `Then circuit breaker debe permanecer en estado CLOSED`
+Valida que circuit breaker permaneció cerrado a pesar del caos.
+
+#### `Then tasa de error debe ser menor al {porcentaje:d} por ciento`
+Valida que tasa de error real está por debajo del umbral.
+
+### Registro Avanzado
+
+#### `Given establezco nivel de registro a "{nivel}"`
+Establece nivel de registro (DEBUG, INFO, WARNING, ERROR).
+
+#### `Given habilito registro de solicitud al directorio "{directorio}"`
+Habilita registro de solicitud al directorio especificado.
+
+#### `Then solicitud y respuesta deben registrarse en archivo`
+Valida que solicitud/respuesta fueron registradas en archivo.
+
+---
+
+## Escenarios de Integración
+
+### Pruebas de Pila Completa
+
+#### `Given establezco alerta de rendimiento para umbral de response_time de {umbral:d} milisegundos`
+Establece umbral de alerta de rendimiento.
+
+#### `Then métricas de rendimiento deben ser recopiladas`
+Valida que métricas de rendimiento fueron recopiladas.
+
+#### `Then caché debe contener {count:d} entrada`
+Valida que caché contiene número especificado de entradas.
+
+### Pruebas de Resiliencia
+
+#### `Given creo circuit breaker con failure_threshold={threshold:d}`
+Crea circuit breaker para pruebas de resiliencia.
+
+#### `When envío {count:d} solicitudes GET a "{endpoint}"`
+Envía múltiples solicitudes para pruebas de resiliencia.
+
+#### `Then circuit breaker debe permanecer en estado CLOSED`
+Valida que circuit breaker permaneció cerrado.
+
+#### `Then tasa de error debe ser menor al {porcentaje:d} por ciento`
+Valida que tasa de error permaneció por debajo del umbral.
+
+---
+
+## 💡 Consejos para Modo Mixto
+
+1. **Usa keywords en inglés**: Son más cortos y universales (Given, When, Then, And, But)
+2. **Descripciones en español**: Más naturales para equipos latinoamericanos
+3. **Sin tag de idioma**: No necesitas `# language: es`
+4. **Mezcla libremente**: Puedes combinar con pasos en inglés puro si lo necesitas
+5. **Usa And/But**: Para encadenar múltiples pasos del mismo tipo
+
+---
+
+## 🔗 Referencias
+
+- **Documentación completa**: `examples/README_mixed_mode.md`
+- **Ejemplo funcional**: `examples/mixed_mode_example.feature`
+- **Pasos en inglés**: `JUDO_STEPS_REFERENCE_EN.md`
+- **Pasos en español**: `JUDO_STEPS_REFERENCE_ES.md`
+
+---
+
+**Versión**: 2.0.0  
+**Fecha**: Enero 4, 2026  
 **Autor**: Felipe Farias - CENTYC

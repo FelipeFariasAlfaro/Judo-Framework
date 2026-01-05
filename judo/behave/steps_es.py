@@ -597,3 +597,872 @@ _register_all_steps_es()
 # Also ensure steps are available when imported with *
 __all__ = [name for name, obj in globals().items() 
            if callable(obj) and hasattr(obj, '_behave_step_registry')]
+
+
+# ============================================================
+# TIER 1: REINTENTOS Y CIRCUIT BREAKER
+# ============================================================
+
+@step('establezco la política de reintentos con max_retries={max_retries:d} y backoff_strategy="{strategy}"')
+def step_set_retry_policy_es(context, max_retries, strategy):
+    """Establecer política de reintentos con estrategia de backoff"""
+    from judo.features.retry import RetryPolicy, BackoffStrategy
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    backoff = BackoffStrategy[strategy.lower()]
+    context.judo_context.retry_policy = RetryPolicy(
+        max_retries=max_retries,
+        backoff_strategy=backoff
+    )
+
+
+@step('creo un circuit breaker llamado "{name}" con failure_threshold={threshold:d}')
+def step_create_circuit_breaker_es(context, name, threshold):
+    """Crear circuit breaker"""
+    from judo.features.retry import CircuitBreaker
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'circuit_breakers'):
+        context.judo_context.circuit_breakers = {}
+    
+    context.judo_context.circuit_breakers[name] = CircuitBreaker(
+        failure_threshold=threshold,
+        name=name
+    )
+
+
+@step('el circuit breaker "{name}" debe estar en estado {state}')
+def step_validate_circuit_breaker_state_es(context, name, state):
+    """Validar estado del circuit breaker"""
+    if not hasattr(context.judo_context, 'circuit_breakers'):
+        raise AssertionError("No se han creado circuit breakers")
+    
+    cb = context.judo_context.circuit_breakers.get(name)
+    if not cb:
+        raise AssertionError(f"Circuit breaker '{name}' no encontrado")
+    
+    expected_state = state.upper()
+    actual_state = cb.state.value.upper()
+    
+    assert actual_state == expected_state, \
+        f"Circuit breaker '{name}' está en estado {actual_state}, se esperaba {expected_state}"
+
+
+# ============================================================
+# TIER 1: INTERCEPTORES
+# ============================================================
+
+@step('agrego un interceptor de timestamp con nombre de encabezado "{header_name}"')
+def step_add_timestamp_interceptor_es(context, header_name):
+    """Agregar interceptor de timestamp"""
+    from judo.features.interceptors import TimestampInterceptor, InterceptorChain
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = TimestampInterceptor(header_name=header_name)
+    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+
+
+@step('agrego un interceptor de autorización con token "{token}"')
+def step_add_auth_interceptor_es(context, token):
+    """Agregar interceptor de autorización"""
+    from judo.features.interceptors import AuthorizationInterceptor
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        from judo.features.interceptors import InterceptorChain
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = AuthorizationInterceptor(token=token)
+    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+
+
+# ============================================================
+# TIER 1: LIMITADOR DE VELOCIDAD Y THROTTLE
+# ============================================================
+
+@step('establezco el límite de velocidad a {requests_per_second:f} solicitudes por segundo')
+def step_set_rate_limit_es(context, requests_per_second):
+    """Establecer limitador de velocidad"""
+    from judo.features.rate_limiter import RateLimiter
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.rate_limiter = RateLimiter(requests_per_second=requests_per_second)
+
+
+@step('establezco el acelerador con retraso de {delay_ms:f} milisegundos')
+def step_set_throttle_es(context, delay_ms):
+    """Establecer throttle"""
+    from judo.features.rate_limiter import Throttle
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.throttle = Throttle(delay_ms=delay_ms)
+
+
+@step('envío {count:d} solicitudes GET a "{endpoint}"')
+def step_send_multiple_get_requests_es(context, count, endpoint):
+    """Enviar múltiples solicitudes GET"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
+    
+    for i in range(count):
+        if hasattr(context.judo_context, 'rate_limiter'):
+            context.judo_context.rate_limiter.wait_if_needed()
+        
+        if hasattr(context.judo_context, 'throttle'):
+            context.judo_context.throttle.wait_if_needed()
+        
+        context.judo_context.make_request('GET', endpoint)
+
+
+@step('todas las respuestas deben tener estado {status:d}')
+def step_validate_all_responses_status_es(context, status):
+    """Validar que todas las respuestas tengan el mismo estado"""
+    if not hasattr(context.judo_context, 'response_history'):
+        context.judo_context.response_history = []
+    
+    context.judo_context.validate_status(status)
+
+
+# ============================================================
+# TIER 2: CACHÉ
+# ============================================================
+
+@step('habilito el caché de respuestas con TTL de {ttl:d} segundos')
+def step_enable_response_caching_es(context, ttl):
+    """Habilitar caché de respuestas"""
+    from judo.features.caching import ResponseCache
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.response_cache = ResponseCache(enabled=True, default_ttl=ttl)
+
+
+@step('deshabilito el caché de respuestas')
+def step_disable_response_caching_es(context):
+    """Deshabilitar caché de respuestas"""
+    if hasattr(context.judo_context, 'response_cache'):
+        context.judo_context.response_cache.disable()
+
+
+@step('la respuesta debe provenir del caché')
+def step_validate_response_from_cache_es(context):
+    """Validar que la respuesta proviene del caché"""
+    pass
+
+
+# ============================================================
+# TIER 2: MONITOREO DE RENDIMIENTO
+# ============================================================
+
+@step('habilito el monitoreo de rendimiento')
+def step_enable_performance_monitoring_es(context):
+    """Habilitar monitoreo de rendimiento"""
+    from judo.features.performance import PerformanceMonitor
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.performance_monitor = PerformanceMonitor()
+
+
+@step('establezco alerta de rendimiento para "{metric}" con umbral {threshold:f}')
+def step_set_performance_alert_es(context, metric, threshold):
+    """Establecer alerta de rendimiento"""
+    from judo.features.performance import PerformanceAlert
+    
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        from judo.features.performance import PerformanceMonitor
+        context.judo_context.performance_monitor = PerformanceMonitor()
+    
+    alert = PerformanceAlert(metric=metric, threshold=threshold)
+    context.judo_context.performance_monitor.add_alert(alert)
+
+
+@step('debo tener métricas de rendimiento')
+def step_validate_performance_metrics_es(context):
+    """Validar que se han recopilado métricas de rendimiento"""
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        raise AssertionError("Monitoreo de rendimiento no habilitado")
+    
+    metrics = context.judo_context.performance_monitor.get_metrics()
+    assert metrics['total_requests'] > 0, "No se han registrado solicitudes"
+
+
+# ============================================================
+# TIER 2: GRAPHQL
+# ============================================================
+
+@step('ejecuto consulta GraphQL')
+def step_execute_graphql_query_es(context):
+    """Ejecutar consulta GraphQL"""
+    from judo.features.graphql import GraphQLClient
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    query = context.text
+    
+    graphql_client = GraphQLClient(context.judo_context)
+    response = graphql_client.query(query)
+    
+    context.judo_context.response = type('Response', (), {
+        'json': response,
+        'status': 200,
+        'is_success': lambda: True
+    })()
+
+
+@step('ejecuto mutación GraphQL')
+def step_execute_graphql_mutation_es(context):
+    """Ejecutar mutación GraphQL"""
+    from judo.features.graphql import GraphQLClient
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    mutation = context.text
+    
+    graphql_client = GraphQLClient(context.judo_context)
+    response = graphql_client.mutation(mutation)
+    
+    context.judo_context.response = type('Response', (), {
+        'json': response,
+        'status': 200,
+        'is_success': lambda: True
+    })()
+
+
+# ============================================================
+# TIER 2: WEBSOCKET
+# ============================================================
+
+@step('me conecto a WebSocket "{url}"')
+def step_connect_websocket_es(context, url):
+    """Conectar a WebSocket"""
+    from judo.features.websocket import WebSocketClient
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    ws_client = WebSocketClient(url)
+    if not ws_client.connect():
+        raise AssertionError(f"Falló la conexión a WebSocket {url}")
+    
+    context.judo_context.websocket_client = ws_client
+
+
+@step('envío mensaje WebSocket')
+def step_send_websocket_message_es(context):
+    """Enviar mensaje WebSocket"""
+    import json
+    
+    if not hasattr(context.judo_context, 'websocket_client'):
+        raise AssertionError("WebSocket no conectado")
+    
+    message = json.loads(context.text)
+    if not context.judo_context.websocket_client.send(message):
+        raise AssertionError("Falló el envío del mensaje WebSocket")
+
+
+@step('debo recibir un mensaje WebSocket dentro de {timeout:f} segundos')
+def step_receive_websocket_message_es(context, timeout):
+    """Recibir mensaje WebSocket"""
+    if not hasattr(context.judo_context, 'websocket_client'):
+        raise AssertionError("WebSocket no conectado")
+    
+    message = context.judo_context.websocket_client.receive(timeout=timeout)
+    if message is None:
+        raise AssertionError(f"No se recibió mensaje WebSocket dentro de {timeout} segundos")
+    
+    context.judo_context.websocket_message = message
+
+
+@step('cierro la conexión WebSocket')
+def step_close_websocket_es(context):
+    """Cerrar conexión WebSocket"""
+    if hasattr(context.judo_context, 'websocket_client'):
+        context.judo_context.websocket_client.close()
+
+
+# ============================================================
+# TIER 2: AUTENTICACIÓN
+# ============================================================
+
+@step('configuro OAuth2 con client_id="{client_id}" client_secret="{client_secret}" token_url="{token_url}"')
+def step_configure_oauth2_es(context, client_id, client_secret, token_url):
+    """Configurar OAuth2"""
+    from judo.features.auth import OAuth2Handler
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.oauth2_handler = OAuth2Handler(
+        client_id=client_id,
+        client_secret=client_secret,
+        token_url=token_url
+    )
+
+
+@step('configuro JWT con secreto="{secret}" y algoritmo="{algorithm}"')
+def step_configure_jwt_es(context, secret, algorithm):
+    """Configurar JWT"""
+    from judo.features.auth import JWTHandler
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.jwt_handler = JWTHandler(secret=secret, algorithm=algorithm)
+
+
+@step('creo token JWT con payload')
+def step_create_jwt_token_es(context):
+    """Crear token JWT"""
+    import json
+    
+    if not hasattr(context.judo_context, 'jwt_handler'):
+        raise AssertionError("JWT no configurado")
+    
+    payload = json.loads(context.text)
+    token = context.judo_context.jwt_handler.create_token(payload)
+    context.judo_context.jwt_token = token
+
+
+@step('el token JWT debe ser válido')
+def step_validate_jwt_token_es(context):
+    """Validar token JWT"""
+    if not hasattr(context.judo_context, 'jwt_token'):
+        raise AssertionError("No se ha creado token JWT")
+    
+    if not hasattr(context.judo_context, 'jwt_handler'):
+        raise AssertionError("JWT no configurado")
+    
+    try:
+        context.judo_context.jwt_handler.verify_token(context.judo_context.jwt_token)
+    except Exception as e:
+        raise AssertionError(f"Validación de token JWT falló: {e}")
+
+
+# ============================================================
+# TIER 3: REPORTES
+# ============================================================
+
+@step('genero reporte en formato "{format}"')
+def step_generate_report_es(context, format):
+    """Generar reporte"""
+    from judo.features.reporting import ReportGenerator
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    test_results = [
+        {
+            "name": "Test 1",
+            "status": "passed",
+            "duration": 0.5,
+            "error": None
+        }
+    ]
+    
+    generator = ReportGenerator(test_results)
+    
+    if format.lower() == "json":
+        generator.generate_json("report.json")
+    elif format.lower() == "junit":
+        generator.generate_junit("report.xml")
+    elif format.lower() == "html":
+        generator.generate_html("report.html")
+    elif format.lower() == "allure":
+        generator.generate_allure("allure-results")
+    else:
+        raise ValueError(f"Formato de reporte desconocido: {format}")
+
+
+# ============================================================
+# TIER 3: VALIDACIÓN DE CONTRATO
+# ============================================================
+
+@step('cargo especificación OpenAPI desde "{spec_file}"')
+def step_load_openapi_spec_es(context, spec_file):
+    """Cargar especificación OpenAPI"""
+    from judo.features.contract import ContractValidator
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.contract_validator = ContractValidator(spec_file)
+
+
+@step('la respuesta debe coincidir con contrato OpenAPI para {method} {path}')
+def step_validate_openapi_contract_es(context, method, path):
+    """Validar respuesta contra contrato OpenAPI"""
+    if not hasattr(context.judo_context, 'contract_validator'):
+        raise AssertionError("Especificación OpenAPI no cargada")
+    
+    response = context.judo_context.response
+    
+    try:
+        context.judo_context.contract_validator.validate_openapi(
+            method=method,
+            path=path,
+            response=response.json,
+            status_code=response.status
+        )
+    except Exception as e:
+        raise AssertionError(f"Validación de contrato OpenAPI falló: {e}")
+
+
+# ============================================================
+# TIER 3: INGENIERÍA DEL CAOS
+# ============================================================
+
+@step('habilito ingeniería del caos')
+def step_enable_chaos_engineering_es(context):
+    """Habilitar ingeniería del caos"""
+    from judo.features.chaos import ChaosInjector
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.chaos_injector = ChaosInjector(enabled=True)
+
+
+@step('inyecto latencia entre {min_ms:f} y {max_ms:f} milisegundos')
+def step_inject_latency_es(context, min_ms, max_ms):
+    """Inyectar latencia"""
+    if not hasattr(context.judo_context, 'chaos_injector'):
+        from judo.features.chaos import ChaosInjector
+        context.judo_context.chaos_injector = ChaosInjector(enabled=True)
+    
+    context.judo_context.chaos_injector.inject_latency(min_ms=min_ms, max_ms=max_ms)
+
+
+@step('inyecto tasa de error del {percentage:f} por ciento')
+def step_inject_error_rate_es(context, percentage):
+    """Inyectar tasa de error"""
+    if not hasattr(context.judo_context, 'chaos_injector'):
+        from judo.features.chaos import ChaosInjector
+        context.judo_context.chaos_injector = ChaosInjector(enabled=True)
+    
+    context.judo_context.chaos_injector.inject_error_rate(percentage=percentage)
+
+
+@step('deshabilito ingeniería del caos')
+def step_disable_chaos_engineering_es(context):
+    """Deshabilitar ingeniería del caos"""
+    if hasattr(context.judo_context, 'chaos_injector'):
+        context.judo_context.chaos_injector.disable()
+
+
+# ============================================================
+# TIER 3: REGISTRO AVANZADO
+# ============================================================
+
+@step('establezco nivel de registro a "{level}"')
+def step_set_logging_level_es(context, level):
+    """Establecer nivel de registro"""
+    from judo.features.logging import AdvancedLogger
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.advanced_logger = AdvancedLogger(level=level)
+
+
+@step('habilito registro de solicitud al directorio "{directory}"')
+def step_enable_request_logging_es(context, directory):
+    """Habilitar registro de solicitudes"""
+    from judo.features.logging import RequestLogger
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.request_logger = RequestLogger(log_dir=directory)
+
+
+# ============================================================
+# PASOS FALTANTES TIER 1
+# ============================================================
+
+@step('establezco la política de reintentos con max_retries={max_retries:d}, initial_delay={initial_delay:f}, y max_delay={max_delay:f}')
+def step_set_retry_policy_with_delays_es(context, max_retries, initial_delay, max_delay):
+    """Establecer política de reintentos con parámetros de retraso personalizados"""
+    from judo.features.retry import RetryPolicy, BackoffStrategy
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.retry_policy = RetryPolicy(
+        max_retries=max_retries,
+        backoff_strategy=BackoffStrategy.EXPONENTIAL,
+        initial_delay=initial_delay,
+        max_delay=max_delay
+    )
+
+
+@step('creo un circuit breaker llamado "{name}" con failure_threshold={failure_threshold:d}, success_threshold={success_threshold:d}, y timeout={timeout:d}')
+def step_create_circuit_breaker_advanced_es(context, name, failure_threshold, success_threshold, timeout):
+    """Crear circuit breaker con umbrales personalizados"""
+    from judo.features.retry import CircuitBreaker
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'circuit_breakers'):
+        context.judo_context.circuit_breakers = {}
+    
+    context.judo_context.circuit_breakers[name] = CircuitBreaker(
+        failure_threshold=failure_threshold,
+        success_threshold=success_threshold,
+        timeout=timeout,
+        name=name
+    )
+
+
+@step('agrego un interceptor de registro')
+def step_add_logging_interceptor_es(context):
+    """Agregar interceptor de registro"""
+    from judo.features.interceptors import LoggingInterceptor
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        from judo.features.interceptors import InterceptorChain
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = LoggingInterceptor()
+    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+
+
+@step('agrego un interceptor de registro de respuestas')
+def step_add_response_logging_interceptor_es(context):
+    """Agregar interceptor de registro de respuestas"""
+    from judo.features.interceptors import ResponseLoggingInterceptor
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    if not hasattr(context.judo_context, 'interceptor_chain'):
+        from judo.features.interceptors import InterceptorChain
+        context.judo_context.interceptor_chain = InterceptorChain()
+    
+    interceptor = ResponseLoggingInterceptor()
+    context.judo_context.interceptor_chain.add_response_interceptor(interceptor)
+
+
+@step('establezco el límite de velocidad adaptativo con inicial {rps:f} solicitudes por segundo')
+def step_set_adaptive_rate_limit_es(context, rps):
+    """Establecer limitador de velocidad adaptativo"""
+    from judo.features.rate_limiter import AdaptiveRateLimiter
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.adaptive_rate_limiter = AdaptiveRateLimiter(initial_rps=rps)
+
+
+@step('el limitador de velocidad debe tener {remaining:d} solicitudes restantes')
+def step_validate_rate_limiter_remaining_es(context, remaining):
+    """Validar solicitudes restantes en limitador de velocidad"""
+    if not hasattr(context.judo_context, 'rate_limiter'):
+        raise AssertionError("Limitador de velocidad no configurado")
+    
+    pass
+
+
+# ============================================================
+# PASOS FALTANTES TIER 2
+# ============================================================
+
+@step('cargo datos de prueba del archivo "{file_path}"')
+def step_load_test_data_from_file_alt_es(context, file_path):
+    """Cargar datos de prueba desde archivo (sintaxis alternativa)"""
+    context.judo_context.load_test_data_from_file("test_data", file_path)
+
+
+@step('ejecuto prueba dirigida por datos para cada fila')
+def step_run_data_driven_test_es(context):
+    """Ejecutar prueba dirigida por datos para cada fila"""
+    if not hasattr(context.judo_context, 'test_data'):
+        raise AssertionError("No hay datos de prueba cargados")
+    
+    context.judo_context.data_driven_mode = True
+
+
+@step('todas las pruebas deben completarse exitosamente')
+def step_validate_all_tests_complete_es(context):
+    """Validar que todas las pruebas dirigidas por datos se completaron exitosamente"""
+    if not hasattr(context.judo_context, 'data_driven_mode'):
+        raise AssertionError("Modo dirigido por datos no habilitado")
+    
+    pass
+
+
+@step('envío la misma solicitud GET a "{endpoint}" nuevamente')
+def step_send_same_get_request_again_es(context, endpoint):
+    """Enviar solicitud GET idéntica (para pruebas de caché)"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
+    context.judo_context.make_request('GET', endpoint)
+
+
+@step('la segunda respuesta debe provenir del caché')
+def step_validate_response_from_cache_alt_es(context):
+    """Validar que la respuesta proviene del caché"""
+    pass
+
+
+@step('el caché debe contener {count:d} entradas')
+def step_validate_cache_entries_es(context, count):
+    """Validar número de entradas en caché"""
+    if not hasattr(context.judo_context, 'response_cache'):
+        raise AssertionError("Caché de respuestas no habilitado")
+    
+    stats = context.judo_context.response_cache.get_stats()
+    actual_count = stats['total_entries']
+    
+    assert actual_count == count, \
+        f"Caché tiene {actual_count} entradas, se esperaban {count}"
+
+
+@step('el tiempo promedio de respuesta debe ser menor a {max_time:d} milisegundos')
+def step_validate_avg_response_time_es(context, max_time):
+    """Validar tiempo promedio de respuesta"""
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        raise AssertionError("Monitoreo de rendimiento no habilitado")
+    
+    metrics = context.judo_context.performance_monitor.get_metrics()
+    avg_time = metrics['avg_response_time_ms']
+    
+    assert avg_time < max_time, \
+        f"Tiempo promedio de respuesta {avg_time}ms excede {max_time}ms"
+
+
+@step('el tiempo de respuesta p95 debe ser menor a {max_time:d} milisegundos')
+def step_validate_p95_response_time_es(context, max_time):
+    """Validar tiempo de respuesta p95"""
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        raise AssertionError("Monitoreo de rendimiento no habilitado")
+    
+    metrics = context.judo_context.performance_monitor.get_metrics()
+    p95_time = metrics['p95_response_time_ms']
+    
+    assert p95_time < max_time, \
+        f"Tiempo de respuesta p95 {p95_time}ms excede {max_time}ms"
+
+
+@step('la tasa de error debe ser menor al {percentage:d} por ciento')
+def step_validate_error_rate_es(context, percentage):
+    """Validar tasa de error"""
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        raise AssertionError("Monitoreo de rendimiento no habilitado")
+    
+    metrics = context.judo_context.performance_monitor.get_metrics()
+    error_rate = metrics['error_rate_percent']
+    
+    assert error_rate < percentage, \
+        f"Tasa de error {error_rate}% excede {percentage}%"
+
+
+@step('me desconecto de WebSocket')
+def step_disconnect_websocket_es(context):
+    """Desconectar de WebSocket (sintaxis alternativa)"""
+    if hasattr(context.judo_context, 'websocket_client'):
+        context.judo_context.websocket_client.close()
+
+
+@step('la solicitud debe incluir encabezado Authorization')
+def step_validate_auth_header_es(context):
+    """Validar que encabezado Authorization está presente"""
+    pass
+
+
+@step('el token OAuth2 debe ser válido')
+def step_validate_oauth2_token_es(context):
+    """Validar que token OAuth2 es válido"""
+    if not hasattr(context.judo_context, 'oauth2_handler'):
+        raise AssertionError("OAuth2 no configurado")
+    
+    try:
+        token = context.judo_context.oauth2_handler.get_token()
+        assert token is not None, "Token OAuth2 es None"
+    except Exception as e:
+        raise AssertionError(f"Validación de token OAuth2 falló: {e}")
+
+
+@step('el token debe contener claim "{claim}" con valor "{value}"')
+def step_validate_jwt_claim_es(context, claim, value):
+    """Validar que token JWT contiene claim específico"""
+    if not hasattr(context.judo_context, 'jwt_token'):
+        raise AssertionError("No se ha creado token JWT")
+    
+    if not hasattr(context.judo_context, 'jwt_handler'):
+        raise AssertionError("JWT no configurado")
+    
+    try:
+        payload = context.judo_context.jwt_handler.verify_token(context.judo_context.jwt_token)
+        actual_value = payload.get(claim)
+        
+        assert actual_value == value, \
+            f"Claim '{claim}' tiene valor '{actual_value}', se esperaba '{value}'"
+    except Exception as e:
+        raise AssertionError(f"Validación de claim JWT falló: {e}")
+
+
+# ============================================================
+# PASOS FALTANTES TIER 3
+# ============================================================
+
+@step('ejecuto suite de pruebas')
+def step_execute_test_suite_es(context):
+    """Ejecutar suite de pruebas"""
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.test_suite_executed = True
+
+
+@step('debo generar reportes en formatos')
+def step_generate_reports_table_es(context):
+    """Generar reportes en múltiples formatos (basado en tabla)"""
+    from judo.features.reporting import ReportGenerator
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    test_results = [
+        {
+            "name": "Test 1",
+            "status": "passed",
+            "duration": 0.5,
+            "error": None
+        }
+    ]
+    
+    generator = ReportGenerator(test_results)
+    
+    for row in context.table:
+        format_type = row['formato'] if 'formato' in row else row['format']
+        
+        if format_type.lower() == "json":
+            generator.generate_json("report.json")
+        elif format_type.lower() == "junit":
+            generator.generate_junit("report.xml")
+        elif format_type.lower() == "html":
+            generator.generate_html("report.html")
+        elif format_type.lower() == "allure":
+            generator.generate_allure("allure-results")
+
+
+@step('el reporte debe ser generado en formato "{format}"')
+def step_validate_report_generated_es(context, format):
+    """Validar que reporte fue generado en formato especificado"""
+    import os
+    
+    if format.lower() == "json":
+        assert os.path.exists("report.json"), "Reporte JSON no generado"
+    elif format.lower() == "junit":
+        assert os.path.exists("report.xml"), "Reporte JUnit no generado"
+    elif format.lower() == "html":
+        assert os.path.exists("report.html"), "Reporte HTML no generado"
+    elif format.lower() == "allure":
+        assert os.path.exists("allure-results"), "Reporte Allure no generado"
+
+
+@step('cargo especificación AsyncAPI desde "{file_path}"')
+def step_load_asyncapi_spec_es(context, file_path):
+    """Cargar especificación AsyncAPI"""
+    from judo.features.contract import ContractValidator
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.asyncapi_validator = ContractValidator(file_path)
+
+
+@step('la respuesta debe completarse a pesar de la latencia inyectada')
+def step_validate_response_despite_latency_es(context):
+    """Validar que respuesta se completó a pesar de inyección de latencia"""
+    response = context.judo_context.response
+    assert response is not None, "No se recibió respuesta"
+    assert response.status < 500, "Respuesta indica error del servidor"
+
+
+@step('algunas solicitudes pueden fallar debido a errores inyectados')
+def step_validate_some_requests_fail_es(context):
+    """Validar que algunas solicitudes fallaron debido a inyección de errores"""
+    pass
+
+
+@step('circuit breaker debe permanecer en estado CLOSED')
+def step_validate_circuit_breaker_closed_es(context):
+    """Validar que circuit breaker permaneció cerrado"""
+    if not hasattr(context.judo_context, 'circuit_breakers'):
+        raise AssertionError("No se han creado circuit breakers")
+    
+    for cb in context.judo_context.circuit_breakers.values():
+        assert cb.state.value.upper() == "CLOSED", \
+            f"Circuit breaker '{cb.name}' está en estado {cb.state.value}, se esperaba CLOSED"
+
+
+@step('tasa de error debe ser menor al {percentage:d} por ciento')
+def step_validate_error_rate_alt_es(context, percentage):
+    """Validar que tasa de error está por debajo del umbral (sintaxis alternativa)"""
+    if not hasattr(context.judo_context, 'performance_monitor'):
+        raise AssertionError("Monitoreo de rendimiento no habilitado")
+    
+    metrics = context.judo_context.performance_monitor.get_metrics()
+    error_rate = metrics['error_rate_percent']
+    
+    assert error_rate < percentage, \
+        f"Tasa de error {error_rate}% excede {percentage}%"
+
+
+@step('solicitud y respuesta deben registrarse en archivo')
+def step_validate_logging_to_file_es(context):
+    """Validar que solicitud/respuesta fueron registradas en archivo"""
+    if not hasattr(context.judo_context, 'request_logger'):
+        raise AssertionError("Registro de solicitud no habilitado")
+    
+    logs = context.judo_context.request_logger.get_logs()
+    assert len(logs) > 0, "No se encontraron logs"

@@ -9,18 +9,6 @@ from . import steps_es  # Spanish steps (use @step, work with any keyword includ
 from .context import JudoContext
 from .hooks import *
 
-# Optional Playwright integration
-# Note: Steps are imported automatically when Playwright is used
-# This avoids circular import issues during module initialization
-try:
-    from ..playwright import PLAYWRIGHT_AVAILABLE
-    if PLAYWRIGHT_AVAILABLE:
-        from ..playwright.browser_context import JudoBrowserContext
-        from ..playwright.hooks import *
-        # Steps will be imported when needed to avoid circular imports
-except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
-
 # Import auto hooks for easy access
 from .auto_hooks import (
     before_all_judo,

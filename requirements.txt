@@ -18,8 +18,4 @@ python-dotenv>=1.0.0
 # Para XML: pip install judo-framework[xml]  
 # lxml>=4.9.0
 
-# Para navegadores: pip install judo-framework[browser]
-# selenium>=4.8.0
-# playwright>=1.32.0
-
 # Para todo: pip install judo-framework[full]

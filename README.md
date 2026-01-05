@@ -9,33 +9,51 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Downloads](https://pepy.tech/badge/judo-framework)](https://pepy.tech/project/judo-framework)
 
-[🇪🇸 Español](docs/README_ES.md) | [🇺🇸 English](README.md)
+[🇪🇸 Español](JUDO_STEPS_REFERENCE_EN.md) | [🇺🇸 English](JUDO_STEPS_REFERENCE_ES.md) |  [ep spanglish](JUDO_STEPS_REFERENCE_MIXED.md)
 
 > **"As simple as Karate, as powerful as Python"**
 
 Judo Framework brings the simplicity and elegance of Karate Framework to the Python ecosystem. Write API tests in plain English (or Spanish!), get beautiful HTML reports automatically, and enjoy the power of Python's ecosystem.
 
-## 🎉 What's New in v1.3.39
+## 🎉 What's New in v1.5.0
 
-### 📸 Screenshot Integration in HTML Reports (NEW!)
-- **Automatic Screenshot Embedding** - Playwright screenshots automatically appear in HTML reports
-- **Base64 Encoding** - Self-contained reports with no external file dependencies
-- **Fullscreen View** - Click any screenshot to view it fullscreen
-- **Failure Capture** - Automatic screenshots on test failures
-- **Manual Control** - Take screenshots programmatically when needed
+### 🚀 MAJOR RELEASE - Advanced Features Suite
 
-### 🎭 Playwright Browser Testing
-- **Hybrid Testing** - Combine API and UI testing in the same scenario
-- **50+ Browser Steps** - Complete browser automation in English and Spanish
-- **Multi-page Support** - Handle multiple browser tabs and windows
-- **Visual Testing** - Screenshot comparison and visual validation
-- **100% Backward Compatible** - Existing API tests work unchanged
+Judo Framework v1.5.0 introduces comprehensive advanced features across 3 tiers for enterprise-grade API testing:
 
-### 📊 Enhanced HTML Reports
-- Professional reports with official CENTYC and Judo Framework logos
-- Beautiful gradient headers, responsive layout, and professional footer
-- Request/Response logging with complete headers
-- Organized by scenario with numbered files
+#### **TIER 1: Robustness & Reliability** ⚡
+- **Retry Policy** - Automatic retry with 4 backoff strategies (linear, exponential, fibonacci, random)
+- **Circuit Breaker Pattern** - Prevent cascading failures with configurable thresholds
+- **Request/Response Interceptors** - Modify requests and responses with custom logic
+- **Rate Limiting & Throttling** - Token bucket rate limiter and fixed delay throttling
+- **Advanced Assertions** - Response time, JSON schema, array validation, field matching
+
+#### **TIER 2: Performance & Modern APIs** 📊
+- **Data-Driven Testing** - Load test data from CSV, JSON, Excel files
+- **Performance Monitoring** - Track response times (avg, p95, p99), error rates, throughput
+- **Response Caching** - Automatic caching of GET requests with TTL support
+- **GraphQL Support** - Execute GraphQL queries and mutations
+- **WebSocket Support** - Real-time communication testing
+- **OAuth2 & JWT** - Modern authentication methods with automatic token refresh
+
+#### **TIER 3: Enterprise Features** 🏢
+- **Multi-Format Reporting** - HTML, JSON, JUnit, Allure formats
+- **Contract Validation** - Validate responses against OpenAPI/AsyncAPI specs
+- **Chaos Engineering** - Inject latency and errors for resilience testing
+- **Advanced Logging** - Detailed request/response logging with configurable levels
+
+### 📚 Complete Step References
+- **English**: [JUDO_STEPS_REFERENCE_EN.md](JUDO_STEPS_REFERENCE_EN.md) - 100+ steps in English
+- **Spanish**: [JUDO_STEPS_REFERENCE_ES.md](JUDO_STEPS_REFERENCE_ES.md) - 100+ pasos en español
+- **Mixed Mode**: [JUDO_STEPS_REFERENCE_MIXED.md](JUDO_STEPS_REFERENCE_MIXED.md) - English keywords + Spanish steps
+
+### 📖 Advanced Features Guide
+- **Complete Guide**: [ADVANCED_FEATURES.md](ADVANCED_FEATURES.md) - Detailed documentation of all v1.5.0 features
+
+### 🎯 Showcase Examples
+- **English**: [examples/showcase_advanced_features.feature](examples/showcase_advanced_features.feature)
+- **Spanish**: [examples/showcase_completo_caracteristicas_avanzadas.feature](examples/showcase_completo_caracteristicas_avanzadas.feature)
+- **Mixed Mode**: [examples/showcase_mixed_advanced_features.feature](examples/showcase_mixed_advanced_features.feature)
 
 [See full changelog](CHANGELOG.md)
 
@@ -145,14 +163,11 @@ Every test run generates a comprehensive HTML report with:
 ### Installation
 
 ```bash
-# Install Judo Framework (includes browser testing capabilities)
+# Install Judo Framework (pure API testing)
 pip install judo-framework
-
-# Install browser engines (one-time setup for UI testing)
-playwright install
 ```
 
-> **🎭 Browser Testing Included**: Playwright comes pre-installed! No need for `[browser]` extras.
+> **API Testing Focused**: Judo Framework is now a pure API testing framework. If you need browser automation, install Playwright separately: `pip install playwright && playwright install chromium`
 
 ### 1. Create Your First Test
 
@@ -308,13 +323,11 @@ Scenario: Create user from file
   Then the response status should be 201
 ```
 
-### 📊 Professional HTML Reports with Screenshots
+### 📊 Professional HTML Reports
 Zero configuration, maximum insight with professional branding:
 
 - **🏢 Official Branding**: CENTYC and Judo Framework logos in header and footer
 - **🎨 Modern Design**: Beautiful gradient headers and responsive layout
-- **📸 Screenshot Integration**: Playwright screenshots embedded directly in reports (v1.3.39+)
-- **🖼️ Fullscreen View**: Click any screenshot to view it fullscreen
 - **📋 Request Details**: Method, URL, headers, body with syntax highlighting
 - **📥 Response Details**: Status, headers, body, timing with color-coded status
 - **✅ Assertions**: All validations with expected vs actual comparisons
@@ -322,38 +335,6 @@ Zero configuration, maximum insight with professional branding:
 - **📊 Statistics**: Success rate, timing, error tracking with visual indicators
 - **🔗 Professional Footer**: Creator information and links to documentation
 - **📱 Responsive Design**: Works perfectly on desktop and mobile devices
-
-#### 📸 Screenshot Features (v1.3.39+)
-
-**Automatic Screenshots:**
-```python
-# In environment.py - screenshots on failures
-import os
-os.environ['JUDO_SCREENSHOT_ON_STEP_FAILURE'] = 'true'
-```
-
-**Manual Screenshots:**
-```python
-# In your step definitions
-@when('I verify the dashboard')
-def step_impl(context):
-    context.judo_context.take_screenshot("dashboard_view")
-    # Screenshot automatically appears in HTML report!
-```
-
-**In Gherkin:**
-```gherkin
-Scenario: Visual verification
-  Given I navigate to "https://example.com"
-  When I take a screenshot named "homepage"
-  Then I should see "Welcome"
-```
-
-Screenshots are:
-- ✅ Embedded as base64 (no external files needed)
-- ✅ Clickable for fullscreen view
-- ✅ Automatically attached to steps
-- ✅ Captured on failures by default
 
 ### 💾 Advanced Request/Response Logging
 Automatically save all HTTP interactions to JSON files with complete details:
@@ -478,7 +459,28 @@ Scenario: Basic authentication
 
 ## 📚 Complete Step Reference
 
-### 🔧 Configuration Steps
+### 📖 Full Documentation by Language
+
+**For complete step documentation, see:**
+
+- **🇺🇸 English**: [JUDO_STEPS_REFERENCE_EN.md](JUDO_STEPS_REFERENCE_EN.md)
+  - 100+ predefined steps in English
+  - Configuration, Authentication, HTTP Requests, Validation, Data Extraction
+  - Tier 1, 2, 3 advanced features
+  - Pattern matching and utilities
+
+- **🇪🇸 Spanish**: [JUDO_STEPS_REFERENCE_ES.md](JUDO_STEPS_REFERENCE_ES.md)
+  - 100+ pasos predefinidos en español
+  - Configuración, Autenticación, Peticiones HTTP, Validación, Extracción de Datos
+  - Características avanzadas Tier 1, 2, 3
+  - Patrones y utilidades
+
+- **🌎 Mixed Mode**: [JUDO_STEPS_REFERENCE_MIXED.md](JUDO_STEPS_REFERENCE_MIXED.md)
+  - English keywords + Spanish step descriptions
+  - Perfect for Latin American teams
+  - All features in mixed mode format
+
+### 🔧 Quick Reference - Configuration Steps
 
 **English:**
 - `Given I have a Judo API client`
@@ -500,17 +502,21 @@ Scenario: Basic authentication
 - `Dado que habilito el guardado de peticiones y respuestas en el directorio "{directorio}"`
 - `Dado que deshabilito el guardado de peticiones y respuestas`
 
-### 🔐 Authentication Steps
+### 🔐 Quick Reference - Authentication Steps
 
 **English:**
 - `Given I use bearer token "{token}"`
 - `Given I use basic authentication with username "{user}" and password "{pass}"`
+- `Given I setup OAuth2 with:` (table format)
+- `Given I setup JWT with secret "{secret}" and algorithm "{algorithm}"`
 
 **Spanish:**
 - `Dado que uso el token bearer "{token}"`
 - `Dado que uso autenticación básica con usuario "{usuario}" y contraseña "{password}"`
+- `Dado que configuro OAuth2 con:` (formato tabla)
+- `Dado que configuro JWT con secreto "{secreto}" y algoritmo "{algoritmo}"`
 
-### 🌐 HTTP Request Steps
+### 🌐 Quick Reference - HTTP Request Steps
 
 **English:**
 - `When I send a GET request to "{endpoint}"`
@@ -526,7 +532,7 @@ Scenario: Basic authentication
 - `Cuando hago una petición PATCH a "{endpoint}" con el cuerpo:`
 - `Cuando hago una petición DELETE a "{endpoint}"`
 
-### ✅ Validation Steps
+### ✅ Quick Reference - Validation Steps
 
 **English:**
 - `Then the response status should be {status}`
@@ -535,6 +541,8 @@ Scenario: Basic authentication
 - `Then the response field "{field}" should equal "{value}"`
 - `Then the response should be an array`
 - `Then the response array should have {count} items`
+- `Then the response time should be less than {max_time} milliseconds`
+- `Then the response should match JSON schema:`
 
 **Spanish:**
 - `Entonces el código de respuesta debe ser {status}`
@@ -543,8 +551,10 @@ Scenario: Basic authentication
 - `Entonces el campo "{campo}" debe ser "{valor}"`
 - `Entonces la respuesta debe ser un array`
 - `Entonces la respuesta debe tener {count} elementos`
+- `Entonces el tiempo de respuesta debe ser menor a {max_time} milisegundos`
+- `Entonces la respuesta debe coincidir con el esquema JSON:`
 
-### 💾 Data Extraction Steps
+### 💾 Quick Reference - Data Extraction Steps
 
 **English:**
 - `When I extract "{path}" from the response as "{variable}"`
@@ -554,14 +564,55 @@ Scenario: Basic authentication
 - `Cuando guardo el valor del campo "{campo}" en la variable "{variable}"`
 - `Cuando guardo la respuesta completa en la variable "{variable}"`
 
-### 🔄 Variable Comparison Steps
+### 🔄 Quick Reference - Variable Comparison Steps
 
 **English:**
 - `Then the variable "{var1}" should equal the variable "{var2}"`
+- `Then the variable "{var1}" should not equal the variable "{var2}"`
 
 **Spanish:**
 - `Entonces la variable "{var1}" debe ser igual a la variable "{var2}"`
 - `Entonces la variable "{var1}" no debe ser igual a la variable "{var2}"`
+
+### 🚀 Advanced Features Steps (v1.5.0)
+
+**Retry & Circuit Breaker:**
+- `Given I set retry policy with max_retries={count} and backoff_strategy="{strategy}"`
+- `Given I create a circuit breaker named "{name}" with failure_threshold={threshold}`
+
+**Rate Limiting:**
+- `Given I set rate limit to {requests} requests per second`
+- `Given I set throttle with delay {delay} milliseconds`
+
+**Performance Monitoring:**
+- `When I send {count} GET requests to "{endpoint}"`
+- `Then I should have performance metrics:` (table format)
+
+**Response Caching:**
+- `Given I enable response caching with TTL {ttl} seconds`
+- `Then the second response should come from cache`
+
+**Data-Driven Testing:**
+- `Given I load test data from file "{file_path}"`
+- `When I run data-driven test for each row`
+
+**GraphQL:**
+- `When I execute GraphQL query:` (query in text)
+- `When I execute GraphQL mutation:` (mutation in text)
+
+**WebSocket:**
+- `Given I connect to WebSocket "{url}"`
+- `When I send WebSocket message:` (message in text)
+
+**Chaos Engineering:**
+- `Given I enable chaos engineering`
+- `Given I inject latency between {min} and {max} milliseconds`
+- `Given I inject error rate of {percentage} percent`
+
+**See complete documentation in:**
+- [JUDO_STEPS_REFERENCE_EN.md](JUDO_STEPS_REFERENCE_EN.md) - Full English reference
+- [JUDO_STEPS_REFERENCE_ES.md](JUDO_STEPS_REFERENCE_ES.md) - Full Spanish reference
+- [JUDO_STEPS_REFERENCE_MIXED.md](JUDO_STEPS_REFERENCE_MIXED.md) - Full Mixed mode reference
 
 ---
 
@@ -587,126 +638,11 @@ my-project/
 └── requirements.txt
 ```
 
-#### Environment Configuration with Screenshots
-```python
-# features/environment.py
-from judo.behave import *
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-PLAYWRIGHT_ENABLED = False
-
-try:
-    from judo.playwright import PLAYWRIGHT_AVAILABLE
-    from judo.playwright.browser_context import JudoBrowserContext
-    
-    if PLAYWRIGHT_AVAILABLE and os.getenv('JUDO_USE_BROWSER', 'false').lower() == 'true':
-        PLAYWRIGHT_ENABLED = True
-except ImportError:
-    PLAYWRIGHT_ENABLED = False
-
-def before_all(context):
-    before_all_judo(context)
-
-def before_scenario(context, scenario):
-    before_scenario_judo(context, scenario)
-    
-    # Initialize Playwright for @test-front tagged scenarios
-    if PLAYWRIGHT_ENABLED and any(tag in scenario.tags for tag in ['test-front', 'front']):
-        from playwright.sync_api import sync_playwright
-        from judo.playwright.browser_context import JudoBrowserContext
-        
-        if not hasattr(context.judo_context, 'page'):
-            old_context = context.judo_context
-            context.judo_context = JudoBrowserContext(context)
-            
-            # Copy variables
-            if hasattr(old_context, 'variables'):
-                context.judo_context.variables = old_context.variables
-            
-            # Start Playwright
-            context.judo_context.playwright = sync_playwright().start()
-            
-            # Full screen browser
-            browser_options = {
-                'headless': False,
-                'args': ['--start-maximized']
-            }
-            context.judo_context.browser = context.judo_context.playwright.chromium.launch(**browser_options)
-            context.judo_context.browser_context = context.judo_context.browser.new_context(no_viewport=True)
-            context.judo_context.page = context.judo_context.browser_context.new_page()
-
-def after_step(context, step):
-    """Take screenshot after EVERY step (pass or fail)"""
-    if hasattr(context.judo_context, 'page') and context.judo_context.page:
-        try:
-            step_name_clean = step.name.replace(' ', '_').replace('"', '').replace("'", '')
-            screenshot_name = f"{step.status}_{step_name_clean}"
-            
-            screenshot_path = context.judo_context.take_screenshot(screenshot_name)
-            
-            # Attach to HTML report
-            from judo.reporting.reporter import get_reporter
-            reporter = get_reporter()
-            if reporter and reporter.current_step:
-                reporter.attach_screenshot(screenshot_path)
-        except Exception as e:
-            print(f"⚠️ Screenshot failed: {e}")
-    
-    after_step_judo(context, step)
-
-def after_scenario(context, scenario):
-    if hasattr(context.judo_context, 'page') and context.judo_context.page:
-        try:
-            context.judo_context.page.close()
-            context.judo_context.page = None
-        except:
-            pass
-    after_scenario_judo(context, scenario)
-
-def after_all(context):
-    if hasattr(context.judo_context, 'browser') and context.judo_context.browser:
-        try:
-            if hasattr(context.judo_context, 'browser_context'):
-                context.judo_context.browser_context.close()
-            context.judo_context.browser.close()
-            if hasattr(context.judo_context, 'playwright'):
-                context.judo_context.playwright.stop()
-        except:
-            pass
-    after_all_judo(context)
-
-before_feature = before_feature_judo
-after_feature = after_feature_judo
-before_step = before_step_judo
-```
-
-#### Environment Variables (.env)
-```bash
-# API Configuration
-API_BASE_URL=https://api.example.com
-API_TOKEN=Bearer your-token-here
-TIMEOUT_SECONDS=30
-
-# Playwright Configuration
-JUDO_USE_BROWSER=true
-JUDO_BROWSER=chromium
-JUDO_HEADLESS=false
-JUDO_SCREENSHOT_DIR=screenshots
-
-# Debug
-JUDO_DEBUG_REPORTER=false
-```
-
 #### Custom Runner
 ```python
 # Runner/runner.py
 from judo.runner.base_runner import BaseRunner
 import os
-
-os.environ['JUDO_DEBUG_REPORTER'] = 'false'
 
 class MyRunner(BaseRunner):
     basedir = "./judo_reports"
@@ -731,52 +667,7 @@ if __name__ == "__main__":
     print(f"✅ Tests completed: {results['passed']}/{results['total']} passed")
 ```
 
-### Mixed API + UI Testing
 
-```gherkin
-Feature: E-commerce Complete Flow
-
-  @mix
-  Scenario: Create product via API and verify in UI
-    # API: Create product
-    Given the base URL is "https://api.shop.com"
-    And I use bearer token "{API_TOKEN}"
-    When I send a POST request to "/products" with JSON:
-      """
-      {
-        "name": "Laptop Pro",
-        "price": 1299.99,
-        "category": "electronics"
-      }
-      """
-    Then the response status should be 201
-    And I extract "$.id" from the response as "productId"
-    
-    # UI: Verify product appears
-    Given I navigate to "https://shop.com/products/{productId}"
-    Then I should see "Laptop Pro"
-    And I should see "$1,299.99"
-    When I take a screenshot named "product_page"
-    
-    # UI: Add to cart
-    When I click "#add-to-cart"
-    Then I should see "Added to cart"
-    When I take a screenshot named "cart_confirmation"
-```
-
-### Frontend Testing with Full Screenshots
-
-```gherkin
-@test-front
-Feature: Website Navigation
-
-  Scenario: Homepage verification with screenshots
-    Given I navigate to "https://www.centyc.cl"
-    # Screenshot automatically captured after each step
-    When I click "a[href='/services']"
-    Then I should see "Our Services"
-    # All screenshots embedded in HTML report
-```
 
 ### Complete CRUD Workflow
 
@@ -975,55 +866,11 @@ Feature: API Contract Testing
 
 ### Common Issues
 
-#### Playwright Not Working
+#### Installation Issues
 ```bash
-# Reinstall Playwright
-pip uninstall playwright
-pip install playwright
-playwright install chromium
-
-# Verify installation
-playwright --version
-```
-
-#### Screenshots Not Appearing in Reports
-```python
-# 1. Check reporter is active
-from judo.reporting.reporter import get_reporter
-reporter = get_reporter()
-print(f"Reporter active: {reporter is not None}")
-
-# 2. Verify screenshot was taken
-screenshot_path = context.judo_context.take_screenshot("test")
-print(f"Screenshot saved: {screenshot_path}")
-
-# 3. Check runner configuration
-runner = BaseRunner(
-    generate_cucumber_json=True  # ✅ Must be True
-)
-```
-
-#### "WinError 123" When Saving Screenshots
-```bash
-# Cause: Invalid characters in filename (: / \ | ? *)
-# Solution: Framework normalizes names automatically
-# If persists, avoid special characters in step names
-```
-
-#### "Playwright Sync API inside asyncio loop"
-```bash
-# Solution: Only initialize Playwright for @test-front tagged scenarios
-# The framework detects automatically and avoids conflicts with API tests
-```
-
-#### Browser Not Starting
-```bash
-# Check environment variables
-echo $JUDO_USE_BROWSER  # Should be 'true'
-
-# Check scenario has correct tag
-@test-front  # or @front
-Scenario: My browser test
+# Clear pip cache and reinstall
+pip cache purge
+pip install --upgrade judo-framework
 ```
 
 #### Reports Not Generated
@@ -1053,11 +900,8 @@ os.environ['JUDO_LOG_LEVEL'] = 'DEBUG'
 # Check Judo Framework
 python -c "import judo; print(f'Judo: {judo.__version__}')"
 
-# Check Playwright
-python -c "from judo.playwright import PLAYWRIGHT_AVAILABLE; print(f'Playwright: {PLAYWRIGHT_AVAILABLE}')"
-
 # Check all dependencies
-pip list | grep -E "judo|behave|playwright|requests"
+pip list | grep -E "judo|behave|requests"
 ```
 
 ---
@@ -1076,9 +920,6 @@ pip install judo-framework[crypto]
 
 # XML/SOAP testing support
 pip install judo-framework[xml]
-
-# Browser automation (Selenium, Playwright)
-pip install judo-framework[browser]
 
 # All features
 pip install judo-framework[full]
@@ -1202,7 +1043,7 @@ We are dedicated to advancing software quality and testing practices across Lati
 - **Language**: Python 3.8+
 - **License**: MIT
 - **Status**: Production Ready
-- **Version**: 1.3.18
+- **Version**: 1.5.0
 - **Downloads**: [![Downloads](https://pepy.tech/badge/judo-framework)](https://pepy.tech/project/judo-framework)
 
 ---

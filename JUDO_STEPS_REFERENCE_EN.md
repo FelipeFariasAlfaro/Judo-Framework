@@ -1,6 +1,6 @@
 # Complete Steps Reference - Judo Framework (English)
 
-This is the complete reference of all **VERIFIED** steps available in Judo Framework v1.3.40 in English.
+This is the complete reference of all **VERIFIED** steps available in Judo Framework v1.5.0 in English.
 
 **⚠️ IMPORTANT**: This documentation has been verified against the framework source code. It only includes steps that actually exist and work.
 
@@ -18,6 +18,9 @@ This is the complete reference of all **VERIFIED** steps available in Judo Frame
 - [File Operations](#file-operations)
 - [Utilities](#utilities)
 - [Logging](#logging)
+- [Advanced Features - Tier 1](#advanced-features---tier-1-robustness--reliability)
+- [Advanced Features - Tier 2](#advanced-features---tier-2-performance--modern-apis)
+- [Advanced Features - Tier 3](#advanced-features---tier-3-enterprise-features)
 
 ---
 
@@ -292,4 +295,297 @@ Validates a JSONPath with a matcher pattern (supports Karate-style patterns).
 
 ---
 
-*Judo Framework v1.3.36 - Documentation verified against source code*
+## Advanced Features - Tier 1: Robustness & Reliability
+
+### Retry Policy
+
+#### `Given I set retry policy with max_retries={count:d} and backoff_strategy="{strategy}"`
+Configures automatic retry policy for failed requests with specified backoff strategy.
+
+**Supported Strategies:**
+- `linear` - Delay increases linearly
+- `exponential` - Delay increases exponentially (default)
+- `fibonacci` - Delay follows Fibonacci sequence
+- `random` - Random delay between min and max
+
+#### `Given I set retry policy with max_retries={count:d}, initial_delay={delay:f}, and max_delay={max_delay:f}`
+Configures retry policy with custom delay parameters.
+
+### Circuit Breaker
+
+#### `Given I create a circuit breaker named "{name}" with failure_threshold={threshold:d}`
+Creates a circuit breaker to prevent cascading failures.
+
+#### `Given I create a circuit breaker named "{name}" with failure_threshold={threshold:d}, success_threshold={success:d}, and timeout={timeout:d}`
+Creates a circuit breaker with custom success threshold and timeout.
+
+#### `Then circuit breaker "{name}" should be in state {state}`
+Validates the current state of a circuit breaker (CLOSED, OPEN, HALF_OPEN).
+
+### Request Interceptors
+
+#### `Given I add a timestamp interceptor with header name "{header_name}"`
+Adds a timestamp to all requests with the specified header name.
+
+#### `Given I add an authorization interceptor with token "{token}"`
+Adds Bearer token authorization to all requests.
+
+#### `Given I add an authorization interceptor with token "{token}" and scheme "{scheme}"`
+Adds custom authorization scheme to all requests.
+
+#### `Given I add a logging interceptor`
+Enables logging of all requests.
+
+#### `Given I add a response logging interceptor`
+Enables logging of all responses.
+
+### Rate Limiting & Throttling
+
+#### `Given I set rate limit to {requests:d} requests per second`
+Configures token bucket rate limiter.
+
+#### `Given I set throttle with delay {delay:d} milliseconds`
+Configures fixed delay throttling between requests.
+
+#### `Given I set adaptive rate limit with initial {rps:d} requests per second`
+Configures adaptive rate limiting that respects API headers.
+
+#### `Then the rate limiter should have {remaining:d} requests remaining`
+Validates remaining requests in rate limiter.
+
+### Advanced Assertions
+
+#### `Then the response time should be less than {max_time:d} milliseconds`
+Validates response time is below threshold in milliseconds.
+
+#### `Then the response should match JSON schema`
+Validates response against JSON schema defined in step text.
+
+#### `Then the response array should have more than {count:d} items`
+Validates array has more than specified number of items.
+
+#### `Then the response array should have less than {count:d} items`
+Validates array has fewer than specified number of items.
+
+#### `Then the response should contain all fields: {fields}`
+Validates response contains all specified fields.
+
+#### `Then the response field "{field}" should be of type "{type}"`
+Validates field is of specified type (string, number, boolean, array, object).
+
+#### `Then the response field "{field}" should match pattern "{pattern}"`
+Validates field matches regex pattern.
+
+#### `Then the response field "{field}" should be in range {min:d} to {max:d}`
+Validates numeric field is within range.
+
+---
+
+## Advanced Features - Tier 2: Performance & Modern APIs
+
+### Data-Driven Testing
+
+#### `Given I load test data from file "{file_path}"`
+Loads test data from CSV, JSON, or Excel file.
+
+#### `When I run data-driven test for each row`
+Executes test scenario for each row in loaded test data.
+
+#### `Then all tests should complete successfully`
+Validates all data-driven tests completed without errors.
+
+### Performance Monitoring
+
+#### `When I send {count:d} GET requests to "{endpoint}"`
+Sends multiple GET requests for performance testing.
+
+#### `Then I should have performance metrics`
+Validates performance metrics were collected (used with table).
+
+#### `Then the average response time should be less than {max_time:d} milliseconds`
+Validates average response time across requests.
+
+#### `Then the p95 response time should be less than {max_time:d} milliseconds`
+Validates 95th percentile response time.
+
+#### `Then the error rate should be less than {percentage:d} percent`
+Validates error rate is below threshold.
+
+### Response Caching
+
+#### `Given I enable response caching with TTL {ttl:d} seconds`
+Enables automatic caching of GET responses with time-to-live.
+
+#### `When I send the same GET request to "{endpoint}" again`
+Sends identical GET request (used to test cache).
+
+#### `Then the second response should come from cache`
+Validates response was served from cache.
+
+#### `Then the cache should contain {count:d} entries`
+Validates number of entries in cache.
+
+### GraphQL
+
+#### `Given I set the base URL to "{url}"`
+Sets base URL for GraphQL endpoint.
+
+#### `When I execute GraphQL query`
+Executes GraphQL query defined in step text.
+
+#### `When I execute GraphQL mutation`
+Executes GraphQL mutation defined in step text.
+
+#### `Then the response should contain "{field}"`
+Validates GraphQL response contains field.
+
+### WebSocket
+
+#### `Given I connect to WebSocket "{url}"`
+Establishes WebSocket connection.
+
+#### `When I send WebSocket message`
+Sends message through WebSocket (message in step text).
+
+#### `Then I should receive a WebSocket message within {seconds:d} seconds`
+Validates WebSocket message received within timeout.
+
+#### `When I disconnect from WebSocket`
+Closes WebSocket connection.
+
+### OAuth2 Authentication
+
+#### `Given I setup OAuth2 with`
+Configures OAuth2 authentication (used with table of client_id, client_secret, token_url).
+
+#### `Then the request should include Authorization header`
+Validates Authorization header is present in request.
+
+#### `Then the OAuth2 token should be valid`
+Validates OAuth2 token is valid.
+
+### JWT Authentication
+
+#### `Given I setup JWT with secret "{secret}" and algorithm "{algorithm}"`
+Configures JWT with secret and algorithm (HS256, RS256, etc.).
+
+#### `When I create JWT token with payload`
+Creates JWT token with payload from step text.
+
+#### `Then the token should be valid`
+Validates JWT token is valid and properly signed.
+
+#### `Then the token should contain claim "{claim}" with value "{value}"`
+Validates JWT token contains specific claim.
+
+---
+
+## Advanced Features - Tier 3: Enterprise Features
+
+### Reporting
+
+#### `When I execute test suite`
+Executes complete test suite for reporting.
+
+#### `Then I should generate reports in formats`
+Generates reports in specified formats (used with table).
+
+#### `Then the report should be generated in "{format}" format`
+Validates report was generated in specified format (html, json, junit, allure).
+
+### Contract Validation
+
+#### `Given I load OpenAPI spec from "{file_path}"`
+Loads OpenAPI specification for contract validation.
+
+#### `Then the response should match OpenAPI contract for {method} {endpoint}`
+Validates response matches OpenAPI contract.
+
+#### `Given I load AsyncAPI spec from "{file_path}"`
+Loads AsyncAPI specification for contract validation.
+
+### Chaos Engineering
+
+#### `Given I enable chaos engineering`
+Enables chaos engineering features.
+
+#### `Given I inject latency between {min_ms:f} and {max_ms:f} milliseconds`
+Injects random latency into requests.
+
+#### `Given I inject error rate of {percentage:d} percent`
+Injects random errors into requests.
+
+#### `When I send a GET request to "{endpoint}"`
+Sends request with chaos engineering enabled.
+
+#### `Then the response should complete despite injected latency`
+Validates request completed despite latency injection.
+
+#### `Then some requests may fail due to injected errors`
+Validates some requests failed due to error injection.
+
+#### `Then circuit breaker should remain in CLOSED state`
+Validates circuit breaker stayed closed despite chaos.
+
+#### `Then error rate should be less than {percentage:d} percent`
+Validates actual error rate is below threshold.
+
+### Advanced Logging
+
+#### `Given I set logging level to "{level}"`
+Sets logging level (DEBUG, INFO, WARNING, ERROR).
+
+#### `Given I enable request logging to directory "{directory}"`
+Enables request logging to specified directory.
+
+#### `Then request and response should be logged to file`
+Validates request/response were logged to file.
+
+---
+
+## Integration Scenarios
+
+### Full Stack Testing
+
+#### `Given I set performance alert for response_time threshold {threshold:d} milliseconds`
+Sets performance alert threshold.
+
+#### `Then performance metrics should be collected`
+Validates performance metrics were collected.
+
+#### `Then cache should contain {count:d} entry`
+Validates cache contains specified number of entries.
+
+### Resilience Testing
+
+#### `Given I create circuit breaker with failure_threshold={threshold:d}`
+Creates circuit breaker for resilience testing.
+
+#### `When I send {count:d} GET requests to "{endpoint}"`
+Sends multiple requests for resilience testing.
+
+#### `Then circuit breaker should remain in CLOSED state`
+Validates circuit breaker remained closed.
+
+#### `Then error rate should be less than {percentage:d} percent`
+Validates error rate stayed below threshold.
+
+---
+
+## Important Notes
+
+- **Variable Interpolation**: Use `{variableName}` syntax in URLs, headers, and JSON bodies.
+- **.env Files**: Steps with `from env` automatically load variables from .env files.
+- **JSONPath**: Use standard JSONPath syntax like `$.field.subfield` to navigate JSON structures.
+- **Data Types**: The framework automatically handles conversions between strings and numbers when appropriate.
+- **Automatic Logging**: When enabled, automatically saves requests/responses with timestamps and metadata.
+- **Pattern Matching**: Supports Karate-style patterns like `##string`, `##number`, `##email`, etc.
+- **File Formats**: Supports JSON, YAML, and CSV files for test data.
+- **Backoff Strategies**: Retry policies support linear, exponential, fibonacci, and random strategies.
+- **Circuit Breaker States**: CLOSED (normal), OPEN (failing), HALF_OPEN (testing recovery).
+- **Performance Metrics**: Includes avg, p95, p99 response times, error rate, and throughput.
+- **Verification**: This documentation has been verified against the source code v1.5.0.
+
+---
+
+*Judo Framework v1.5.0 - Documentation verified against source code*

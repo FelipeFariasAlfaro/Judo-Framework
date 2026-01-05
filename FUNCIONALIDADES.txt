@@ -1,0 +1,292 @@
+================================================================================
+JUDO FRAMEWORK v1.5.0 - LISTADO COMPLETO DE FUNCIONALIDADES
+================================================================================
+
+
+Política de Reintentos: Reintenta automáticamente solicitudes fallidas con 
+estrategias de backoff (exponencial, lineal, fibonacci, aleatorio) para 
+manejar fallos transitorios.
+
+Circuit Breaker: Previene fallos en cascada detectando cuando un servicio 
+está caído y rechazando solicitudes temporalmente hasta que se recupere.
+
+Interceptores de Solicitud: Modifica solicitudes antes de enviarlas agregando 
+headers personalizados, timestamps, tokens de autorización y logging.
+
+Interceptores de Respuesta: Procesa respuestas después de recibirlas para 
+logging, transformación y validación automática.
+
+Cadena de Interceptores: Encadena múltiples interceptores de solicitud y 
+respuesta para flujos complejos de procesamiento.
+
+Limitador de Velocidad: Controla la tasa de solicitudes usando algoritmo de 
+token bucket para respetar límites de API y evitar throttling.
+
+Limitador Adaptativo: Ajusta automáticamente la tasa de solicitudes basado 
+en headers de rate limit (X-RateLimit-*) de la API.
+
+Acelerador de Solicitudes: Añade retraso fijo entre solicitudes para controlar 
+el flujo y evitar sobrecargar servidores.
+
+Aserciones Avanzadas - Tiempo: Valida que el tiempo de respuesta sea menor que 
+un umbral o esté dentro de un rango específico.
+
+Aserciones Avanzadas - Esquema JSON: Valida que la respuesta cumpla con un 
+esquema JSON complejo con propiedades requeridas y tipos específicos.
+
+Aserciones Avanzadas - Arrays: Valida longitud de arrays, contiene elementos 
+específicos y valida contenido de cada elemento.
+
+Aserciones Avanzadas - Tipos: Verifica que campos sean del tipo correcto 
+(string, número, booleano, array, objeto, null).
+
+Aserciones Avanzadas - Patrones: Valida que campos cumplan con patrones regex 
+(email, URL, UUID, teléfono, etc.).
+
+Aserciones Avanzadas - Rangos: Valida que valores numéricos estén dentro de 
+rangos específicos (mín, máx).
+
+Aserciones Avanzadas - Headers: Valida que la respuesta contenga headers 
+específicos con valores esperados.
+
+Aserciones Avanzadas - Contenido: Valida que la respuesta contenga todos, 
+algunos o ninguno de los campos especificados.
+
+Aserciones Avanzadas - Regex: Valida que el texto de respuesta coincida o no 
+coincida con patrones regex complejos.
+
+
+Pruebas Dirigidas por Datos - CSV: Carga datos de archivos CSV y ejecuta el 
+mismo test con cada fila automáticamente.
+
+Pruebas Dirigidas por Datos - JSON: Carga datos de archivos JSON (arrays u 
+objetos) para pruebas parametrizadas.
+
+Pruebas Dirigidas por Datos - Excel: Carga datos de archivos Excel (.xlsx) 
+con soporte para múltiples hojas.
+
+Generación de Datos Sintéticos: Genera datos de prueba realistas usando 
+templates con funciones generadoras (Faker).
+
+Guardado de Resultados: Exporta resultados de pruebas dirigidas por datos en 
+formatos JSON o CSV para análisis.
+
+Resumen de Resultados: Calcula estadísticas de pruebas (total, pasadas, 
+fallidas, tasa de éxito).
+
+Monitoreo de Rendimiento: Recopila métricas de rendimiento (promedio, mediana, 
+p95, p99, mín, máx) en tiempo real.
+
+Alertas de Rendimiento: Configura alertas que se disparan cuando métricas 
+exceden umbrales (tiempo, tasa de error, throughput).
+
+Cálculo de Throughput: Calcula solicitudes por segundo (RPS) para medir 
+capacidad y rendimiento del API.
+
+Cálculo de Tasa de Error: Calcula porcentaje de solicitudes fallidas para 
+monitoreo de confiabilidad.
+
+Estadísticas de Desviación: Calcula desviación estándar de tiempos de respuesta 
+para análisis de variabilidad.
+
+Caché de Respuestas: Almacena automáticamente respuestas GET en caché con 
+expiración TTL para mejorar rendimiento.
+
+Estadísticas de Caché: Obtiene estadísticas de caché (entradas, tamaño total, 
+TTL) para monitoreo y debugging.
+
+Limpieza de Caché: Limpia entradas expiradas o todo el caché manualmente.
+
+Soporte GraphQL - Consultas: Ejecuta consultas GraphQL con soporte para 
+variables y validación de respuestas.
+
+Soporte GraphQL - Mutaciones: Ejecuta mutaciones GraphQL para modificar datos 
+en APIs GraphQL.
+
+Soporte WebSocket: Conecta a endpoints WebSocket para comunicación en tiempo 
+real bidireccional.
+
+Mensajes WebSocket: Envía y recibe mensajes en WebSocket con timeouts 
+configurables.
+
+Autenticación OAuth2: Configura flujo de credenciales de cliente, maneja 
+tokens automáticamente y refresca cuando expiran.
+
+Autenticación JWT: Crea, verifica y valida tokens JWT con múltiples algoritmos 
+(HS256, RS256, etc.).
+
+Validación de JWT: Verifica que tokens JWT sean válidos y no estén expirados.
+
+
+Generación de Reportes - HTML: Genera reportes HTML interactivos con detalles 
+de cada paso, solicitudes, respuestas y métricas.
+
+Generación de Reportes - JSON: Exporta resultados en formato JSON para 
+integración con herramientas externas.
+
+Generación de Reportes - JUnit: Exporta resultados en formato JUnit XML 
+compatible con herramientas de CI/CD (Jenkins, GitLab, etc.).
+
+Generación de Reportes - Allure: Integración con Allure para reportes visuales 
+avanzados con historial y tendencias.
+
+Validación de Contrato OpenAPI: Valida que las respuestas cumplan con la 
+especificación OpenAPI definida.
+
+Validación de Endpoint OpenAPI: Verifica que el endpoint y método HTTP sean 
+válidos según la especificación.
+
+Ingeniería del Caos - Latencia: Inyecta latencia simulada (rango configurable) 
+para probar comportamiento bajo lentitud.
+
+Ingeniería del Caos - Errores: Inyecta errores simulados (porcentaje 
+configurable) para probar manejo de fallos.
+
+Ingeniería del Caos - Timeouts: Inyecta timeouts simulados (probabilidad 
+configurable) para probar recuperación.
+
+Registro Avanzado - Solicitudes: Registra solicitudes completas (método, URL, 
+headers, parámetros, body) en archivos JSON.
+
+Registro Avanzado - Respuestas: Registra respuestas completas (status, headers, 
+body, tiempo) en archivos JSON.
+
+Registro Avanzado - Organización: Organiza logs por escenario en directorios 
+separados con timestamps.
+
+Registro Avanzado - Niveles: Configura niveles de logging (DEBUG, INFO, WARNING, 
+ERROR) para control granular.
+
+
+Soporte JSON: Lee, escribe y valida archivos JSON, interpola variables en 
+payloads y valida esquemas JSON en respuestas.
+
+Soporte YAML: Carga configuraciones y datos de prueba desde archivos YAML 
+con soporte para variables y referencias.
+
+Soporte CSV: Carga datos de prueba desde archivos CSV para pruebas dirigidas 
+por datos con múltiples filas.
+
+Soporte Excel: Carga datos de prueba desde archivos Excel (.xlsx) con soporte 
+para múltiples hojas.
+
+Gestión de Variables: Define y utiliza variables en solicitudes, respuestas 
+y validaciones con interpolación automática.
+
+Interpolación de Variables: Reemplaza automáticamente {variable} y ${variable} 
+en URLs, headers, body y validaciones.
+
+Autenticación Básica: Configura autenticación básica con usuario y contraseña 
+codificados en Base64.
+
+Autenticación Bearer: Utiliza tokens Bearer para autenticación en APIs 
+modernas y servicios OAuth2.
+
+Headers Personalizados: Añade headers personalizados a todas las solicitudes 
+o a solicitudes específicas.
+
+Headers desde Env: Carga valores de headers desde variables de entorno (.env) 
+para configuración segura.
+
+Parámetros de Consulta: Configura parámetros de query string en solicitudes 
+GET y POST.
+
+Validación de Respuesta - Status: Valida códigos de estado HTTP (200, 404, 500, 
+etc.).
+
+Validación de Respuesta - Contenido: Valida que la respuesta contenga campos 
+específicos con valores esperados.
+
+Validación de Respuesta - Estructura: Valida la estructura completa de la 
+respuesta JSON.
+
+Extracción de Datos - JSONPath: Extrae valores de respuestas usando JSONPath 
+y los almacena en variables.
+
+Extracción de Datos - Campos: Extrae campos específicos de respuestas para 
+uso en solicitudes posteriores.
+
+Esperas y Delays: Añade esperas entre solicitudes para sincronización y 
+control de timing en pruebas.
+
+Soporte Multiidioma: Define pasos de prueba en inglés, español o modo mixto 
+(keywords en inglés, descripciones en español).
+
+Datos Sintéticos - Faker: Genera datos realistas (nombres, emails, direcciones, 
+teléfonos, etc.) usando Faker.
+
+Validación de Tipos: Verifica que campos en respuestas sean del tipo correcto 
+(string, número, booleano, array, objeto).
+
+Validación de Patrones: Valida que campos cumplan con patrones específicos 
+(email, URL, UUID, teléfono, etc.).
+
+Validación de Null: Verifica que campos sean null o no sean null según lo 
+esperado.
+
+Validación de Rango: Valida que valores numéricos estén dentro de rangos 
+específicos.
+
+Validación de Longitud: Valida que strings tengan longitud específica o dentro 
+de rango.
+
+Validación de Contenido: Valida que arrays contengan elementos específicos o 
+tengan longitud esperada.
+
+Estado del Circuit Breaker: Consulta el estado actual del circuit breaker 
+(CLOSED, OPEN, HALF_OPEN) y métricas de fallos.
+
+Reseteo Manual: Resetea manualmente circuit breakers, caché, limitadores y 
+otras características.
+
+Integración con Behave: Funciona nativamente con Behave para escribir tests 
+en formato Gherkin legible.
+
+Integración con Pytest: Compatible con pytest para ejecución de tests 
+programática.
+
+Logging Detallado: Registra solicitudes y respuestas con todos los detalles 
+(headers, body, parámetros, timestamps).
+
+Depuración: Modo debug para ver detalles internos de ejecución y troubleshooting.
+
+Configuración por Entorno: Carga configuración desde variables de entorno 
+(.env) para diferentes ambientes.
+
+Manejo de Errores: Captura y reporta errores de forma clara con stack traces 
+y contexto.
+
+Reintentos Automáticos: Reintenta automáticamente solicitudes fallidas con 
+backoff configurable.
+
+Recuperación Automática: Se recupera automáticamente de fallos transitorios 
+sin intervención manual.
+
+Validación de Seguridad: Valida certificados SSL/TLS y soporta autenticación 
+mutua.
+
+Proxy Support: Soporta proxies HTTP/HTTPS para testing en ambientes corporativos.
+
+Cookies: Maneja cookies automáticamente entre solicitudes.
+
+Sesiones: Mantiene sesiones entre solicitudes para testing de flujos 
+autenticados.
+
+Redirecciones: Sigue automáticamente redirecciones HTTP (301, 302, 303, 307, 
+308).
+
+Compresión: Soporta respuestas comprimidas (gzip, deflate, brotli).
+
+Streaming: Soporta descarga de archivos grandes con streaming.
+
+Timeouts: Configura timeouts para conexión y lectura de respuestas.
+
+Reintentos de Conexión: Reintenta automáticamente en caso de errores de 
+conexión.
+
+Validación de Certificados: Valida certificados SSL/TLS o permite desactivar 
+validación para testing.
+
+================================================================================
+TOTAL: 100+ FUNCIONALIDADES IMPLEMENTADAS Y OPERACIONALES
+================================================================================

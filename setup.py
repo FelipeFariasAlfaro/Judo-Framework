@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="judo-framework",
-    version="1.3.42",
+    version="1.5.0",
     author="Felipe Farias - CENTYC",
     author_email="felipe.farias@centyc.cl",
     description="A comprehensive API testing framework for Python, inspired by Karate Framework",
@@ -39,7 +39,7 @@ setup(
         "websocket-client>=1.5.0",
         "beautifulsoup4>=4.12.0",
         "python-dotenv>=1.0.0",
-        "playwright>=1.32.0",
+        "PyJWT>=2.6.0",
     ],
     extras_require={
         "dev": [
@@ -54,15 +54,21 @@ setup(
         "xml": [
             "lxml>=4.9.0",
         ],
-        "browser": [
-            "selenium>=4.8.0",
-            "playwright>=1.40.0",
+        "excel": [
+            "openpyxl>=3.0.0",
+        ],
+        "websocket": [
+            "websockets>=10.0",
+        ],
+        "graphql": [
+            "graphql-core>=3.2.0",
         ],
         "full": [
             "cryptography>=40.0.0",
             "lxml>=4.9.0",
-            "selenium>=4.8.0",
-            "playwright>=1.40.0",
+            "openpyxl>=3.0.0",
+            "websockets>=10.0",
+            "graphql-core>=3.2.0",
         ]
     },
     entry_points={
