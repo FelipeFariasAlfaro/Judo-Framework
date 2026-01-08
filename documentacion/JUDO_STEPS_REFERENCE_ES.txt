@@ -8,18 +8,18 @@ Esta es la referencia completa de todos los pasos **VERIFICADOS** disponibles en
 
 ## 📋 Índice
 
-- [Configuración](#configuración)
-- [Autenticación](#autenticación)
-- [Peticiones HTTP](#peticiones-http)
-- [Validación de Respuestas](#validación-de-respuestas)
-- [Extracción de Datos](#extracción-de-datos)
-- [Variables](#variables)
-- [Arrays y Colecciones](#arrays-y-colecciones)
-- [Utilidades](#utilidades)
-- [Logging](#logging)
-- [Características Avanzadas - Tier 1](#características-avanzadas---tier-1-robustez-y-confiabilidad)
-- [Características Avanzadas - Tier 2](#características-avanzadas---tier-2-rendimiento-y-apis-modernas)
-- [Características Avanzadas - Tier 3](#características-avanzadas---tier-3-características-empresariales)
+- Configuración
+- Autenticación
+- Peticiones HTTP
+- Validación de Respuestas
+- Extracción de Datos
+- Variables
+- Arrays y Colecciones
+- Utilidades
+- Logging
+- Características Avanzadas - Tier 1
+- Características Avanzadas - Tier 2
+- Características Avanzadas - Tier 3
 
 ---
 
@@ -150,8 +150,6 @@ Valida que todos los elementos del array tengan un campo específico.
 
 ### `Entonces el array "{ruta_array}" debe contener un elemento con "{campo}" igual a "{valor}"`
 Busca en un array (anidado o de nivel raíz) un elemento que tenga un campo con un valor específico.
-
-
 
 ---
 

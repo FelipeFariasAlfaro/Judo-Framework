@@ -1,0 +1,573 @@
+===============================================================================
+                    JUDO FRAMEWORK - GUÍA DE SOLUCIÓN DE PROBLEMAS
+===============================================================================
+
+VERSIÓN: 1.5.9.5
+FECHA: Enero 2026
+AUTOR: Felipe Farias - CENTYC
+
+===============================================================================
+ÍNDICE DE CONTENIDOS
+===============================================================================
+
+1. PROBLEMAS DE INSTALACIÓN
+2. PROBLEMAS DE CONFIGURACIÓN
+3. PROBLEMAS DE EJECUCIÓN
+4. PROBLEMAS DE PASOS (STEPS)
+5. PROBLEMAS DE REPORTES
+6. PROBLEMAS DE PERFORMANCE
+7. PROBLEMAS DE INTEGRACIÓN
+8. PROBLEMAS DE AUTENTICACIÓN
+9. HERRAMIENTAS DE DIAGNÓSTICO
+10. LOGS Y DEBUGGING
+
+===============================================================================
+1. PROBLEMAS DE INSTALACIÓN
+===============================================================================
+
+PROBLEMA: Error "No module named 'judo'" después de instalar
+SÍNTOMAS: ImportError al intentar importar judo
+SOLUCIÓN:
+1. Verificar que pip instaló correctamente:
+   pip list | grep judo-framework
+2. Verificar que estás usando el Python correcto:
+   which python
+   which pip
+3. Si usas entornos virtuales, activar el correcto:
+   source venv/bin/activate  # Linux/Mac
+   venv\Scripts\activate     # Windows
+4. Reinstalar si es necesario:
+   pip uninstall judo-framework
+   pip install judo-framework
+
+PROBLEMA: Error de permisos durante instalación
+SÍNTOMAS: "Permission denied" o "Access denied"
+SOLUCIÓN:
+1. En Linux/Mac, usar --user:
+   pip install --user judo-framework
+2. O usar sudo (no recomendado):
+   sudo pip install judo-framework
+3. En Windows, ejecutar como administrador
+4. Mejor práctica: usar entorno virtual:
+   python -m venv judo_env
+   source judo_env/bin/activate
+   pip install judo-framework
+
+PROBLEMA: Conflictos de dependencias
+SÍNTOMAS: "Dependency conflict" o versiones incompatibles
+SOLUCIÓN:
+1. Crear entorno virtual limpio:
+   python -m venv fresh_env
+   source fresh_env/bin/activate
+2. Instalar solo judo-framework:
+   pip install judo-framework[full]
+3. Si persiste, verificar requirements.txt:
+   pip install -r requirements.txt
+4. Usar pip-tools para resolver conflictos:
+   pip install pip-tools
+   pip-compile requirements.in
+
+PROBLEMA: Error con extras ([full], [excel], etc.)
+SÍNTOMAS: "No such option" o dependencias faltantes
+SOLUCIÓN:
+1. Usar comillas en algunos shells:
+   pip install "judo-framework[full]"
+2. Instalar extras por separado:
+   pip install judo-framework
+   pip install openpyxl  # Para Excel
+   pip install websockets  # Para WebSocket
+3. Verificar extras disponibles:
+   pip show judo-framework
+
+===============================================================================
+2. PROBLEMAS DE CONFIGURACIÓN
+===============================================================================
+
+PROBLEMA: Variables de entorno no se cargan desde .env
+SÍNTOMAS: Configuración por defecto en lugar de valores del .env
+SOLUCIÓN:
+1. Verificar ubicación del archivo .env (debe estar en la raíz)
+2. Verificar formato del archivo:
+   JUDO_FEATURES_DIR=features
+   JUDO_OUTPUT_DIR=judo_reports
+   # Sin espacios alrededor del =
+3. Verificar encoding del archivo (debe ser UTF-8)
+4. Forzar carga manual si es necesario:
+   from dotenv import load_dotenv
+   load_dotenv('.env')
+
+PROBLEMA: Configuración JSON inválida
+SÍNTOMAS: "JSON decode error" o configuración no aplicada
+SOLUCIÓN:
+1. Validar JSON con herramienta online o:
+   python -m json.tool report_config.json
+2. Verificar comillas dobles (no simples):
+   ✓ "key": "value"
+   ✗ 'key': 'value'
+3. Verificar comas finales:
+   ✗ {"key": "value",}  # Coma final inválida
+   ✓ {"key": "value"}
+4. Verificar encoding UTF-8
+
+PROBLEMA: Logo base64 no se muestra
+SÍNTOMAS: Logo no aparece en reportes HTML
+SOLUCIÓN:
+1. Verificar formato completo del base64:
+   "primary_logo": "data:image/png;base64,iVBORw0KGgo..."
+2. Verificar que el base64 es válido:
+   - Debe tener longitud > 100 caracteres
+   - No debe tener espacios o saltos de línea
+3. Verificar configuración del footer:
+   "footer": {
+     "show_logo": true,
+     "show_creator": false
+   }
+4. Usar herramienta de diagnóstico:
+   python debug_logo_config.py
+
+PROBLEMA: Rutas de archivos incorrectas
+SÍNTOMAS: "File not found" o "No such file or directory"
+SOLUCIÓN:
+1. Usar rutas relativas desde la raíz del proyecto:
+   JUDO_FEATURES_DIR=features
+   JUDO_OUTPUT_DIR=judo_reports
+2. En Windows, usar barras normales o dobles:
+   ✓ features/api_tests.feature
+   ✓ features\\api_tests.feature
+   ✗ features\api_tests.feature
+3. Verificar permisos de lectura/escritura
+4. Usar Path absolutos si es necesario:
+   from pathlib import Path
+   features_dir = Path.cwd() / "features"
+
+===============================================================================
+3. PROBLEMAS DE EJECUCIÓN
+===============================================================================
+
+PROBLEMA: "No features found"
+SÍNTOMAS: Runner no encuentra archivos .feature
+SOLUCIÓN:
+1. Verificar estructura de directorios:
+   proyecto/
+   ├── features/
+   │   └── api_tests.feature
+   └── runner.py
+2. Verificar variable JUDO_FEATURES_DIR
+3. Verificar extensión de archivos (.feature)
+4. Verificar permisos de lectura en directorio
+
+PROBLEMA: Pruebas se cuelgan o no terminan
+SÍNTOMAS: Ejecución infinita o timeout
+SOLUCIÓN:
+1. Configurar timeout apropiado:
+   JUDO_TIMEOUT=300  # 5 minutos
+2. Verificar conectividad de red
+3. Usar Ctrl+C para interrumpir y revisar logs
+4. Reducir max_workers si hay problemas de recursos:
+   JUDO_MAX_WORKERS=2
+5. Verificar loops infinitos en pasos personalizados
+
+PROBLEMA: Errores de memoria (Out of Memory)
+SÍNTOMAS: "MemoryError" o sistema lento
+SOLUCIÓN:
+1. Reducir workers paralelos:
+   JUDO_MAX_WORKERS=2
+2. Desactivar logging detallado:
+   JUDO_SAVE_REQUESTS_RESPONSES=false
+3. Procesar features en lotes pequeños
+4. Aumentar memoria del sistema
+5. Usar generadores en lugar de listas grandes
+
+PROBLEMA: Errores de encoding/caracteres especiales
+SÍNTOMAS: "UnicodeDecodeError" o caracteres raros
+SOLUCIÓN:
+1. Asegurar que todos los archivos usen UTF-8
+2. En Windows, configurar encoding:
+   set PYTHONIOENCODING=utf-8
+3. En archivos Python, usar:
+   # -*- coding: utf-8 -*-
+4. En JSON, usar escape para caracteres especiales:
+   "name": "José Pérez"  # ✓
+   "name": "Jos\u00e9 P\u00e9rez"  # ✓ alternativa
+
+===============================================================================
+4. PROBLEMAS DE PASOS (STEPS)
+===============================================================================
+
+PROBLEMA: "Step not found" o "Undefined step"
+SÍNTOMAS: behave no reconoce un paso
+SOLUCIÓN:
+1. Verificar sintaxis exacta en JUDO_STEPS_REFERENCE_ES.txt
+2. Verificar comillas y parámetros:
+   ✓ Given I set base URL to "https://api.ejemplo.com"
+   ✗ Given I set base URL to 'https://api.ejemplo.com'
+3. Verificar importación en environment.py:
+   from judo.behave.steps import *
+4. Verificar que el paso existe en la versión instalada
+
+PROBLEMA: Pasos en español no funcionan
+SÍNTOMAS: Solo funcionan pasos en inglés
+SOLUCIÓN:
+1. Verificar importación de pasos en español:
+   from judo.behave.steps_es import *
+2. Usar sintaxis correcta en español:
+   Dado que configuro la URL base como "https://api.ejemplo.com"
+3. Verificar que el feature usa encoding UTF-8
+4. Verificar versión de judo-framework (debe ser >= 1.5.0)
+
+PROBLEMA: Parámetros no se pasan correctamente
+SÍNTOMAS: Variables vacías o valores incorrectos
+SOLUCIÓN:
+1. Verificar sintaxis de parámetros:
+   ✓ When I send GET request to "/users/{user_id}"
+   ✓ When I send GET request to "/users/${user_id}"
+2. Verificar que la variable existe:
+   Given I set variable "user_id" to "123"
+3. Usar comillas dobles para strings:
+   ✓ Given I set variable "name" to "Juan"
+   ✗ Given I set variable "name" to Juan
+
+PROBLEMA: JSONPath no encuentra campos
+SÍNTOMAS: "Field not found" en validaciones
+SOLUCIÓN:
+1. Verificar estructura del JSON response:
+   Then I print the response  # Para debug
+2. Usar JSONPath correcto:
+   ✓ response.data[0].name
+   ✓ response.data[*].name
+   ✗ response.data.0.name
+3. Verificar que el campo existe en la respuesta
+4. Usar herramientas online para probar JSONPath
+
+===============================================================================
+5. PROBLEMAS DE REPORTES
+===============================================================================
+
+PROBLEMA: No se generan reportes HTML
+SÍNTOMAS: Carpeta judo_reports vacía
+SOLUCIÓN:
+1. Verificar permisos de escritura en directorio de salida
+2. Verificar que el runner completó sin errores críticos
+3. Verificar configuración:
+   JUDO_OUTPUT_DIR=judo_reports
+4. Ejecutar con verbose para ver errores:
+   JUDO_VERBOSE=true python runner.py
+5. Verificar espacio en disco
+
+PROBLEMA: Reportes HTML se ven mal o sin estilos
+SÍNTOMAS: HTML sin formato, colores o gráficos
+SOLUCIÓN:
+1. Verificar que el archivo HTML se generó completamente
+2. Abrir en navegador moderno (Chrome, Firefox, Edge)
+3. Verificar conexión a internet (para Chart.js CDN)
+4. Verificar configuración JSON válida
+5. Revisar consola del navegador para errores JavaScript
+
+PROBLEMA: Gráficos no se muestran en reportes
+SÍNTOMAS: Espacios vacíos donde deberían estar los gráficos
+SOLUCIÓN:
+1. Verificar conexión a internet (Chart.js se carga desde CDN)
+2. Verificar configuración de gráficos:
+   "charts": {
+     "enabled": true,
+     "show_pie_charts": true
+   }
+3. Abrir consola del navegador para ver errores
+4. Probar en navegador diferente
+
+PROBLEMA: Logo personalizado no aparece
+SÍNTOMAS: Logo por defecto en lugar del personalizado
+SOLUCIÓN:
+1. Verificar formato base64 completo:
+   "primary_logo": "data:image/png;base64,iVBORw0KGgo..."
+2. Verificar configuración del footer:
+   "footer": {
+     "show_logo": true,
+     "show_creator": false
+   }
+3. Usar herramienta de diagnóstico:
+   python debug_logo_config.py
+4. Verificar que el base64 es válido (longitud > 100 caracteres)
+
+PROBLEMA: Reportes Cucumber JSON malformados
+SÍNTOMAS: Errores en herramientas CI/CD que leen JSON
+SOLUCIÓN:
+1. Verificar que se generó correctamente:
+   JUDO_GENERATE_CUCUMBER_JSON=true
+2. Validar JSON generado:
+   python -m json.tool cucumber-reports/results.json
+3. Si está corrupto, regenerar:
+   rm -rf cucumber-reports/
+   python runner.py
+4. Verificar permisos de escritura
+
+===============================================================================
+6. PROBLEMAS DE PERFORMANCE
+===============================================================================
+
+PROBLEMA: Pruebas muy lentas
+SÍNTOMAS: Ejecución toma mucho tiempo
+SOLUCIÓN:
+1. Habilitar ejecución paralela:
+   JUDO_PARALLEL=true
+   JUDO_MAX_WORKERS=4
+2. Optimizar timeouts:
+   JUDO_TIMEOUT=30  # Reducir si es apropiado
+3. Usar caching para datos estáticos:
+   Given I enable response caching with TTL 300 seconds
+4. Revisar red y latencia al servidor
+5. Optimizar número de requests por prueba
+
+PROBLEMA: Alto uso de CPU/memoria
+SÍNTOMAS: Sistema lento durante ejecución
+SOLUCIÓN:
+1. Reducir workers paralelos:
+   JUDO_MAX_WORKERS=2
+2. Desactivar logging detallado:
+   JUDO_SAVE_REQUESTS_RESPONSES=false
+   JUDO_VERBOSE=false
+3. Procesar en lotes más pequeños
+4. Cerrar aplicaciones innecesarias
+5. Monitorear con herramientas del sistema
+
+PROBLEMA: Timeouts frecuentes
+SÍNTOMAS: Muchas pruebas fallan por timeout
+SOLUCIÓN:
+1. Aumentar timeout global:
+   JUDO_TIMEOUT=600  # 10 minutos
+2. Verificar conectividad de red
+3. Verificar carga del servidor de destino
+4. Implementar retry policy:
+   context.judo.set_retry_policy(max_retries=3)
+5. Usar circuit breakers para servicios inestables
+
+PROBLEMA: Rate limiting del servidor
+SÍNTOMAS: Errores 429 "Too Many Requests"
+SOLUCIÓN:
+1. Configurar rate limiting:
+   context.judo.set_rate_limit(requests_per_second=5)
+2. Añadir delays entre requests:
+   context.judo.set_throttle(delay_ms=200)
+3. Reducir workers paralelos
+4. Implementar backoff exponencial
+5. Coordinar con equipo de infraestructura
+
+===============================================================================
+7. PROBLEMAS DE INTEGRACIÓN
+===============================================================================
+
+PROBLEMA: Fallos en CI/CD
+SÍNTOMAS: Pruebas pasan localmente pero fallan en CI
+SOLUCIÓN:
+1. Verificar variables de entorno en CI:
+   - API keys y secrets
+   - URLs de ambiente correcto
+2. Verificar conectividad de red en CI
+3. Ajustar timeouts para ambiente CI:
+   JUDO_TIMEOUT=900  # CI puede ser más lento
+4. Verificar versión de Python en CI
+5. Usar mismas dependencias (requirements.txt)
+
+PROBLEMA: Reportes no se publican en CI
+SÍNTOMAS: Artefactos de reportes vacíos
+SOLUCIÓN:
+1. Verificar que los reportes se generan:
+   ls -la judo_reports/
+2. Configurar artifacts correctamente:
+   # GitHub Actions
+   - uses: actions/upload-artifact@v2
+     with:
+       name: test-reports
+       path: judo_reports/
+3. Verificar permisos de lectura
+4. Verificar rutas relativas vs absolutas
+
+PROBLEMA: Secretos y credenciales
+SÍNTOMAS: Errores de autenticación en CI
+SOLUCIÓN:
+1. Configurar secrets en plataforma CI:
+   - GitHub: Settings > Secrets
+   - Jenkins: Credentials
+2. Usar variables de entorno:
+   API_KEY: ${{ secrets.API_KEY }}
+3. No hardcodear credenciales en código
+4. Usar diferentes credenciales por ambiente
+
+PROBLEMA: Diferencias entre ambientes
+SÍNTOMAS: Comportamiento inconsistente
+SOLUCIÓN:
+1. Usar configuración por ambiente:
+   .env.dev, .env.staging, .env.prod
+2. Parametrizar URLs y configuraciones
+3. Documentar diferencias conocidas
+4. Usar feature flags para funcionalidades específicas
+
+===============================================================================
+8. PROBLEMAS DE AUTENTICACIÓN
+===============================================================================
+
+PROBLEMA: OAuth2 no funciona
+SÍNTOMAS: Errores de autenticación o tokens inválidos
+SOLUCIÓN:
+1. Verificar configuración OAuth2:
+   context.judo.setup_oauth2(
+       client_id="correcto",
+       client_secret="correcto",
+       token_url="https://api.ejemplo.com/oauth/token"
+   )
+2. Verificar scopes requeridos
+3. Verificar que el token no expiró
+4. Usar debugging para ver requests:
+   JUDO_SAVE_REQUESTS_RESPONSES=true
+
+PROBLEMA: JWT tokens inválidos
+SÍNTOMAS: "Invalid token" o "Token expired"
+SOLUCIÓN:
+1. Verificar configuración JWT:
+   context.judo.configure_jwt(
+       secret="secret_correcto",
+       algorithm="HS256"
+   )
+2. Verificar que el secret es correcto
+3. Verificar algoritmo (HS256, RS256, etc.)
+4. Verificar claims requeridos (exp, iat, etc.)
+
+PROBLEMA: API Keys no funcionan
+SÍNTOMAS: "Unauthorized" o "Invalid API key"
+SOLUCIÓN:
+1. Verificar header correcto:
+   Given I set request header "X-API-Key" to "${API_KEY}"
+2. Verificar que la variable está configurada:
+   Given I set variable "API_KEY" to "tu_api_key"
+3. Verificar formato requerido por la API
+4. Verificar que la key no expiró
+
+PROBLEMA: Autenticación básica
+SÍNTOMAS: Errores 401 con Basic Auth
+SOLUCIÓN:
+1. Usar paso de autenticación básica:
+   Given I set basic authentication to "usuario:password"
+2. Verificar encoding base64 si es manual
+3. Verificar credenciales correctas
+4. Verificar que el servidor soporta Basic Auth
+
+===============================================================================
+9. HERRAMIENTAS DE DIAGNÓSTICO
+===============================================================================
+
+HERRAMIENTA: Script de diagnóstico de logos
+UBICACIÓN: debug_logo_config.py
+USO: python debug_logo_config.py
+PROPÓSITO: Diagnosticar problemas con logos en reportes
+
+HERRAMIENTA: Logging detallado
+CONFIGURACIÓN: 
+JUDO_VERBOSE=true
+JUDO_SAVE_REQUESTS_RESPONSES=true
+PROPÓSITO: Ver requests/responses detallados
+
+HERRAMIENTA: Validación de JSON
+COMANDO: python -m json.tool archivo.json
+PROPÓSITO: Verificar sintaxis JSON
+
+HERRAMIENTA: Verificación de dependencias
+COMANDO: pip list | grep judo
+PROPÓSITO: Verificar instalación correcta
+
+HERRAMIENTA: Test de conectividad
+COMANDO: curl -I https://api.ejemplo.com
+PROPÓSITO: Verificar acceso al servidor
+
+HERRAMIENTA: Análisis de performance
+CONFIGURACIÓN: Métricas automáticas en reportes HTML
+PROPÓSITO: Identificar cuellos de botella
+
+===============================================================================
+10. LOGS Y DEBUGGING
+===============================================================================
+
+UBICACIÓN DE LOGS:
+- Logs de ejecución: Consola o archivo de log
+- Requests/Responses: carpeta requests_responses/
+- Reportes: carpeta judo_reports/
+- Logs de error: stderr
+
+NIVELES DE LOGGING:
+1. ERROR: Solo errores críticos
+2. WARNING: Advertencias y errores
+3. INFO: Información general (por defecto)
+4. DEBUG: Información detallada (JUDO_VERBOSE=true)
+
+CONFIGURACIÓN DE DEBUGGING:
+# En .env
+JUDO_VERBOSE=true
+JUDO_DEBUG_REPORTER=true
+JUDO_SAVE_REQUESTS_RESPONSES=true
+
+# En código Python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+ANÁLISIS DE LOGS:
+1. Buscar patrones de error:
+   grep -i error judo_reports/execution.log
+2. Verificar timeouts:
+   grep -i timeout judo_reports/execution.log
+3. Analizar requests fallidos:
+   ls requests_responses/failed_*
+
+HERRAMIENTAS EXTERNAS:
+- Postman: Para probar APIs manualmente
+- curl: Para requests simples
+- jq: Para procesar JSON en línea de comandos
+- Wireshark: Para análisis de red avanzado
+
+===============================================================================
+COMANDOS ÚTILES PARA DIAGNÓSTICO
+===============================================================================
+
+# Verificar instalación
+python -c "import judo; print(judo.__version__)"
+
+# Listar pasos disponibles
+python -c "from judo.behave import steps; help(steps)"
+
+# Validar archivo JSON
+python -m json.tool report_config.json
+
+# Probar conectividad
+curl -I https://tu-api.com/health
+
+# Ver logs en tiempo real
+tail -f judo_reports/execution.log
+
+# Buscar errores específicos
+grep -r "ConnectionError" judo_reports/
+
+# Verificar uso de memoria
+ps aux | grep python
+
+# Verificar puertos en uso
+netstat -tulpn | grep :8080
+
+===============================================================================
+CONTACTO PARA SOPORTE AVANZADO
+===============================================================================
+
+Si los problemas persisten después de seguir esta guía:
+
+1. GitHub Issues: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+2. Email: felipe.farias@centyc.cl
+3. Documentación: http://centyc.cl/judo-framework/
+
+Al reportar problemas, incluir:
+- Versión de Judo Framework
+- Versión de Python
+- Sistema operativo
+- Configuración relevante (.env, JSON)
+- Logs de error completos
+- Pasos para reproducir el problema
+
+===============================================================================
+FIN DE LA GUÍA DE SOLUCIÓN DE PROBLEMAS
+===============================================================================

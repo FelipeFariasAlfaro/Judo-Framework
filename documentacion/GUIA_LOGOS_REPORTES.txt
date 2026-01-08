@@ -1,0 +1,413 @@
+===============================================================================
+                    JUDO FRAMEWORK - GUÍA DE LOGOS EN REPORTES HTML
+===============================================================================
+
+VERSIÓN: 1.5.9.5
+FECHA: Enero 2026
+AUTOR: Felipe Farias - CENTYC
+
+===============================================================================
+RESUMEN DE PROBLEMAS SOLUCIONADOS
+===============================================================================
+
+PROBLEMAS RESUELTOS:
+✅ Logo base64 no se mostraba: Ahora funciona correctamente
+✅ Logo pequeño fijo en footer: Ahora se puede ocultar completamente
+✅ Footer solo logo: Implementado para mostrar únicamente el logo
+✅ Mejor manejo de logos: Soporte mejorado para diferentes formatos
+
+===============================================================================
+CONFIGURACIÓN DE LOGOS
+===============================================================================
+
+1. LOGO EN EL HEADER (EMPRESA)
+-------------------------------
+Para mostrar tu logo de empresa en la esquina superior izquierda del reporte:
+
+{
+  "branding": {
+    "secondary_logo": "data:image/png;base64,TU_LOGO_BASE64_AQUI"
+  }
+}
+
+2. LOGO EN EL FOOTER (SOLO LOGO)
+---------------------------------
+Para mostrar únicamente tu logo en el footer sin texto adicional:
+
+{
+  "branding": {
+    "primary_logo": "data:image/png;base64,TU_LOGO_BASE64_AQUI"
+  },
+  "footer": {
+    "show_creator": false,
+    "show_logo": true
+  }
+}
+
+3. OCULTAR LOGO DEL FOOTER COMPLETAMENTE
+-----------------------------------------
+Para eliminar completamente el logo del footer:
+
+{
+  "footer": {
+    "show_logo": false
+  }
+}
+
+===============================================================================
+CÓMO CONVERTIR TU LOGO A BASE64
+===============================================================================
+
+OPCIÓN 1: HERRAMIENTAS ONLINE
+------------------------------
+1. Ve a https://www.base64-image.de/
+2. Sube tu logo (PNG, JPG, GIF)
+3. Copia el resultado completo (incluye data:image/png;base64,)
+
+OPCIÓN 2: LÍNEA DE COMANDOS
+----------------------------
+# En Linux/Mac
+base64 -i tu_logo.png
+
+# En Windows PowerShell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("tu_logo.png"))
+
+OPCIÓN 3: PYTHON
+-----------------
+import base64
+
+with open("tu_logo.png", "rb") as img_file:
+    logo_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+    print(f"data:image/png;base64,{logo_base64}")
+
+OPCIÓN 4: HERRAMIENTAS ONLINE ADICIONALES
+------------------------------------------
+- https://base64.guru/converter/encode/image
+- https://www.base64encode.org/
+- https://codebeautify.org/image-to-base64-converter
+
+===============================================================================
+CONFIGURACIÓN COMPLETA DE EJEMPLO
+===============================================================================
+
+EJEMPLO 1: FOOTER SOLO LOGO
+----------------------------
+{
+  "project": {
+    "name": "Mi Empresa - API Tests",
+    "company": "Mi Empresa S.A."
+  },
+  "branding": {
+    "primary_logo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77zgAAAABJRU5ErkJggg==",
+    "primary_color": "#1e40af",
+    "secondary_color": "#1d4ed8"
+  },
+  "footer": {
+    "show_creator": false,
+    "show_logo": true,
+    "company_name": "Mi Empresa S.A.",
+    "company_url": "https://www.miempresa.com"
+  }
+}
+
+EJEMPLO 2: LOGO EN HEADER Y SIN FOOTER
+---------------------------------------
+{
+  "project": {
+    "name": "Mi Empresa - API Tests",
+    "company": "Mi Empresa S.A."
+  },
+  "branding": {
+    "secondary_logo": "data:image/png;base64,TU_LOGO_BASE64_AQUI",
+    "primary_color": "#1e40af"
+  },
+  "footer": {
+    "show_logo": false,
+    "company_name": "Mi Empresa S.A."
+  }
+}
+
+EJEMPLO 3: CONFIGURACIÓN COMPLETA CON MÚLTIPLES LOGOS
+------------------------------------------------------
+{
+  "project": {
+    "name": "Proyecto Cliente ABC - API Tests",
+    "engineer": "Ana García",
+    "team": "Equipo QA",
+    "company": "Consultora XYZ"
+  },
+  "branding": {
+    "primary_logo": "data:image/png;base64,LOGO_CONSULTORA_BASE64",
+    "secondary_logo": "data:image/png;base64,LOGO_CLIENTE_BASE64",
+    "primary_color": "#1e40af"
+  },
+  "footer": {
+    "show_creator": false,
+    "show_logo": true,
+    "company_name": "Consultora XYZ",
+    "company_url": "https://www.consultoraxyz.com"
+  }
+}
+
+===============================================================================
+TIPOS DE LOGO SOPORTADOS
+===============================================================================
+
+LOGO PRINCIPAL (primary_logo)
+------------------------------
+- Ubicación: Footer (cuando show_logo: true)
+- Uso: Logo principal de tu empresa/organización
+- Control: footer.show_logo (true/false)
+- Nuevo en v1.5.9.5: Soporte para footer solo logo
+
+LOGO SECUNDARIO (secondary_logo)
+---------------------------------
+- Ubicación: Header superior izquierdo
+- Uso: Logo de empresa/cliente en header
+- Siempre visible: Si está configurado
+- Ideal para: Branding en la parte superior
+
+LOGO DE EMPRESA (company_logo)
+-------------------------------
+- Ubicación: Alternativa al secondary_logo
+- Uso: Mismo propósito que secondary_logo
+- Flexibilidad: Puedes usar cualquiera de los dos
+
+===============================================================================
+FORMATOS SOPORTADOS
+===============================================================================
+
+FORMATOS DE IMAGEN
+-------------------
+✅ PNG (recomendado) - Soporta transparencia
+✅ JPG/JPEG - Buena compresión
+✅ GIF - Soporta animación (no recomendado)
+✅ SVG - Vectorial (como base64)
+
+FORMATOS DE CONFIGURACIÓN
+--------------------------
+1. Base64 completo:
+   "primary_logo": "data:image/png;base64,iVBORw0KGgo..."
+
+2. Base64 sin prefijo (se agrega automáticamente):
+   "primary_logo": "iVBORw0KGgo..."
+
+3. Ruta de archivo:
+   "primary_logo": "assets/logos/mi-logo.png"
+
+4. URL (no recomendado para reportes offline):
+   "primary_logo": "https://miempresa.com/logo.png"
+
+===============================================================================
+RECOMENDACIONES PARA LOGOS
+===============================================================================
+
+TAMAÑO Y RESOLUCIÓN
+-------------------
+- Logo principal (footer): 24x24px a 48x48px
+- Logo secundario (header): 30x30px a 60x60px
+- Resolución: 72-150 DPI
+- Formato: PNG con transparencia preferido
+
+OPTIMIZACIÓN
+------------
+- Peso del archivo: < 50KB por logo
+- Usar herramientas de compresión: TinyPNG, ImageOptim
+- Evitar logos muy detallados en tamaños pequeños
+- Probar legibilidad en diferentes fondos
+
+DISEÑO
+------
+- Usar logos con buen contraste
+- Evitar texto muy pequeño en logos
+- Considerar versiones para fondo claro y oscuro
+- Mantener proporciones originales
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+PROBLEMA: Logo no se muestra
+SÍNTOMAS: Espacio vacío donde debería estar el logo
+SOLUCIÓN:
+1. Verificar que el base64 es completo y válido
+2. Verificar configuración show_logo: true
+3. Verificar que el base64 incluye el prefijo data:image
+4. Usar herramienta de diagnóstico: python debug_logo_config.py
+
+PROBLEMA: Logo se ve pixelado
+SÍNTOMAS: Logo borroso o de baja calidad
+SOLUCIÓN:
+1. Usar imagen de mayor resolución
+2. Verificar que la imagen original es de buena calidad
+3. Usar formato PNG en lugar de JPG
+4. Evitar redimensionar logos muy pequeños
+
+PROBLEMA: Logo muy grande o muy pequeño
+SÍNTOMAS: Logo no se ajusta bien al diseño
+SOLUCIÓN:
+1. Redimensionar imagen antes de convertir a base64
+2. Usar herramientas de edición de imagen
+3. Mantener proporciones cuadradas o rectangulares apropiadas
+4. Probar diferentes tamaños hasta encontrar el óptimo
+
+PROBLEMA: Base64 inválido
+SÍNTOMAS: Error al cargar configuración o logo no se muestra
+SOLUCIÓN:
+1. Verificar que el base64 no tiene espacios o saltos de línea
+2. Verificar que incluye el prefijo completo
+3. Usar herramientas online para validar base64
+4. Regenerar el base64 desde la imagen original
+
+===============================================================================
+HERRAMIENTAS ÚTILES
+===============================================================================
+
+CONVERSIÓN A BASE64
+--------------------
+- https://www.base64-image.de/ (recomendado)
+- https://base64.guru/converter/encode/image
+- https://codebeautify.org/image-to-base64-converter
+
+OPTIMIZACIÓN DE IMÁGENES
+-------------------------
+- https://tinypng.com/ (compresión PNG/JPG)
+- https://imageoptim.com/ (Mac)
+- https://compressor.io/ (online)
+
+EDICIÓN DE IMÁGENES
+-------------------
+- GIMP (gratuito)
+- Photoshop (comercial)
+- Canva (online)
+- Paint.NET (Windows, gratuito)
+
+VALIDACIÓN
+----------
+- https://jsonlint.com/ (validar JSON)
+- python debug_logo_config.py (herramienta incluida)
+
+===============================================================================
+CASOS DE USO COMUNES
+===============================================================================
+
+CASO 1: EMPRESA INTERNA
+------------------------
+Configuración:
+- Logo de empresa en header (secondary_logo)
+- Logo de empresa en footer (primary_logo)
+- Colores corporativos
+- show_creator: false para branding limpio
+
+CASO 2: CONSULTORÍA EXTERNA
+----------------------------
+Configuración:
+- Logo del cliente en header (secondary_logo)
+- Logo de la consultora en footer (primary_logo)
+- Colores del cliente
+- Información del proyecto específico
+
+CASO 3: FREELANCER
+-------------------
+Configuración:
+- Logo personal en header o footer
+- Colores profesionales neutros
+- Información de contacto en footer
+- show_creator: false para branding personal
+
+CASO 4: EQUIPO DE QA INTERNO
+-----------------------------
+Configuración:
+- Logo de la empresa en header
+- Sin logo en footer (show_logo: false)
+- Información del equipo y producto
+- Links a documentación interna
+
+===============================================================================
+MIGRACIÓN DESDE VERSIONES ANTERIORES
+===============================================================================
+
+DESDE v1.5.9.4 A v1.5.9.5
+--------------------------
+Nueva funcionalidad: Footer solo logo
+
+Antes:
+{
+  "footer": {
+    "show_creator": true  // Mostraba texto del creador
+  }
+}
+
+Después:
+{
+  "footer": {
+    "show_creator": false,  // Oculta texto del creador
+    "show_logo": true       // Muestra solo el logo
+  }
+}
+
+DESDE VERSIONES ANTERIORES
+---------------------------
+Si no tenías configuración de logos:
+1. Crear archivo report_config.json
+2. Agregar sección branding con tu logo
+3. Configurar footer según preferencias
+4. Probar con herramienta de diagnóstico
+
+===============================================================================
+VALIDACIÓN Y TESTING
+===============================================================================
+
+HERRAMIENTA DE DIAGNÓSTICO
+---------------------------
+Usar el script incluido para validar configuración:
+
+python debug_logo_config.py
+
+Este script verifica:
+✅ Existencia del archivo de configuración
+✅ Validez del JSON
+✅ Formato correcto del base64
+✅ Configuración del footer
+✅ Generación de reporte de prueba
+
+VALIDACIÓN MANUAL
+------------------
+1. Verificar que el JSON es válido
+2. Verificar que el base64 es completo
+3. Generar reporte de prueba
+4. Abrir reporte en navegador
+5. Verificar que los logos se muestran correctamente
+
+TESTING EN DIFERENTES NAVEGADORES
+----------------------------------
+- Chrome (recomendado)
+- Firefox
+- Edge
+- Safari (Mac)
+
+===============================================================================
+SOPORTE Y RECURSOS
+===============================================================================
+
+DOCUMENTACIÓN
+-------------
+- Guía completa: http://centyc.cl/judo-framework/
+- Guía de reportes personalizables: CUSTOM_REPORTS_GUIDE.txt
+- Configuración de entorno: ENV_CONFIGURATION_GUIDE.txt
+
+HERRAMIENTAS
+------------
+- debug_logo_config.py: Script de diagnóstico incluido
+- Convertidores base64 online
+- Herramientas de optimización de imágenes
+
+SOPORTE
+-------
+- GitHub Issues: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+- Email: felipe.farias@centyc.cl
+- Documentación oficial: http://centyc.cl/judo-framework/
+
+===============================================================================
+FIN DE LA GUÍA DE LOGOS EN REPORTES HTML
+===============================================================================

@@ -1,0 +1,536 @@
+===============================================================================
+                    JUDO FRAMEWORK - GUÍA DE REPORTES PERSONALIZABLES
+===============================================================================
+
+VERSIÓN: 1.5.9.5
+FECHA: Enero 2026
+AUTOR: Felipe Farias - CENTYC
+
+===============================================================================
+DESCRIPCIÓN
+===============================================================================
+
+Judo Framework v1.5.9.2+ introduce un sistema completo de personalización para 
+los reportes HTML, permitiendo a los usuarios configurar logos, colores, 
+información del proyecto y gráficos según sus necesidades empresariales.
+
+===============================================================================
+CARACTERÍSTICAS PRINCIPALES
+===============================================================================
+
+PERSONALIZACIÓN VISUAL
+-----------------------
+- Logos personalizables: Logo principal, secundario y de empresa
+- Colores configurables: Esquema completo de colores corporativos
+- Gráficos tipo torta: Visualización de resultados con Chart.js
+- Información del proyecto: Ingeniero, equipo, producto, empresa
+
+GRÁFICOS INTERACTIVOS
+---------------------
+- Gráficos de torta: Distribución de escenarios y pasos
+- Gráficos de barras: Comparación de resultados (opcional)
+- Colores personalizables: Esquema de colores para cada estado
+- Interactividad: Tooltips con porcentajes y detalles
+
+CONFIGURACIÓN FLEXIBLE
+----------------------
+- Archivo JSON: Configuración centralizada y versionable
+- Múltiples ubicaciones: Búsqueda automática en ubicaciones estándar
+- Merge inteligente: Combina configuración por defecto con personalizada
+- Validación robusta: Manejo de errores y fallbacks
+
+===============================================================================
+ESTRUCTURA DE CONFIGURACIÓN
+===============================================================================
+
+ARCHIVO DE CONFIGURACIÓN: report_config.json
+---------------------------------------------
+
+{
+  "project": {
+    "name": "Mi Proyecto API Tests",
+    "engineer": "Juan Pérez",
+    "team": "Equipo QA",
+    "product": "Sistema de Gestión",
+    "company": "Mi Empresa S.A.",
+    "date_format": "%d/%m/%Y %H:%M:%S"
+  },
+  "branding": {
+    "primary_logo": "data:image/png;base64,iVBORw0KGgo...",
+    "secondary_logo": "",
+    "company_logo": "path/to/company-logo.png",
+    "primary_color": "#1e40af",
+    "secondary_color": "#3b82f6",
+    "accent_color": "#60a5fa",
+    "success_color": "#10b981",
+    "error_color": "#f87171",
+    "warning_color": "#fbbf24"
+  },
+  "charts": {
+    "enabled": true,
+    "show_pie_charts": true,
+    "show_bar_charts": true,
+    "colors": {
+      "passed": "#10b981",
+      "failed": "#f87171",
+      "skipped": "#fbbf24"
+    }
+  },
+  "footer": {
+    "show_creator": false,
+    "show_logo": true,
+    "creator_name": "Juan Pérez",
+    "creator_email": "juan.perez@miempresa.com",
+    "company_name": "Mi Empresa S.A.",
+    "company_url": "https://www.miempresa.com",
+    "documentation_url": "https://docs.miempresa.com/testing",
+    "github_url": "https://github.com/miempresa/testing-framework"
+  },
+  "display": {
+    "show_request_details": true,
+    "show_response_details": true,
+    "show_variables": true,
+    "show_assertions": true,
+    "collapse_sections_by_default": false,
+    "show_duration_in_ms": true
+  }
+}
+
+===============================================================================
+ESTRUCTURA DE PROYECTO RECOMENDADA
+===============================================================================
+
+mi-proyecto/
+├── features/
+│   ├── api_tests.feature
+│   └── environment.py
+├── runner/
+│   ├── runner.py
+│   └── judo_reports/
+│       ├── report_config.json          ⭐ UBICACIÓN RECOMENDADA
+│       ├── test_execution_report.html
+│       ├── api_logs/
+│       └── cucumber-json/
+├── test_data/
+├── .env
+└── README.md
+
+===============================================================================
+CONFIGURACIÓN DETALLADA
+===============================================================================
+
+SECCIÓN PROJECT
+---------------
+"project": {
+  "name": "Nombre del proyecto de pruebas",
+  "engineer": "Nombre del ingeniero responsable",
+  "team": "Nombre del equipo",
+  "product": "Producto o sistema bajo prueba",
+  "company": "Nombre de la empresa",
+  "date_format": "Formato de fecha (%d/%m/%Y %H:%M:%S)"
+}
+
+SECCIÓN BRANDING
+----------------
+"branding": {
+  "primary_logo": "Logo principal (base64 o ruta)",
+  "secondary_logo": "Logo secundario (opcional)",
+  "company_logo": "Logo de empresa (opcional)",
+  "primary_color": "Color primario (#hex)",
+  "secondary_color": "Color secundario (#hex)",
+  "accent_color": "Color de acento (#hex)",
+  "success_color": "Color para éxito (#hex)",
+  "error_color": "Color para errores (#hex)",
+  "warning_color": "Color para advertencias (#hex)"
+}
+
+SECCIÓN CHARTS
+--------------
+"charts": {
+  "enabled": true/false,
+  "show_pie_charts": true/false,
+  "show_bar_charts": true/false,
+  "colors": {
+    "passed": "Color para pruebas exitosas",
+    "failed": "Color para pruebas fallidas",
+    "skipped": "Color para pruebas omitidas"
+  }
+}
+
+SECCIÓN FOOTER
+--------------
+"footer": {
+  "show_creator": false,        // ⭐ NUEVO: Ocultar texto del creador
+  "show_logo": true,           // ⭐ NUEVO: Mostrar solo logo
+  "creator_name": "Nombre del creador",
+  "creator_email": "Email del creador",
+  "company_name": "Nombre de la empresa",
+  "company_url": "URL de la empresa",
+  "documentation_url": "URL de documentación",
+  "github_url": "URL del repositorio"
+}
+
+SECCIÓN DISPLAY
+---------------
+"display": {
+  "show_request_details": true/false,
+  "show_response_details": true/false,
+  "show_variables": true/false,
+  "show_assertions": true/false,
+  "collapse_sections_by_default": true/false,
+  "show_duration_in_ms": true/false
+}
+
+===============================================================================
+CONFIGURACIÓN DE LOGOS
+===============================================================================
+
+FORMATOS SOPORTADOS
+-------------------
+1. Base64 embebido:
+   "primary_logo": "data:image/png;base64,iVBORw0KGgo..."
+
+2. Ruta de archivo:
+   "primary_logo": "assets/logos/mi-logo.png"
+
+3. URL (no recomendado para reportes offline):
+   "primary_logo": "https://miempresa.com/logo.png"
+
+CONVERSIÓN A BASE64
+-------------------
+Método 1 - Online:
+1. Ir a https://www.base64-image.de/
+2. Subir imagen
+3. Copiar resultado completo
+
+Método 2 - Python:
+import base64
+with open("mi-logo.png", "rb") as f:
+    logo_b64 = base64.b64encode(f.read()).decode('utf-8')
+    print(f"data:image/png;base64,{logo_b64}")
+
+Método 3 - Línea de comandos:
+base64 -i mi-logo.png
+
+RECOMENDACIONES PARA LOGOS
+---------------------------
+- Formato: PNG con transparencia
+- Tamaño: 200x200px máximo para logo principal
+- Peso: < 50KB para mejor rendimiento
+- Colores: Que contrasten bien con fondos claros y oscuros
+
+===============================================================================
+CONFIGURACIÓN DE COLORES
+===============================================================================
+
+ESQUEMAS DE COLORES PREDEFINIDOS
+---------------------------------
+
+Esquema Azul Corporativo:
+"primary_color": "#1e40af",
+"secondary_color": "#3b82f6",
+"accent_color": "#60a5fa",
+"success_color": "#10b981",
+"error_color": "#f87171",
+"warning_color": "#fbbf24"
+
+Esquema Verde Empresarial:
+"primary_color": "#059669",
+"secondary_color": "#10b981",
+"accent_color": "#34d399",
+"success_color": "#22c55e",
+"error_color": "#ef4444",
+"warning_color": "#f59e0b"
+
+Esquema Púrpura Moderno:
+"primary_color": "#7c3aed",
+"secondary_color": "#8b5cf6",
+"accent_color": "#a78bfa",
+"success_color": "#22c55e",
+"error_color": "#ef4444",
+"warning_color": "#f59e0b"
+
+HERRAMIENTAS PARA COLORES
+-------------------------
+- Adobe Color: https://color.adobe.com/
+- Coolors: https://coolors.co/
+- Material Design Colors: https://materialui.co/colors/
+
+===============================================================================
+UBICACIONES DE CONFIGURACIÓN
+===============================================================================
+
+BÚSQUEDA AUTOMÁTICA
+-------------------
+Judo Framework busca automáticamente el archivo de configuración en:
+
+1. Variable de entorno JUDO_REPORT_CONFIG_FILE
+2. Parámetro directo en el runner
+3. ./report_config.json
+4. ./judo_report_config.json
+5. ./.judo/report_config.json
+6. ./judo_reports/report_config.json  ⭐ RECOMENDADO
+7. Directorio actual
+8. Directorio padre
+
+CONFIGURACIÓN VIA VARIABLE DE ENTORNO
+--------------------------------------
+En archivo .env:
+JUDO_REPORT_CONFIG_FILE=mi_config_personalizado.json
+
+En runner:
+export JUDO_REPORT_CONFIG_FILE=/path/to/config.json
+python runner.py
+
+CONFIGURACIÓN VIA CÓDIGO
+-------------------------
+from judo.reporting.html_reporter import HTMLReporter
+
+reporter = HTMLReporter(
+    output_dir="mis_reportes",
+    config_file="mi_configuracion.json"
+)
+
+===============================================================================
+CASOS DE USO EMPRESARIALES
+===============================================================================
+
+CASO 1: EMPRESA DE CONSULTORÍA
+-------------------------------
+- Logo de la consultora en header
+- Logo del cliente en footer
+- Colores corporativos del cliente
+- Información del proyecto específico
+
+CASO 2: EQUIPO INTERNO DE QA
+-----------------------------
+- Logo de la empresa
+- Información del equipo y producto
+- Colores corporativos estándar
+- Links a documentación interna
+
+CASO 3: FREELANCER/CONTRACTOR
+------------------------------
+- Logo personal o de marca
+- Información del cliente
+- Colores neutros profesionales
+- Links a portfolio y contacto
+
+CASO 4: PROYECTO OPEN SOURCE
+-----------------------------
+- Logo del proyecto
+- Información de la comunidad
+- Colores del branding del proyecto
+- Links a GitHub y documentación
+
+===============================================================================
+INTEGRACIÓN CON RUNNERS
+===============================================================================
+
+RUNNER BÁSICO
+-------------
+from judo.runner.base_runner import BaseRunner
+
+class MiRunner(BaseRunner):
+    def __init__(self):
+        super().__init__(
+            output_dir="reportes_personalizados"
+        )
+        # La configuración se carga automáticamente desde report_config.json
+
+RUNNER AVANZADO
+---------------
+from judo.runner.base_runner import BaseRunner
+from judo.reporting.html_reporter import HTMLReporter
+
+class MiRunnerPersonalizado(BaseRunner):
+    def __init__(self):
+        super().__init__()
+        
+        # Configurar reporter personalizado
+        self.reporter = HTMLReporter(
+            output_dir="mis_reportes",
+            config_file="config_cliente_a.json"
+        )
+
+MÚLTIPLES CONFIGURACIONES
+-------------------------
+# Para diferentes clientes o proyectos
+configs = {
+    "cliente_a": "config_cliente_a.json",
+    "cliente_b": "config_cliente_b.json",
+    "interno": "config_interno.json"
+}
+
+cliente = os.getenv("CLIENTE", "interno")
+config_file = configs.get(cliente, "config_interno.json")
+
+runner = BaseRunner()
+runner.reporter = HTMLReporter(config_file=config_file)
+
+===============================================================================
+VALIDACIÓN Y TROUBLESHOOTING
+===============================================================================
+
+VALIDAR CONFIGURACIÓN JSON
+---------------------------
+python -m json.tool report_config.json
+
+PROBLEMAS COMUNES
+-----------------
+
+1. JSON inválido:
+   - Verificar comillas dobles
+   - Verificar comas finales
+   - Usar validador JSON online
+
+2. Logo no se muestra:
+   - Verificar formato base64 completo
+   - Verificar que show_logo: true
+   - Verificar longitud del base64 (> 100 caracteres)
+
+3. Colores no se aplican:
+   - Verificar formato hexadecimal (#rrggbb)
+   - Verificar que el archivo se carga correctamente
+   - Revisar logs de error
+
+4. Configuración no se carga:
+   - Verificar ubicación del archivo
+   - Verificar permisos de lectura
+   - Verificar encoding UTF-8
+
+HERRAMIENTA DE DIAGNÓSTICO
+--------------------------
+Usar el script de diagnóstico incluido:
+python debug_logo_config.py
+
+Este script verifica:
+- Existencia del archivo de configuración
+- Validez del JSON
+- Formato de logos base64
+- Configuración del footer
+- Generación de reporte de prueba
+
+===============================================================================
+MEJORES PRÁCTICAS
+===============================================================================
+
+ORGANIZACIÓN
+------------
+- Mantener configuraciones en control de versiones
+- Usar nombres descriptivos para archivos de configuración
+- Documentar cambios en configuración
+- Separar configuraciones por ambiente/cliente
+
+PERFORMANCE
+-----------
+- Usar logos optimizados (< 50KB)
+- Evitar URLs externas para logos
+- Usar base64 para logos pequeños
+- Considerar caching para logos grandes
+
+MANTENIMIENTO
+-------------
+- Revisar configuración regularmente
+- Actualizar colores según branding corporativo
+- Validar configuración después de cambios
+- Mantener backups de configuraciones funcionales
+
+SEGURIDAD
+---------
+- No incluir información sensible en configuración
+- Usar variables de entorno para datos sensibles
+- Revisar permisos de archivos de configuración
+- No commitear configuraciones con datos reales
+
+===============================================================================
+EJEMPLOS COMPLETOS
+===============================================================================
+
+CONFIGURACIÓN MÍNIMA
+---------------------
+{
+  "project": {
+    "name": "API Tests",
+    "company": "Mi Empresa"
+  },
+  "footer": {
+    "show_creator": false,
+    "show_logo": true
+  }
+}
+
+CONFIGURACIÓN COMPLETA
+----------------------
+{
+  "project": {
+    "name": "Sistema de Gestión - API Tests",
+    "engineer": "Ana García",
+    "team": "Equipo QA Avanzado",
+    "product": "ERP Empresarial v2.0",
+    "company": "TechCorp Solutions S.A.",
+    "date_format": "%d/%m/%Y %H:%M:%S"
+  },
+  "branding": {
+    "primary_logo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77zgAAAABJRU5ErkJggg==",
+    "secondary_logo": "assets/logos/cliente-logo.png",
+    "primary_color": "#1e3a8a",
+    "secondary_color": "#3b82f6",
+    "accent_color": "#60a5fa",
+    "success_color": "#059669",
+    "error_color": "#dc2626",
+    "warning_color": "#d97706"
+  },
+  "charts": {
+    "enabled": true,
+    "show_pie_charts": true,
+    "show_bar_charts": false,
+    "colors": {
+      "passed": "#059669",
+      "failed": "#dc2626",
+      "skipped": "#d97706"
+    }
+  },
+  "footer": {
+    "show_creator": false,
+    "show_logo": true,
+    "company_name": "TechCorp Solutions S.A.",
+    "company_url": "https://www.techcorp.com",
+    "documentation_url": "https://docs.techcorp.com/testing",
+    "github_url": "https://github.com/techcorp/api-tests"
+  },
+  "display": {
+    "show_request_details": true,
+    "show_response_details": true,
+    "show_variables": true,
+    "show_assertions": true,
+    "collapse_sections_by_default": true,
+    "show_duration_in_ms": false
+  }
+}
+
+===============================================================================
+SOPORTE Y RECURSOS
+===============================================================================
+
+DOCUMENTACIÓN
+-------------
+- Guía completa: http://centyc.cl/judo-framework/
+- Referencia de pasos: JUDO_STEPS_REFERENCE_ES.txt
+- Configuración de entorno: ENV_CONFIGURATION_GUIDE.txt
+
+HERRAMIENTAS
+------------
+- Validador JSON: https://jsonlint.com/
+- Conversor Base64: https://www.base64-image.de/
+- Paleta de colores: https://coolors.co/
+
+SOPORTE
+-------
+- GitHub Issues: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+- Email: felipe.farias@centyc.cl
+- Documentación oficial: http://centyc.cl/judo-framework/
+
+===============================================================================
+FIN DE LA GUÍA DE REPORTES PERSONALIZABLES
+===============================================================================

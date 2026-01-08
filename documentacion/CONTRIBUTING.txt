@@ -1,0 +1,349 @@
+===============================================================================
+                    JUDO FRAMEWORK - GUÍA DE CONTRIBUCIÓN
+===============================================================================
+
+VERSIÓN: 1.5.9.5
+FECHA: Enero 2026
+AUTOR: Felipe Farias - CENTYC
+
+===============================================================================
+POLÍTICA DE CONTRIBUCIÓN
+===============================================================================
+
+IMPORTANTE: Este proyecto solo acepta contribuciones a través de GitHub Issues.
+
+CONTRIBUCIONES ACEPTADAS:
+✅ Reportes de bugs - Apreciamos y damos la bienvenida a reportes de errores
+✅ Sugerencias de funcionalidades - Comparte tus ideas para mejoras
+✅ Feedback de documentación - Ayúdanos a mejorar nuestra documentación
+✅ Preguntas - Pregunta en GitHub Discussions
+
+CONTRIBUCIONES NO ACEPTADAS:
+❌ Pull Requests - Serán cerrados sin revisión
+❌ Contribuciones de código - No se aceptan
+❌ Forks con modificaciones - Por favor no redistribuyas versiones modificadas
+
+===============================================================================
+¿POR QUÉ ESTA POLÍTICA?
+===============================================================================
+
+Judo Framework es mantenido profesionalmente por CENTYC (Centro Latinoamericano 
+de Testing y Calidad del Software) para asegurar:
+
+✅ Calidad de código y arquitectura consistente
+✅ Releases confiables y estabilidad
+✅ Soporte y mantenimiento profesional
+✅ Roadmap y dirección clara
+✅ Estándares de calidad empresarial
+
+Todo el desarrollo y mantenimiento es manejado exclusivamente por el equipo de CENTYC.
+
+===============================================================================
+CÓMO REPORTAR BUGS
+===============================================================================
+
+¡Apreciamos los reportes de bugs! Aquí está cómo enviar uno:
+
+1. VERIFICAR ISSUES EXISTENTES
+------------------------------
+Antes de crear un nuevo issue, por favor verifica si ya ha sido reportado:
+- Buscar en: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+
+2. CREAR UN NUEVO ISSUE
+-----------------------
+Ve a GitHub Issues y haz clic en "New Issue"
+
+3. PROPORCIONAR INFORMACIÓN COMPLETA
+------------------------------------
+Usar la siguiente plantilla:
+
+**Describir el bug**
+Una descripción clara y concisa de cuál es el bug.
+
+**Para Reproducir**
+Pasos para reproducir el comportamiento:
+1. Crear archivo feature con '...'
+2. Ejecutar comando '...'
+3. Ver error
+
+**Comportamiento Esperado**
+Lo que esperabas que pasara.
+
+**Comportamiento Actual**
+Lo que realmente pasó.
+
+**Ambiente:**
+- OS: [ej., Windows 10, macOS 13, Ubuntu 22.04]
+- Versión de Python: [ej., 3.9.7]
+- Versión de Judo Framework: [ej., 1.5.9.5]
+- Versión de Behave: [ej., 1.2.6]
+
+**Muestra de código**
+# Código mínimo para reproducir el issue
+# Incluir archivos feature, environment.py, etc.
+
+**Mensaje de error/Stack trace**
+Pegar el mensaje de error completo aquí
+
+**Contexto adicional**
+Cualquier otra información relevante, screenshots, etc.
+
+===============================================================================
+CÓMO SUGERIR FUNCIONALIDADES
+===============================================================================
+
+¿Tienes una idea para mejorar Judo Framework? ¡Nos encantaría escucharla!
+
+1. VERIFICAR SUGERENCIAS EXISTENTES
+-----------------------------------
+- Buscar issues existentes con label "enhancement"
+
+2. CREAR UN FEATURE REQUEST
+---------------------------
+Usar la siguiente plantilla:
+
+**¿Tu feature request está relacionado con un problema?**
+Una descripción clara y concisa de cuál es el problema.
+
+**Describe la solución que te gustaría**
+Una descripción clara y concisa de lo que quieres que pase.
+
+**Describe alternativas que has considerado**
+Una descripción clara y concisa de cualquier solución alternativa.
+
+**Contexto adicional**
+Agrega cualquier otro contexto o screenshots sobre el feature request aquí.
+
+**Casos de uso**
+Describe cómo usarías esta funcionalidad en tus proyectos.
+
+===============================================================================
+TIPOS DE CONTRIBUCIONES BIENVENIDAS
+===============================================================================
+
+1. REPORTES DE BUGS
+-------------------
+- Errores en funcionalidad existente
+- Problemas de performance
+- Problemas de compatibilidad
+- Errores en documentación
+
+2. SUGERENCIAS DE FUNCIONALIDADES
+---------------------------------
+- Nuevos pasos para BDD
+- Mejoras en reportes
+- Nuevas integraciones
+- Mejoras en usabilidad
+
+3. FEEDBACK DE DOCUMENTACIÓN
+-----------------------------
+- Errores en documentación
+- Secciones confusas
+- Ejemplos faltantes
+- Mejoras en claridad
+
+4. PREGUNTAS Y DISCUSIONES
+--------------------------
+- Cómo usar funcionalidades específicas
+- Mejores prácticas
+- Casos de uso complejos
+- Integración con otras herramientas
+
+===============================================================================
+PROCESO DE REVISIÓN
+===============================================================================
+
+1. RECEPCIÓN DEL ISSUE
+----------------------
+- El equipo de CENTYC revisa todos los issues
+- Respuesta inicial dentro de 48-72 horas
+- Clasificación y etiquetado apropiado
+
+2. INVESTIGACIÓN
+----------------
+- Reproducción del bug (si aplica)
+- Análisis de viabilidad (para features)
+- Estimación de esfuerzo y prioridad
+
+3. DESARROLLO
+-------------
+- Implementación por el equipo de CENTYC
+- Testing exhaustivo
+- Documentación actualizada
+
+4. RELEASE
+----------
+- Inclusión en próximo release
+- Notificación al reportador
+- Actualización del changelog
+
+===============================================================================
+ESTÁNDARES DE CALIDAD
+===============================================================================
+
+CÓDIGO
+------
+- Cobertura de tests > 90%
+- Documentación completa
+- Compatibilidad con Python 3.8+
+- Seguimiento de PEP 8
+
+DOCUMENTACIÓN
+-------------
+- Ejemplos funcionales
+- Casos de uso reales
+- Múltiples idiomas (EN/ES)
+- Actualización constante
+
+TESTING
+-------
+- Tests unitarios
+- Tests de integración
+- Tests de performance
+- Tests de compatibilidad
+
+===============================================================================
+ROADMAP Y PRIORIDADES
+===============================================================================
+
+ALTA PRIORIDAD
+--------------
+- Bugs críticos que afectan funcionalidad core
+- Problemas de seguridad
+- Incompatibilidades con versiones de Python
+- Errores en documentación crítica
+
+MEDIA PRIORIDAD
+---------------
+- Nuevas funcionalidades solicitadas frecuentemente
+- Mejoras en performance
+- Mejoras en usabilidad
+- Integraciones con herramientas populares
+
+BAJA PRIORIDAD
+--------------
+- Funcionalidades nicho
+- Mejoras cosméticas
+- Optimizaciones menores
+- Features experimentales
+
+===============================================================================
+COMUNICACIÓN
+===============================================================================
+
+CANALES OFICIALES
+-----------------
+- GitHub Issues: Reportes de bugs y feature requests
+- GitHub Discussions: Preguntas y discusiones generales
+- Email: felipe.farias@centyc.cl (soporte directo)
+- Documentación: http://centyc.cl/judo-framework/
+
+TIEMPO DE RESPUESTA
+-------------------
+- Issues críticos: 24-48 horas
+- Issues normales: 48-72 horas
+- Feature requests: 1-2 semanas
+- Preguntas generales: 24-48 horas
+
+IDIOMAS SOPORTADOS
+------------------
+- Español (preferido)
+- Inglés
+- Portugués (limitado)
+
+===============================================================================
+RECONOCIMIENTOS
+===============================================================================
+
+CONTRIBUIDORES DESTACADOS
+--------------------------
+Reconocemos a los contribuidores que han ayudado significativamente:
+
+- Reportes de bugs críticos
+- Sugerencias de funcionalidades implementadas
+- Feedback valioso de documentación
+- Casos de uso que mejoraron el framework
+
+FORMAS DE RECONOCIMIENTO
+------------------------
+- Mención en changelog
+- Créditos en documentación
+- Reconocimiento en redes sociales
+- Invitación a beta testing de nuevas versiones
+
+===============================================================================
+CÓDIGO DE CONDUCTA
+===============================================================================
+
+COMPORTAMIENTO ESPERADO
+------------------------
+- Ser respetuoso y profesional
+- Proporcionar información clara y detallada
+- Ser paciente con los tiempos de respuesta
+- Seguir las plantillas proporcionadas
+
+COMPORTAMIENTO NO ACEPTADO
+---------------------------
+- Lenguaje ofensivo o discriminatorio
+- Spam o contenido irrelevante
+- Demandas agresivas o irrespetuosas
+- Intentos de modificar el código sin autorización
+
+===============================================================================
+LICENCIA Y DERECHOS
+===============================================================================
+
+LICENCIA
+--------
+Judo Framework está licenciado bajo MIT License.
+
+DERECHOS DE AUTOR
+-----------------
+© 2024-2026 Felipe Farias - CENTYC
+Todos los derechos reservados.
+
+CONTRIBUCIONES
+--------------
+Al enviar issues o sugerencias, aceptas que:
+- Tu contribución puede ser usada libremente por el proyecto
+- No reclamas derechos de autor sobre ideas o sugerencias
+- Entiendes que el desarrollo es manejado exclusivamente por CENTYC
+
+===============================================================================
+CONTACTO
+===============================================================================
+
+EQUIPO DE DESARROLLO
+--------------------
+Felipe Farias - Lead Developer
+Email: felipe.farias@centyc.cl
+LinkedIn: https://linkedin.com/in/felipe-farias-alfaro
+
+CENTYC
+------
+Centro Latinoamericano de Testing y Calidad del Software
+Website: https://www.centyc.cl
+Email: info@centyc.cl
+
+RECURSOS ADICIONALES
+--------------------
+- Documentación oficial: http://centyc.cl/judo-framework/
+- GitHub Repository: https://github.com/FelipeFariasAlfaro/Judo-Framework
+- PyPI Package: https://pypi.org/project/judo-framework/
+
+===============================================================================
+AGRADECIMIENTOS
+===============================================================================
+
+Agradecemos a todos los usuarios que han contribuido con:
+- Reportes de bugs detallados
+- Sugerencias de funcionalidades valiosas
+- Feedback constructivo sobre documentación
+- Casos de uso reales que mejoraron el framework
+- Paciencia durante el desarrollo y mejoras
+
+¡Gracias por hacer de Judo Framework una herramienta mejor para toda la comunidad!
+
+===============================================================================
+FIN DE LA GUÍA DE CONTRIBUCIÓN
+===============================================================================

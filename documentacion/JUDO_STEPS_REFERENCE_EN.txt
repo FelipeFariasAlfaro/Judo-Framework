@@ -8,19 +8,19 @@ This is the complete reference of all **VERIFIED** steps available in Judo Frame
 
 ## 📋 Table of Contents
 
-- [Configuration](#configuration)
-- [Authentication](#authentication)
-- [HTTP Requests](#http-requests)
-- [Response Validation](#response-validation)
-- [Data Extraction](#data-extraction)
-- [Variables](#variables)
-- [Arrays and Collections](#arrays-and-collections)
-- [File Operations](#file-operations)
-- [Utilities](#utilities)
-- [Logging](#logging)
-- [Advanced Features - Tier 1](#advanced-features---tier-1-robustness--reliability)
-- [Advanced Features - Tier 2](#advanced-features---tier-2-performance--modern-apis)
-- [Advanced Features - Tier 3](#advanced-features---tier-3-enterprise-features)
+- Configuration
+- Authentication
+- HTTP Requests
+- Response Validation
+- Data Extraction
+- Variables
+- Arrays and Collections
+- File Operations
+- Utilities
+- Logging
+- Advanced Features - Tier 1
+- Advanced Features - Tier 2
+- Advanced Features - Tier 3
 
 ---
 
@@ -291,7 +291,7 @@ Validates a JSONPath with a matcher pattern (supports Karate-style patterns).
 - **Automatic Logging**: When enabled, automatically saves requests/responses with timestamps and metadata.
 - **Pattern Matching**: Supports Karate-style patterns like `##string`, `##number`, `##email`, etc.
 - **File Formats**: Supports JSON, YAML, and CSV files for test data.
-- **Verification**: This documentation has been verified against the source code v1.3.36.
+- **Verification**: This documentation has been verified against the source code v1.5.0.
 
 ---
 

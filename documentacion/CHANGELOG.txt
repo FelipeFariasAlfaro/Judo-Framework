@@ -1,0 +1,281 @@
+===============================================================================
+                    JUDO FRAMEWORK - HISTORIAL DE CAMBIOS (CHANGELOG)
+===============================================================================
+
+VERSIÓN: 1.5.9.5
+FECHA: Enero 2026
+AUTOR: Felipe Farias - CENTYC
+
+===============================================================================
+VERSIONES RECIENTES
+===============================================================================
+
+[1.5.9.5] - 2026-01-08
+-----------------------
+MEJORAS FINALES: Footer Solo Logo Completamente Implementado
+
+- Footer Solo Logo: Footer muestra únicamente el logo cuando se configura 
+  show_creator: false y show_logo: true
+- Sin Texto Adicional: Eliminado completamente el texto "Framework creado por..."
+- Logo Centrado: Logo del footer centrado con diseño limpio
+- Configuración Intuitiva: Configuración simple en archivo JSON
+- Soporte Base64 Completo: Funciona perfectamente con logos en formato base64
+
+Configuración Final:
+{
+  "footer": {
+    "show_creator": false,
+    "show_logo": true
+  },
+  "branding": {
+    "primary_logo": "data:image/png;base64,TU_LOGO_BASE64_AQUI"
+  }
+}
+
+Archivos Actualizados:
+- judo/reporting/html_reporter.py: Método _generate_footer() optimizado
+- test_footer_solo_logo.py: Test completo validando funcionalidad
+- ejemplo_configuracion_logo.json: Configuración actualizada
+
+[1.5.9.4] - 2026-01-08
+-----------------------
+MEJORAS CRÍTICAS: Diseño de Reportes HTML y Corrección de Problemas Visuales
+
+- Problema de Texto Blanco: Solucionado problema crítico donde los textos 
+  aparecían en blanco debido a CSS duplicado
+- Limpieza de CSS: Eliminadas ~1000 líneas de CSS duplicado
+- Logo Único: Eliminado logo duplicado
+- Rediseño de Sección Test Summary: Gráficos integrados directamente
+- Mejoras en Chart.js: JavaScript actualizado para nuevos IDs
+
+[1.5.9.3] - 2026-01-08
+-----------------------
+LIMPIEZA: Eliminación de Referencias a Playwright en Documentación HTML
+
+- Eliminación de Sección Screenshots: Removida sección completa de screenshots
+- Eliminación de Arquitectura Playwright: Removida sección obsoleta
+- Limpieza Completa: Eliminadas todas las referencias a Playwright
+- Consistencia de Documentación: Enfoque correcto en pruebas de API
+
+[1.5.9.2] - 2026-01-08
+-----------------------
+NUEVA FUNCIONALIDAD: Reportes HTML Completamente Personalizables
+
+- Sistema de Configuración Personalizable: Configuración mediante archivos JSON
+- Logos Personalizables: Soporte para logos principales, secundarios y de empresa
+- Colores Corporativos: Esquema completo de colores personalizables
+- Información del Proyecto: Campos para ingeniero, equipo, producto y empresa
+- Gráficos Interactivos: Gráficos tipo torta con Chart.js
+- Variable JUDO_REPORT_CONFIG_FILE: Configuración centralizada
+
+[1.5.9.1] - 2026-01-07
+-----------------------
+MAJOR FEATURE: Validación Completa de Contratos de Servicios
+
+- Validación OpenAPI: Carga y validación completa contra especificaciones OpenAPI 3.0
+- Validación AsyncAPI: Soporte para especificaciones AsyncAPI
+- Validación de Esquemas: Validación contra esquemas específicos por nombre
+- Validación de Tipos: Validación avanzada de tipos de datos
+- Validadores de Formatos Avanzados: Email, URL, UUID, Fecha ISO, Teléfono
+- 20+ Nuevos Pasos de Validación en inglés y español
+
+[1.5.9.0] - 2026-01-07
+-----------------------
+MAJOR FEATURE: Configuración Centralizada via .env
+
+- Configuración Centralizada: Migración completa de configuraciones del runner al .env
+- Runners Ultra-Simples: Solo necesitan heredar de BaseRunner()
+- Variables de Entorno Soportadas: 15+ variables para configuración completa
+- Carga Automática de .env: Busca automáticamente archivos .env
+- Compatibilidad hacia atrás: Cero breaking changes
+
+Variables de Entorno Principales:
+- JUDO_FEATURES_DIR: Directorio con archivos .feature
+- JUDO_OUTPUT_DIR: Directorio para reportes
+- JUDO_PARALLEL: Ejecutar en paralelo
+- JUDO_MAX_WORKERS: Número máximo de hilos
+- JUDO_CONSOLE_FORMAT: Formato de consola
+- JUDO_TIMEOUT: Timeout en segundos
+
+===============================================================================
+VERSIONES ANTERIORES IMPORTANTES
+===============================================================================
+
+[1.5.8.2] - 2026-01-05
+-----------------------
+Bug Fixes & Documentation Updates
+
+- JSON Generation Fix: Corregidos archivos JSON malformados
+- Step References Updated: Documentación de pasos completamente actualizada
+- Advanced Features Validation: Todas las funcionalidades avanzadas confirmadas
+
+[1.5.8.1] - 2026-01-04
+-----------------------
+HOTFIX - Fixed Cross-File Duplicate Step Conflicts
+
+- Eliminados 18 decoradores de pasos duplicados en inglés
+- Eliminados todos los conflictos AmbiguousStep
+- Framework ahora carga sin errores de registro de pasos
+
+[1.5.8] - 2026-01-04
+---------------------
+FEATURE - Complete Spanish Step Definitions Implementation
+
+- 25 Nuevos Pasos en Español implementados
+- Rate Limiting & Throttling (3 pasos)
+- Multiple Requests (2 pasos)
+- Response Caching (4 pasos)
+- Authorization & Interceptors (1 paso)
+- Authentication (5 pasos)
+- Circuit Breaker (2 pasos)
+- Response Validation (1 paso)
+- Environment Variables (1 paso)
+
+[1.5.0] - 2025-01-04
+---------------------
+MAJOR RELEASE - Complete Feature Suite
+
+TIER 1: Robustness & Reliability
+- Retry & Circuit Breaker Pattern
+- Request/Response Interceptors
+- Rate Limiting & Throttling
+- Advanced Assertions
+
+TIER 2: Performance & Modern APIs
+- Data-Driven Testing
+- Performance Monitoring
+- Response Caching
+- GraphQL Support
+- WebSocket Support
+- OAuth2 & JWT Automation
+
+TIER 3: Enterprise Features
+- Advanced Reporting
+- API Contract Testing
+- Chaos Engineering
+- Advanced Logging
+
+[1.4.0] - 2025-01-04
+---------------------
+BREAKING CHANGE - Playwright Removed as Mandatory Dependency
+
+- Playwright ya no se instala por defecto
+- Judo Framework es ahora un framework puro de pruebas de API
+- Instalación 90% más rápida (150MB → 10MB)
+- Tiempo de instalación reducido 95% (2-3 minutos → 10-20 segundos)
+
+[1.3.42] - 2024-12-20
+----------------------
+Features
+
+- Smart .env file loading from project root
+- Improved environment variable support
+- Enhanced HTML reports with professional branding
+
+[1.3.0] - 2024-11-01
+---------------------
+Initial Release
+
+- Complete API testing framework
+- BDD/Gherkin support with Behave
+- 100+ predefined steps in English and Spanish
+- Professional HTML reports
+- Mock server integration
+- Request/Response logging
+
+===============================================================================
+INSTALACIÓN Y ACTUALIZACIÓN
+===============================================================================
+
+Instalación Básica:
+pip install judo-framework
+
+Instalación Completa:
+pip install judo-framework[full]
+
+Actualización:
+pip install --upgrade judo-framework
+
+Verificar Versión:
+python -c "import judo; print(judo.__version__)"
+
+===============================================================================
+COMPATIBILIDAD
+===============================================================================
+
+Versiones de Python Soportadas:
+- Python 3.8+
+- Python 3.9 (recomendado)
+- Python 3.10
+- Python 3.11
+
+Sistemas Operativos:
+- Windows
+- Linux
+- macOS
+
+Dependencias Principales:
+- requests>=2.28.0
+- jsonpath-ng>=1.5.3
+- pyyaml>=6.0
+- jsonschema>=4.17.0
+- behave>=1.2.6
+
+===============================================================================
+MIGRACIÓN ENTRE VERSIONES
+===============================================================================
+
+De 1.5.x a 1.5.9.5:
+- No hay breaking changes
+- Nuevas funcionalidades son opt-in
+- Configuración existente sigue funcionando
+
+De 1.4.x a 1.5.x:
+- Añadir archivo .env para configuración centralizada
+- Actualizar runners para usar BaseRunner simplificado
+- Revisar configuración de reportes personalizados
+
+De 1.3.x a 1.4.x:
+- Playwright removido como dependencia obligatoria
+- Instalar por separado si se necesita UI testing
+- Enfoque completo en API testing
+
+===============================================================================
+ROADMAP FUTURO
+===============================================================================
+
+Próximas Versiones Planificadas:
+
+1.6.0 - Mejoras en Performance
+- Optimización de ejecución paralela
+- Mejoras en caching
+- Reducción de memoria utilizada
+
+1.7.0 - Integración Avanzada
+- Soporte para más formatos de datos
+- Integración con herramientas de monitoreo
+- Mejoras en CI/CD
+
+2.0.0 - Arquitectura Renovada
+- Refactorización de core
+- Nuevas APIs públicas
+- Mejoras en extensibilidad
+
+===============================================================================
+SOPORTE Y COMUNIDAD
+===============================================================================
+
+Documentación Oficial: http://centyc.cl/judo-framework/
+GitHub Repository: https://github.com/FelipeFariasAlfaro/Judo-Framework
+Issues y Bugs: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+Email de Soporte: felipe.farias@centyc.cl
+
+Contribuciones:
+- Fork del repositorio
+- Crear branch para feature
+- Seguir guías de contribución
+- Enviar Pull Request
+
+===============================================================================
+FIN DEL HISTORIAL DE CAMBIOS
+===============================================================================

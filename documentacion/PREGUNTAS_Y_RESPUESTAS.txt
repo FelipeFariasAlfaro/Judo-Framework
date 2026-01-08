@@ -1,0 +1,443 @@
+===============================================================================
+                    JUDO FRAMEWORK - PREGUNTAS Y RESPUESTAS FRECUENTES
+===============================================================================
+
+VERSIÓN: 1.5.9.5
+FECHA: Enero 2026
+AUTOR: Felipe Farias - CENTYC
+
+===============================================================================
+ÍNDICE DE CONTENIDOS
+===============================================================================
+
+1. INSTALACIÓN Y CONFIGURACIÓN
+2. CREACIÓN DE PRUEBAS
+3. EJECUCIÓN Y RUNNERS
+4. REPORTES Y VISUALIZACIÓN
+5. INTEGRACIÓN Y CI/CD
+6. TROUBLESHOOTING
+7. FUNCIONALIDADES AVANZADAS
+8. PERFORMANCE Y OPTIMIZACIÓN
+
+===============================================================================
+1. INSTALACIÓN Y CONFIGURACIÓN
+===============================================================================
+
+P: ¿Qué versión de Python necesito para Judo Framework?
+R: Judo Framework requiere Python 3.8 o superior. Es compatible con Python 3.8, 3.9, 3.10 y 3.11. Recomendamos usar Python 3.9 o superior para mejor rendimiento.
+
+P: ¿Cómo instalo Judo Framework?
+R: Usa pip para instalar desde PyPI:
+   pip install judo-framework
+   
+   Para funcionalidades específicas:
+   pip install judo-framework[full]  # Todas las funcionalidades
+   pip install judo-framework[excel] # Soporte Excel
+   pip install judo-framework[websocket] # WebSocket
+   pip install judo-framework[graphql] # GraphQL
+
+P: ¿Dónde debo colocar el archivo .env?
+R: El archivo .env debe estar en la raíz de tu proyecto. Judo Framework busca automáticamente en:
+   1. Directorio actual (.env)
+   2. Directorio padre (../.env)
+   3. Raíz del proyecto
+   
+   Si no encuentra .env, usa valores por defecto.
+
+P: ¿Puedo usar Judo Framework sin archivo .env?
+R: Sí, puedes pasar parámetros directamente al BaseRunner o usar valores por defecto. El .env es opcional pero recomendado para proyectos grandes.
+
+P: ¿Cómo configuro múltiples ambientes (dev, staging, prod)?
+R: Usa diferentes archivos .env:
+   - .env.dev
+   - .env.staging  
+   - .env.prod
+   
+   Luego carga el apropiado:
+   load_dotenv('.env.dev')
+
+===============================================================================
+2. CREACIÓN DE PRUEBAS
+===============================================================================
+
+P: ¿Dónde debo colocar mis archivos .feature?
+R: Por defecto en la carpeta "features/" en la raíz de tu proyecto. Puedes cambiar esto con la variable JUDO_FEATURES_DIR en tu .env.
+
+P: ¿Puedo escribir pruebas en español?
+R: Sí, Judo Framework soporta completamente español. Tienes 166+ pasos predefinidos en español. Usa:
+   Feature: Mi funcionalidad
+   Scenario: Mi escenario
+   Dado que configuro la URL base como "https://api.ejemplo.com"
+
+P: ¿Cómo organizo mis features?
+R: Recomendamos organizar por funcionalidad:
+   features/
+   ├── authentication/
+   ├── users/
+   ├── products/
+   └── reports/
+
+P: ¿Puedo mezclar inglés y español en mis pruebas?
+R: Sí, Judo Framework soporta modo mixto. Puedes usar keywords en inglés (Feature, Scenario) con pasos en español, o viceversa.
+
+P: ¿Cómo creo pasos personalizados?
+R: Crea un archivo steps/custom_steps.py:
+   from behave import step
+   
+   @step('mi paso personalizado con "{valor}"')
+   def mi_paso(context, valor):
+       # Tu lógica aquí
+       pass
+
+P: ¿Puedo usar datos de prueba externos?
+R: Sí, Judo Framework soporta:
+   - Archivos JSON
+   - Archivos CSV
+   - Archivos Excel (con extra [excel])
+   - Variables de entorno
+   - Datos generados con Faker
+
+===============================================================================
+3. EJECUCIÓN Y RUNNERS
+===============================================================================
+
+P: ¿Cómo ejecuto mis pruebas?
+R: Tienes varias opciones:
+   1. Con runner personalizado: python runner.py
+   2. Directamente con behave: behave features/
+   3. Feature específico: behave features/mi_feature.feature
+   4. Con tags: behave --tags=@smoke features/
+
+P: ¿Puedo ejecutar pruebas en paralelo?
+R: Sí, configura JUDO_PARALLEL=true en tu .env o:
+   runner = BaseRunner(parallel=True, max_workers=8)
+
+P: ¿Cómo filtro pruebas por tags?
+R: Usa tags en tus features:
+   @smoke @api
+   Scenario: Mi prueba
+   
+   Luego ejecuta:
+   behave --tags=@smoke features/
+   behave --tags="@api and not @slow" features/
+
+P: ¿Qué formatos de consola están disponibles?
+R: Judo Framework soporta:
+   - progress (por defecto): Barra de progreso
+   - pretty: Salida detallada y colorida
+   - plain: Salida simple sin colores
+   - none: Sin salida de consola
+
+P: ¿Cómo configuro timeouts?
+R: Usa JUDO_TIMEOUT en tu .env (en segundos):
+   JUDO_TIMEOUT=300  # 5 minutos
+   
+   O en tu runner:
+   runner = BaseRunner(timeout=300)
+
+P: ¿Puedo reintentar pruebas que fallan?
+R: Sí, configura JUDO_RETRY_COUNT:
+   JUDO_RETRY_COUNT=3
+   
+   También puedes configurar estrategias de backoff:
+   context.judo.set_retry_policy(max_retries=3, backoff_strategy="exponential")
+
+===============================================================================
+4. REPORTES Y VISUALIZACIÓN
+===============================================================================
+
+P: ¿Dónde se generan los reportes?
+R: Por defecto en la carpeta "judo_reports/". Puedes cambiar esto con JUDO_OUTPUT_DIR en tu .env.
+
+P: ¿Qué tipos de reportes genera Judo Framework?
+R: Genera automáticamente:
+   - Reportes HTML interactivos con gráficos
+   - JSON Cucumber para CI/CD
+   - Logs detallados de requests/responses (opcional)
+   - Métricas de performance
+
+P: ¿Cómo personalizo los reportes HTML?
+R: Crea un archivo report_config.json con tu branding:
+   {
+     "branding": {
+       "primary_logo": "data:image/png;base64,TU_LOGO_AQUI",
+       "primary_color": "#1e40af"
+     },
+     "footer": {
+       "show_creator": false,
+       "show_logo": true
+     }
+   }
+
+P: ¿Puedo usar mi logo empresarial en los reportes?
+R: Sí, convierte tu logo a base64 y úsalo en report_config.json. El reporte mostrará tu logo en lugar del logo de Judo Framework.
+
+P: ¿Los reportes incluyen gráficos?
+R: Sí, los reportes HTML incluyen:
+   - Gráficos de torta para distribución de resultados
+   - Métricas de tiempo de ejecución
+   - Estadísticas detalladas por feature y scenario
+
+P: ¿Cómo integro reportes con herramientas de CI/CD?
+R: Judo Framework genera JSON Cucumber compatible con:
+   - Jenkins (Cucumber Reports Plugin)
+   - GitHub Actions
+   - Azure DevOps
+   - GitLab CI
+
+===============================================================================
+5. INTEGRACIÓN Y CI/CD
+===============================================================================
+
+P: ¿Cómo integro Judo Framework con GitHub Actions?
+R: Crea .github/workflows/api-tests.yml:
+   - name: Run API Tests
+     run: |
+       pip install judo-framework[full]
+       python runner.py
+
+P: ¿Funciona con Jenkins?
+R: Sí, usa el plugin Cucumber Reports para visualizar resultados. Judo Framework genera automáticamente archivos JSON compatibles.
+
+P: ¿Puedo usar Docker?
+R: Sí, ejemplo de Dockerfile:
+   FROM python:3.9
+   COPY . /app
+   WORKDIR /app
+   RUN pip install judo-framework[full]
+   CMD ["python", "runner.py"]
+
+P: ¿Cómo manejo secretos y API keys?
+R: Usa variables de entorno:
+   - En .env para desarrollo local
+   - En CI/CD como secrets
+   - Nunca hardcodees credenciales en el código
+
+P: ¿Puedo ejecutar pruebas en múltiples ambientes?
+R: Sí, usa diferentes configuraciones:
+   TEST_ENV=dev python runner.py
+   TEST_ENV=staging python runner.py
+   TEST_ENV=prod python runner.py
+
+===============================================================================
+6. TROUBLESHOOTING
+===============================================================================
+
+P: ¿Por qué mis pruebas fallan con "step not found"?
+R: Verifica que:
+   1. El paso existe en JUDO_STEPS_REFERENCE_ES.txt
+   2. La sintaxis es exacta (incluyendo comillas y parámetros)
+   3. Tienes importados los pasos correctos en environment.py
+
+P: ¿Por qué no se genera el reporte HTML?
+R: Verifica que:
+   1. La carpeta de salida existe y tienes permisos de escritura
+   2. No hay errores en la configuración JSON
+   3. El runner completó la ejecución sin errores críticos
+
+P: ¿Por qué mi logo no aparece en el reporte?
+R: Verifica que:
+   1. El base64 es válido y completo
+   2. Tienes "show_logo": true en la configuración
+   3. El archivo report_config.json está en la ubicación correcta
+
+P: ¿Por qué las pruebas son lentas?
+R: Optimiza con:
+   1. Ejecución en paralelo: JUDO_PARALLEL=true
+   2. Reduce timeouts innecesarios
+   3. Usa rate limiting apropiado
+   4. Implementa caching de responses
+
+P: ¿Cómo debuggeo requests/responses?
+R: Activa logging detallado:
+   JUDO_SAVE_REQUESTS_RESPONSES=true
+   JUDO_VERBOSE=true
+   
+   Los logs se guardan en la carpeta requests_responses/
+
+P: ¿Por qué obtengo errores de conexión?
+R: Verifica:
+   1. La URL base es correcta
+   2. El servicio está disponible
+   3. No hay problemas de firewall/proxy
+   4. Los headers de autenticación son correctos
+
+===============================================================================
+7. FUNCIONALIDADES AVANZADAS
+===============================================================================
+
+P: ¿Cómo uso OAuth2 con Judo Framework?
+R: Configura OAuth2 en environment.py:
+   context.judo.setup_oauth2(
+       client_id="tu_client_id",
+       client_secret="tu_client_secret",
+       token_url="https://api.ejemplo.com/oauth/token"
+   )
+
+P: ¿Puedo validar esquemas JSON?
+R: Sí, usa pasos de validación de esquema:
+   Then the response should match schema "user_schema"
+   
+   Define esquemas en archivos JSON separados.
+
+P: ¿Cómo implemento rate limiting?
+R: Configura límites de velocidad:
+   context.judo.set_rate_limit(requests_per_second=10)
+   context.judo.set_throttle(delay_ms=100)
+
+P: ¿Puedo usar WebSockets?
+R: Sí, con el extra [websocket]:
+   Given I connect to WebSocket "ws://ejemplo.com/socket"
+   When I send WebSocket message "Hello"
+   Then I should receive WebSocket message "World"
+
+P: ¿Cómo uso GraphQL?
+R: Con el extra [graphql]:
+   Given I set GraphQL endpoint to "https://api.ejemplo.com/graphql"
+   When I send GraphQL query:
+     """
+     query { users { id name } }
+     """
+
+P: ¿Puedo hacer pruebas de carga básicas?
+R: Sí, usa data-driven testing con múltiples usuarios:
+   context.judo.run_data_driven_test("users.csv", test_function)
+
+===============================================================================
+8. PERFORMANCE Y OPTIMIZACIÓN
+===============================================================================
+
+P: ¿Cómo optimizo el tiempo de ejecución?
+R: Estrategias de optimización:
+   1. Ejecución paralela con JUDO_PARALLEL=true
+   2. Ajustar max_workers según tu hardware
+   3. Usar caching de responses para datos estáticos
+   4. Implementar circuit breakers para servicios inestables
+   5. Optimizar timeouts por tipo de request
+
+P: ¿Cuántos workers paralelos debo usar?
+R: Recomendaciones:
+   - CPU de 4 cores: max_workers=4-6
+   - CPU de 8 cores: max_workers=8-12
+   - Considera la capacidad del servidor de destino
+   - Monitorea el uso de CPU y memoria
+
+P: ¿Cómo monitoreo el performance de mis pruebas?
+R: Judo Framework incluye métricas automáticas:
+   - Tiempo de respuesta por request
+   - Estadísticas de éxito/fallo
+   - Métricas de throughput
+   - Alertas de performance configurables
+
+P: ¿Puedo cachear responses para pruebas más rápidas?
+R: Sí, habilita caching:
+   Given I enable response caching with TTL 300 seconds
+   
+   Útil para datos de referencia que no cambian.
+
+P: ¿Cómo manejo servicios lentos o inestables?
+R: Usa circuit breakers y retry policies:
+   context.judo.create_circuit_breaker("api", failure_threshold=5)
+   context.judo.set_retry_policy(max_retries=3, backoff_strategy="exponential")
+
+===============================================================================
+9. CASOS DE USO ESPECÍFICOS
+===============================================================================
+
+P: ¿Cómo pruebo APIs REST completas?
+R: Usa el conjunto completo de pasos HTTP:
+   - GET, POST, PUT, DELETE, PATCH
+   - Validación de status codes
+   - Validación de headers y body
+   - Extracción de datos para siguientes requests
+
+P: ¿Cómo pruebo autenticación JWT?
+R: Configura JWT en environment.py:
+   context.judo.configure_jwt(secret="tu_secret", algorithm="HS256")
+   
+   Luego usa pasos de validación JWT en tus features.
+
+P: ¿Cómo pruebo APIs con paginación?
+R: Usa loops y extracción de datos:
+   Given I set variable "page" to "1"
+   When I send GET request to "/users?page=${page}"
+   Then I extract "next_page" from response field "pagination.next"
+
+P: ¿Cómo valido respuestas complejas?
+R: Usa JSONPath para navegación:
+   Then the response field "users[0].address.city" should be "Madrid"
+   And the response field "users[*].status" should contain "active"
+
+P: ¿Cómo pruebo file uploads?
+R: Usa pasos de multipart:
+   Given I set multipart field "file" to file "test_image.jpg"
+   And I set multipart field "description" to "Test upload"
+   When I send POST request to "/upload"
+
+===============================================================================
+10. MIGRACIÓN Y COMPATIBILIDAD
+===============================================================================
+
+P: ¿Puedo migrar desde Karate Framework?
+R: Sí, Judo Framework está inspirado en Karate. La mayoría de conceptos son similares:
+   - Features y Scenarios son idénticos
+   - Sintaxis de pasos es muy similar
+   - JSONPath funciona igual
+   - Variables y contexto son compatibles
+
+P: ¿Es compatible con Postman Collections?
+R: No directamente, pero puedes:
+   1. Exportar requests de Postman
+   2. Convertir a features de Judo Framework
+   3. Usar los mismos datos de prueba
+
+P: ¿Puedo usar con Selenium para UI testing?
+R: Judo Framework se enfoca en API testing. Para UI, usa Selenium por separado o considera frameworks híbridos.
+
+P: ¿Funciona con bases de datos?
+R: Judo Framework se enfoca en APIs, pero puedes:
+   1. Usar pasos personalizados para DB
+   2. Integrar con SQLAlchemy u otros ORMs
+   3. Validar datos a través de APIs que consultan la DB
+
+===============================================================================
+11. SOPORTE Y COMUNIDAD
+===============================================================================
+
+P: ¿Dónde puedo obtener ayuda?
+R: Recursos de soporte:
+   - Documentación oficial: http://centyc.cl/judo-framework/
+   - GitHub Issues: https://github.com/FelipeFariasAlfaro/Judo-Framework/issues
+   - Email: felipe.farias@centyc.cl
+   - Esta guía de FAQ
+
+P: ¿Cómo reporto bugs?
+R: Usa GitHub Issues con:
+   1. Descripción detallada del problema
+   2. Pasos para reproducir
+   3. Versión de Judo Framework
+   4. Logs de error
+   5. Configuración relevante
+
+P: ¿Puedo contribuir al proyecto?
+R: Sí, el proyecto acepta contribuciones:
+   1. Fork del repositorio
+   2. Crear branch para tu feature
+   3. Seguir las guías de contribución
+   4. Enviar Pull Request
+
+P: ¿Con qué frecuencia se actualiza?
+R: Judo Framework se actualiza regularmente:
+   - Bugfixes: según necesidad
+   - Features nuevos: mensualmente
+   - Versiones mayores: trimestralmente
+
+P: ¿Hay roadmap público?
+R: Sí, revisa GitHub Issues y Projects para ver:
+   - Features planificados
+   - Mejoras en desarrollo
+   - Roadmap de versiones futuras
+
+===============================================================================
+FIN DE PREGUNTAS Y RESPUESTAS FRECUENTES
+===============================================================================
