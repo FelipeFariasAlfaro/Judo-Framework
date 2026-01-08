@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: JSONPlaceholder API
+  description: Fake REST API for testing and prototyping
+  version: 1.0.0
+  contact:
+    url: https://jsonplaceholder.typicode.com
+servers:
+  - url: https://jsonplaceholder.typicode.com
+    description: JSONPlaceholder server
+
+paths:
+  /posts:
+    get:
+      summary: Get all posts
+      operationId: getAllPosts
+      tags:
+        - posts
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+  /posts/{id}:
+    get:
+      summary: Get post by ID
+      operationId: getPostById
+      tags:
+        - posts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found
+
+  /users:
+    get:
+      summary: Get all users
+      operationId: getAllUsers
+      tags:
+        - users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      operationId: getUserById
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    Post:
+      type: object
+      required:
+        - id
+        - userId
+        - title
+        - body
+      properties:
+        id:
+          type: integer
+          description: Post ID
+          example: 1
+        userId:
+          type: integer
+          description: User ID who created the post
+          example: 1
+        title:
+          type: string
+          description: Post title
+          example: "sunt aut facere repellat provident occaecati excepturi optio reprehenderit"
+        body:
+          type: string
+          description: Post content
+          example: "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum"
+
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - username
+        - email
+      properties:
+        id:
+          type: integer
+          description: User ID
+          example: 1
+        name:
+          type: string
+          description: Full name
+          example: "Leanne Graham"
+        username:
+          type: string
+          description: Username
+          example: "Bret"
+        email:
+          type: string
+          format: email
+          description: Email address
+          example: "Sincere@april.biz"
+        address:
+          $ref: '#/components/schemas/Address'
+        phone:
+          type: string
+          description: Phone number
+          example: "1-770-736-8031 x56442"
+        website:
+          type: string
+          format: uri
+          description: Website URL
+          example: "hildegard.org"
+        company:
+          $ref: '#/components/schemas/Company'
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: "Kulas Light"
+        suite:
+          type: string
+          example: "Apt. 556"
+        city:
+          type: string
+          example: "Gwenborough"
+        zipcode:
+          type: string
+          example: "92998-3874"
+        geo:
+          $ref: '#/components/schemas/Geo'
+
+    Geo:
+      type: object
+      properties:
+        lat:
+          type: string
+          example: "-37.3159"
+        lng:
+          type: string
+          example: "81.1496"
+
+    Company:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Romaguera-Crona"
+        catchPhrase:
+          type: string
+          example: "Multi-layered client-server neural-net"
+        bs:
+          type: string
+          example: "harness real-time e-markets"

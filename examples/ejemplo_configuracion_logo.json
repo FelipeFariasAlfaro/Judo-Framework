@@ -1,0 +1,49 @@
+{
+  "project": {
+    "name": "Mi Empresa - API Tests",
+    "engineer": "Tu Nombre",
+    "team": "Equipo QA",
+    "product": "Sistema de Gestión",
+    "company": "Mi Empresa S.A.",
+    "date_format": "%d/%m/%Y %H:%M:%S"
+  },
+  "branding": {
+    "primary_logo": "data:image/png;base64,TU_LOGO_BASE64_AQUI",
+    "secondary_logo": "data:image/png;base64,TU_LOGO_BASE64_AQUI",
+    "company_logo": "",
+    "primary_color": "#1e40af",
+    "secondary_color": "#1d4ed8",
+    "accent_color": "#3b82f6",
+    "success_color": "#22c55e",
+    "error_color": "#ef4444",
+    "warning_color": "#f59e0b"
+  },
+  "charts": {
+    "enabled": true,
+    "show_pie_charts": true,
+    "show_bar_charts": false,
+    "colors": {
+      "passed": "#22c55e",
+      "failed": "#ef4444",
+      "skipped": "#f59e0b"
+    }
+  },
+  "footer": {
+    "show_creator": false,
+    "show_logo": true,
+    "creator_name": "Tu Nombre",
+    "creator_email": "tu.email@empresa.com",
+    "company_name": "Mi Empresa S.A.",
+    "company_url": "https://www.miempresa.com",
+    "documentation_url": "http://centyc.cl/judo-framework/",
+    "github_url": "https://github.com/FelipeFariasAlfaro/Judo-Framework"
+  },
+  "display": {
+    "show_request_details": true,
+    "show_response_details": true,
+    "show_variables": true,
+    "show_assertions": true,
+    "collapse_sections_by_default": true,
+    "show_duration_in_ms": false
+  }
+}

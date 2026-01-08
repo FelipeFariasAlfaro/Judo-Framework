@@ -1,0 +1,1435 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Empresa - API Tests</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        .report-header {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #3b82f6 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+        
+        .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        /* Logo secundario/empresa en esquina superior izquierda */
+        .secondary-logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .secondary-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+        
+        .secondary-link:hover {
+            opacity: 0.8;
+        }
+        
+        .secondary-text {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .secondary-img {
+            height: 30px;
+            width: auto;
+            max-width: 120px;
+            transition: opacity 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .secondary-img:hover {
+            opacity: 0.8;
+        }
+        
+        .secondary-fallback {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+        }
+        
+        /* Logo principal y título centrados */
+        .main-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 0 auto;
+            padding-top: 10px;
+        }
+        
+
+        .primary-img {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            object-fit: cover;
+        }
+        
+        .primary-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .primary-fallback {
+            font-size: 2em;
+        }
+        
+        .report-title {
+            font-size: 2.2em;
+            margin: 0;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Información horizontal */
+        .header-info-horizontal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .info-label {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: white;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+        }
+        
+        .status-badge.status-success {
+            background: #22c55e;
+            color: white;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+        
+        .status-badge.status-failure {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Project Info Section */
+        .project-info-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .project-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .project-info-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #1e40af;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .project-info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .info-icon {
+            font-size: 2em;
+            opacity: 0.8;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-title {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .charts-section h2 {
+            margin-bottom: 25px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            align-items: start;
+        }
+        
+        .chart-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .chart-container canvas {
+            max-width: 100%;
+            height: 300px !important;
+        }
+        
+        .chart-wide {
+            grid-column: 1 / -1;
+        }
+        
+        .chart-wide canvas {
+            height: 400px !important;
+        }
+        
+        /* Summary Section */
+        .summary-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .summary-layout {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        
+        /* Información de ejecución a la izquierda */
+        .execution-info {
+            flex: 0 0 200px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #1e40af;
+        }
+        
+        .execution-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 8px 0;
+        }
+        
+        .execution-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .execution-icon {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .execution-label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+            min-width: 70px;
+        }
+        
+        .execution-value {
+            font-size: 0.9em;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        /* Gráficos de resumen */
+        .summary-charts-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .summary-chart-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .summary-chart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1e40af;
+        }
+        
+        .chart-icon {
+            font-size: 1.2em;
+        }
+        
+        .chart-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .chart-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .chart-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1e40af;
+            line-height: 1;
+        }
+        
+        .chart-canvas-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        
+        .chart-canvas-container canvas {
+            max-width: 100% !important;
+            max-height: 100% !important;
+        }
+        
+        .chart-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em;
+            font-weight: 500;
+            padding: 2px 0;
+        }
+        
+        .stat-item.passed {
+            color: #22c55e;
+        }
+        
+        .stat-item.failed {
+            color: #ef4444;
+        }
+        
+        .stat-item.skipped {
+            color: #f59e0b;
+        }
+        
+        /* Responsive design para summary */
+        @media (max-width: 768px) {
+            .summary-layout {
+                flex-direction: column;
+            }
+            
+            .execution-info {
+                flex: none;
+                width: 100%;
+            }
+            
+            .summary-charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .summary-charts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .passed {
+            color: #22c55e;
+        }
+        
+        .failed {
+            color: #ef4444;
+        }
+        
+        .skipped {
+            color: #f59e0b;
+        }
+        
+        /* Feature Section */
+        .feature-section {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .feature-header {
+            background: #f8f9fa;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .feature-header:hover {
+            background: #e9ecef;
+        }
+        
+        .feature-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        
+        .feature-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .feature-content {
+            padding: 20px;
+        }
+        
+        /* Scenario Section */
+        .scenario-section {
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .scenario-header {
+            background: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .scenario-header:hover {
+            background: #e9ecef;
+        }
+        
+        .scenario-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.1em;
+        }
+        
+        .scenario-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .scenario-content {
+            padding: 15px;
+            background: #fafafa;
+        }
+        
+        /* Step Section */
+        .step-section {
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .step-section.status-passed {
+            border-left: 4px solid #22c55e;
+        }
+        
+        .step-section.status-failed {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .step-section.status-skipped {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .step-header {
+            background: white;
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .step-header:hover {
+            background: #f8f9fa;
+        }
+        
+        .step-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .step-text {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+        
+        .step-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .step-content {
+            padding: 15px;
+            background: #fafafa;
+            display: none;
+        }
+        
+        .step-content.expanded {
+            display: block;
+        }
+        
+        /* Detail Sections */
+        .detail-section {
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .detail-section h4 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1em;
+        }
+        
+        .detail-section h5 {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* Request/Response Styles */
+        .method-url {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .http-method {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8em;
+            color: white;
+        }
+        
+        .method-get { background: #22c55e; }
+        .method-post { background: #2196F3; }
+        .method-put { background: #f59e0b; }
+        .method-patch { background: #9c27b0; }
+        .method-delete { background: #ef4444; }
+        
+        .url {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .status-line {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .status-code {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-success { background: #22c55e; }
+        .status-error { background: #ef4444; }
+        
+        .response-time {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        /* Headers and Parameters */
+        .headers-section, .params-section, .body-section {
+            margin-bottom: 15px;
+        }
+        
+        .headers-list, .params-list {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .header-item, .param-item {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .header-key, .param-key {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .header-value, .param-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        /* Code Content */
+        .json-content, .text-content {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.8em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        /* Assertions */
+        .assertions-list {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .assertion-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #ccc;
+        }
+        
+        .assertion-item.status-passed {
+            border-left-color: #22c55e;
+            background: #f1f8e9;
+        }
+        
+        .assertion-item.status-failed {
+            border-left-color: #ef4444;
+            background: #ffebee;
+        }
+        
+        .assertion-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .assertion-description {
+            font-weight: bold;
+        }
+        
+        .assertion-details {
+            font-size: 0.9em;
+        }
+        
+        .assertion-expected, .assertion-actual {
+            margin-bottom: 4px;
+        }
+        
+        .assertion-expected code, .assertion-actual code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        /* Error Section */
+        .error-section {
+            border-left: 4px solid #ef4444;
+            background: #ffebee;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .error-traceback {
+            background: #ffcdd2;
+            border: 1px solid #ef4444;
+            color: #b71c1c;
+            font-size: 0.8em;
+        }
+        
+        /* Toggle Icons */
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
+        /* Footer Styles */
+        .report-footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .footer-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .primary-logo-footer {
+            height: 24px;
+            width: 24px;
+            opacity: 0.8;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .primary-fallback-footer {
+            font-size: 1.2em;
+        }
+        
+        .footer-text {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .footer-email {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-email:hover {
+            color: #5dade2;
+            text-decoration: underline;
+        }
+        
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .separator {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8em;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header-layout {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .secondary-logo {
+                position: static;
+                order: -1;
+            }
+            
+            .main-title {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .report-title {
+                font-size: 1.8em;
+            }
+            
+            .header-info-horizontal {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .info-group {
+                flex-direction: row;
+                gap: 10px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .method-url {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .feature-header, .scenario-header, .step-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .footer-links {
+                justify-content: center;
+            }
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        
+        <header class="report-header">
+            <div class="header-content">
+                <div class="header-layout">
+                    <!-- Logo secundario/empresa en esquina superior izquierda -->
+                    <div class="secondary-logo">
+                        <a href="https://www.miempresa.com" target="_blank" class="secondary-link">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77zgAAAABJRU5ErkJggg==" alt="Company Logo" class="secondary-img">
+                            <span class="secondary-text">Mi Empresa S.A.</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Título centrado sin logo -->
+                    <div class="main-title">
+                        <h1 class="report-title">Mi Empresa - API Tests</h1>
+                    </div>
+                </div>
+                
+                <!-- Información del reporte en layout horizontal -->
+                <div class="header-info-horizontal">
+                    <div class="info-group">
+                        <span class="info-label">Fecha:</span>
+                        <span class="info-value">08/01/2026 11:57:51</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Duración:</span>
+                        <span class="info-value">15.25s</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Estado:</span>
+                        <span class="status-badge status-success">
+                            ✓
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        
+        <section class="project-info-section">
+            <div class="project-info-grid">
+                <div class="project-info-card">
+                    <div class="info-icon">👨‍💻</div>
+                    <div class="info-content">
+                        <div class="info-title">Ingeniero</div>
+                        <div class="info-value">Felipe Farias</div>
+                    </div>
+                </div>
+                <div class="project-info-card">
+                    <div class="info-icon">👥</div>
+                    <div class="info-content">
+                        <div class="info-title">Equipo</div>
+                        <div class="info-value">Equipo QA</div>
+                    </div>
+                </div>
+                <div class="project-info-card">
+                    <div class="info-icon">📦</div>
+                    <div class="info-content">
+                        <div class="info-title">Producto</div>
+                        <div class="info-value">Sistema de Gestión</div>
+                    </div>
+                </div>
+                <div class="project-info-card">
+                    <div class="info-icon">🏢</div>
+                    <div class="info-content">
+                        <div class="info-title">Empresa</div>
+                        <div class="info-value">Mi Empresa S.A.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        
+        <section class="summary-section">
+            <div class="summary-layout">
+                <!-- Información de ejecución a la izquierda -->
+                <div class="execution-info">
+                    <div class="execution-item">
+                        <span class="execution-icon">🕐</span>
+                        <span class="execution-label">Inicio</span>
+                        <span class="execution-value">08/01/2026 11:57:51</span>
+                    </div>
+                    <div class="execution-item">
+                        <span class="execution-icon">🏁</span>
+                        <span class="execution-label">Fin</span>
+                        <span class="execution-value">08/01/2026 11:58:06</span>
+                    </div>
+                    <div class="execution-item">
+                        <span class="execution-icon">⏱️</span>
+                        <span class="execution-label">Duración</span>
+                        <span class="execution-value">15.25s</span>
+                    </div>
+                    <div class="execution-item">
+                        <span class="execution-icon">🌐</span>
+                        <span class="execution-label">Navegador</span>
+                        <span class="execution-value">Chromium</span>
+                    </div>
+                </div>
+                
+                <!-- Gráficos de resultados a la derecha -->
+                
+            <div class="summary-charts-grid">
+                <div class="summary-chart-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">📁</span>
+                        <span class="chart-title">Features</span>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart-number">1</div>
+                        <div class="chart-canvas-container">
+                            <canvas id="scenariosChart" width="120" height="120"></canvas>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="stat-item passed">1 PASSED</div>
+                            <div class="stat-item failed">0 FAILED</div>
+                            <div class="stat-item skipped">0 SKIPPED</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-chart-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">📋</span>
+                        <span class="chart-title">Scenarios</span>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart-number">1</div>
+                        <div class="chart-canvas-container">
+                            <canvas id="scenariosChart2" width="120" height="120"></canvas>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="stat-item passed">1 PASSED</div>
+                            <div class="stat-item failed">0 FAILED</div>
+                            <div class="stat-item skipped">0 SKIPPED</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-chart-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">🔸</span>
+                        <span class="chart-title">Steps</span>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart-number">4</div>
+                        <div class="chart-canvas-container">
+                            <canvas id="stepsChart" width="120" height="120"></canvas>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="stat-item passed">4 PASSED</div>
+                            <div class="stat-item failed">0 FAILED</div>
+                            <div class="stat-item skipped">0 SKIPPED</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            </div>
+        </section>
+        
+        
+            <section class="feature-section">
+                <div class="feature-header" onclick="toggleFeature(0)">
+                    <h2>
+                        <span class="status-icon status-passed">
+                            ✅
+                        </span>
+                        📋 Pruebas de Logo - API Tests
+                    </h2>
+                    <div class="feature-info">
+                        <span class="duration">15.25s</span>
+                        <span class="scenario-count">1 scenarios</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                
+                <div class="feature-content" id="feature-0">
+                    
+            <div class="scenario-section">
+                <div class="scenario-header" onclick="toggleScenario(0, 0)">
+                    <h3>
+                        <span class="status-icon status-passed">
+                            ✅
+                        </span>
+                        🎯 Verificar configuración de logos
+                    </h3>
+                    <div class="scenario-info">
+                        <span class="duration">15.25s</span>
+                        <span class="step-count">4 steps</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                
+                <div class="scenario-content" id="scenario-0-0">
+                    
+            <div class="step-section status-passed">
+                <div class="step-header" onclick="toggleStep(this)">
+                    <div class="step-info">
+                        <span class="status-icon">
+                            ✅
+                        </span>
+                        <span class="step-text">Dado que tengo un cliente Judo API</span>
+                    </div>
+                    <div class="step-meta">
+                        <span class="duration">0.050s</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                
+                <div class="step-content">
+                    
+                </div>
+            </div>
+            
+            <div class="step-section status-passed">
+                <div class="step-header" onclick="toggleStep(this)">
+                    <div class="step-info">
+                        <span class="status-icon">
+                            ✅
+                        </span>
+                        <span class="step-text">Cuando configuro un logo base64 en el JSON</span>
+                    </div>
+                    <div class="step-meta">
+                        <span class="duration">0.100s</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                
+                <div class="step-content">
+                    
+                </div>
+            </div>
+            
+            <div class="step-section status-passed">
+                <div class="step-header" onclick="toggleStep(this)">
+                    <div class="step-info">
+                        <span class="status-icon">
+                            ✅
+                        </span>
+                        <span class="step-text">Entonces el logo debe aparecer en el header</span>
+                    </div>
+                    <div class="step-meta">
+                        <span class="duration">0.080s</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                
+                <div class="step-content">
+                    
+                </div>
+            </div>
+            
+            <div class="step-section status-passed">
+                <div class="step-header" onclick="toggleStep(this)">
+                    <div class="step-info">
+                        <span class="status-icon">
+                            ✅
+                        </span>
+                        <span class="step-text">Y el logo del footer debe estar oculto</span>
+                    </div>
+                    <div class="step-meta">
+                        <span class="duration">0.020s</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                
+                <div class="step-content">
+                    
+                </div>
+            </div>
+            
+                </div>
+            </div>
+            
+                </div>
+            </section>
+            
+    </div>
+    
+    
+        <footer class="report-footer">
+            <div class="footer-content">
+        
+                <div class="footer-info">
+                    
+                    <span class="footer-text">Framework creado por Felipe Farias</span>
+                     - <a href="mailto:felipe.farias@centyc.cl" class="footer-email">felipe.farias@centyc.cl</a>
+                </div>
+            
+                <div class="footer-links">
+                    <a href="https://www.miempresa.com" target="_blank" class="footer-link">Mi Empresa S.A.</a>
+                    <span class="separator">•</span>
+                    <a href="http://centyc.cl/judo-framework/" target="_blank" class="footer-link">Documentación</a>
+                    <span class="separator">•</span>
+                    <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework" target="_blank" class="footer-link">GitHub</a>
+                </div>
+            </div>
+        </footer>
+        
+    
+    <script>
+        
+        function toggleFeature(index) {
+            const content = document.getElementById(`feature-${index}`);
+            const icon = content.previousElementSibling.querySelector('.toggle-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.classList.remove('rotated');
+            } else {
+                content.style.display = 'none';
+                icon.classList.add('rotated');
+            }
+        }
+        
+        function toggleScenario(featureIndex, scenarioIndex) {
+            const content = document.getElementById(`scenario-${featureIndex}-${scenarioIndex}`);
+            const icon = content.previousElementSibling.querySelector('.toggle-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.classList.remove('rotated');
+            } else {
+                content.style.display = 'none';
+                icon.classList.add('rotated');
+            }
+        }
+        
+        function toggleStep(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.add('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.remove('rotated');
+            }
+        }
+        
+        // Initialize collapsed state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Collapse all features initially
+            document.querySelectorAll('[id^="feature-"]').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Collapse all scenarios initially
+            document.querySelectorAll('[id^="scenario-"]').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Rotate all toggle icons initially
+            document.querySelectorAll('.toggle-icon').forEach(icon => {
+                icon.classList.add('rotated');
+            });
+        });
+        
+        
+        // Chart.js configuration and initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Features Pie Chart (first chart in summary)
+            if (document.getElementById('scenariosChart')) {
+                const featuresCtx = document.getElementById('scenariosChart').getContext('2d');
+                new Chart(featuresCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
+                        datasets: [{
+                            data: [1, 0, 0],
+                            backgroundColor: [
+                                '#22c55e',
+                                '#ef4444',
+                                '#f59e0b'
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Scenarios Pie Chart (second chart in summary)
+            if (document.getElementById('scenariosChart2')) {
+                const scenariosCtx = document.getElementById('scenariosChart2').getContext('2d');
+                new Chart(scenariosCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
+                        datasets: [{
+                            data: [1, 0, 0],
+                            backgroundColor: [
+                                '#22c55e',
+                                '#ef4444',
+                                '#f59e0b'
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Steps Pie Chart (third chart in summary)
+            if (document.getElementById('stepsChart')) {
+                const stepsCtx = document.getElementById('stepsChart').getContext('2d');
+                new Chart(stepsCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
+                        datasets: [{
+                            data: [4, 0, 0],
+                            backgroundColor: [
+                                '#22c55e',
+                                '#ef4444',
+                                '#f59e0b'
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        
+    </script>
+</body>
+</html>
+        

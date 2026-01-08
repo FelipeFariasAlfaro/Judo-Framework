@@ -5,9 +5,9 @@ HTML Reporter - Generate comprehensive HTML reports for Judo Framework tests
 import json
 import os
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from .report_data import ReportData
 
 
@@ -17,7 +17,7 @@ class HTMLReporter:
     Creates detailed reports with request/response data, assertions, and more
     """
     
-    def __init__(self, output_dir: str = None):
+    def __init__(self, output_dir: str = None, config_file: str = None):
         """Initialize HTML reporter"""
         if output_dir is None:
             # Usar directorio actual del proyecto del usuario
@@ -27,9 +27,157 @@ class HTMLReporter:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Cargar logos como base64
-        self.centyc_logo_b64 = self._load_logo_as_base64("logo_centyc.png")
-        self.judo_logo_b64 = self._load_logo_as_base64("logo_judo.png")
+        # Cargar configuración personalizable
+        self.config = self._load_config(config_file)
+        
+        # Cargar logos desde configuración o usar defaults
+        self.primary_logo_b64 = self._get_logo_from_config("primary_logo")
+        self.secondary_logo_b64 = self._get_logo_from_config("secondary_logo") 
+        self.company_logo_b64 = self._get_logo_from_config("company_logo")
+        
+        # Fallback a logos por defecto si no hay configuración
+        if not self.primary_logo_b64:
+            self.primary_logo_b64 = self._load_logo_as_base64("logo_judo.png")
+        if not self.secondary_logo_b64:
+            self.secondary_logo_b64 = self._load_logo_as_base64("logo_centyc.png")
+    
+    def _load_config(self, config_file: str = None) -> Dict[str, Any]:
+        """Load configuration from JSON file"""
+        default_config = {
+            "project": {
+                "name": "Judo Framework Test Report",
+                "engineer": "Test Engineer",
+                "team": "QA Team", 
+                "product": "API Testing Suite",
+                "company": "Your Company",
+                "date_format": "%Y-%m-%d %H:%M:%S"
+            },
+            "branding": {
+                "primary_logo": "",
+                "secondary_logo": "",
+                "company_logo": "",
+                "primary_color": "#8b5cf6",
+                "secondary_color": "#a855f7", 
+                "accent_color": "#9333ea",
+                "success_color": "#22c55e",
+                "error_color": "#ef4444",
+                "warning_color": "#f59e0b"
+            },
+            "charts": {
+                "enabled": True,
+                "show_pie_charts": True,
+                "show_bar_charts": False,
+                "colors": {
+                    "passed": "#22c55e",
+                    "failed": "#ef4444", 
+                    "skipped": "#f59e0b"
+                }
+            },
+            "footer": {
+                "show_creator": False,
+                "show_logo": True,
+                "creator_name": "Felipe Farias",
+                "creator_email": "felipe.farias@centyc.cl",
+                "company_name": "CENTYC",
+                "company_url": "https://www.centyc.cl",
+                "documentation_url": "http://centyc.cl/judo-framework/",
+                "github_url": "https://github.com/FelipeFariasAlfaro/Judo-Framework"
+            },
+            "display": {
+                "show_request_details": True,
+                "show_response_details": True,
+                "show_variables": True,
+                "show_assertions": True,
+                "collapse_sections_by_default": True,
+                "show_duration_in_ms": False
+            }
+        }
+        
+        # Buscar archivo de configuración
+        config_paths = []
+        
+        # 1. Desde variable de entorno JUDO_REPORT_CONFIG_FILE
+        env_config_file = os.getenv('JUDO_REPORT_CONFIG_FILE')
+        if env_config_file:
+            config_paths.append(env_config_file)
+        
+        # 2. Desde parámetro directo
+        if config_file:
+            config_paths.append(config_file)
+        
+        # 3. Buscar en ubicaciones estándar
+        config_paths.extend([
+            "report_config.json",
+            "judo_report_config.json", 
+            ".judo/report_config.json",
+            "judo_reports/report_config.json",  # Ubicación recomendada
+            os.path.join(os.getcwd(), "report_config.json"),
+            os.path.join(os.getcwd(), "judo_reports", "report_config.json"),
+            os.path.join(os.getcwd(), ".judo", "report_config.json")
+        ])
+        
+        # Intentar cargar configuración
+        for config_path in config_paths:
+            try:
+                if os.path.exists(config_path):
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        user_config = json.load(f)
+                        # Merge con configuración por defecto
+                        return self._merge_config(default_config, user_config)
+            except Exception as e:
+                print(f"Warning: Could not load config from {config_path}: {e}")
+                continue
+        
+        return default_config
+    
+    def _merge_config(self, default: Dict, user: Dict) -> Dict:
+        """Merge user configuration with defaults"""
+        result = default.copy()
+        for key, value in user.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self._merge_config(result[key], value)
+            else:
+                result[key] = value
+        return result
+    
+    def _get_logo_from_config(self, logo_key: str) -> str:
+        """Get logo from configuration"""
+        try:
+            logo_data = self.config.get("branding", {}).get(logo_key, "")
+            
+            # Si no hay datos de logo, retornar vacío
+            if not logo_data:
+                return ""
+            
+            # Si ya es un data URL válido, retornarlo directamente
+            if logo_data.startswith("data:image"):
+                return logo_data
+            
+            # Si es una ruta de archivo, cargarla
+            if os.path.exists(logo_data):
+                with open(logo_data, 'rb') as f:
+                    file_data = f.read()
+                    logo_b64 = base64.b64encode(file_data).decode('utf-8')
+                    # Detectar tipo de imagen
+                    ext = Path(logo_data).suffix.lower()
+                    mime_type = {
+                        '.png': 'image/png',
+                        '.jpg': 'image/jpeg', 
+                        '.jpeg': 'image/jpeg',
+                        '.gif': 'image/gif',
+                        '.svg': 'image/svg+xml'
+                    }.get(ext, 'image/png')
+                    return f"data:{mime_type};base64,{logo_b64}"
+            
+            # Si parece ser base64 sin el prefijo data:, agregarlo
+            if len(logo_data) > 100 and not logo_data.startswith("data:"):
+                # Asumir PNG por defecto
+                return f"data:image/png;base64,{logo_data}"
+                
+        except Exception as e:
+            print(f"Warning: Could not load logo {logo_key}: {e}")
+        
+        return ""
     
     def _load_logo_as_base64(self, logo_filename: str) -> str:
         """Load logo file and convert to base64 data URL"""
@@ -130,15 +278,17 @@ class HTMLReporter:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{report_data.title}</title>
+    <title>{self.config['project']['name']}</title>
     <style>
         {self._get_css_styles()}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         {self._generate_header(report_data, summary)}
-        {self._generate_summary_section(summary)}
+        {self._generate_project_info()}
+        {self._generate_summary_section(summary, report_data)}
         {self._generate_features_section(report_data.features)}
     </div>
     
@@ -146,6 +296,7 @@ class HTMLReporter:
     
     <script>
         {self._get_javascript()}
+        {self._get_charts_javascript(summary) if self.config['charts']['enabled'] else ''}
     </script>
 </body>
 </html>
@@ -155,40 +306,43 @@ class HTMLReporter:
     def _generate_header(self, report_data: ReportData, summary: Dict) -> str:
         """Generate report header"""
         status_class = "success" if summary["scenario_counts"]["failed"] == 0 else "failure"
+        project_config = self.config['project']
+        branding_config = self.config['branding']
+        
+        # Usar logos configurados o fallbacks
+        secondary_logo = self.secondary_logo_b64 or self.company_logo_b64
+        primary_logo = self.primary_logo_b64
         
         return f"""
         <header class="report-header">
             <div class="header-content">
                 <div class="header-layout">
-                    <!-- Logo CENTYC en esquina superior izquierda -->
-                    <div class="centyc-logo">
-                        <a href="https://www.centyc.cl" target="_blank" class="centyc-link">
-                            {f'<img src="{self.centyc_logo_b64}" alt="CENTYC Logo" class="centyc-img">' if self.centyc_logo_b64 else '<span class="centyc-fallback">CENTYC</span>'}
-                            <span class="centyc-text">www.centyc.cl</span>
-                        </a>
+                    <!-- Logo secundario/empresa en esquina superior izquierda -->
+                    <div class="secondary-logo">
+                        {f'<a href="{self.config["footer"]["company_url"]}" target="_blank" class="secondary-link">' if self.config["footer"]["company_url"] else '<div class="secondary-link">'}
+                            {f'<img src="{secondary_logo}" alt="Company Logo" class="secondary-img">' if secondary_logo else f'<span class="secondary-fallback">{project_config["company"]}</span>'}
+                            <span class="secondary-text">{project_config["company"]}</span>
+                        {f'</a>' if self.config["footer"]["company_url"] else '</div>'}
                     </div>
                     
-                    <!-- Logo Judo Framework y título centrados -->
+                    <!-- Título centrado sin logo -->
                     <div class="main-title">
-                        <div class="judo-logo-circle">
-                            {f'<img src="{self.judo_logo_b64}" alt="Judo Framework Logo" class="judo-img">' if self.judo_logo_b64 else '<span class="judo-fallback">🥋</span>'}
-                        </div>
-                        <h1 class="report-title">{report_data.title}</h1>
+                        <h1 class="report-title">{project_config['name']}</h1>
                     </div>
                 </div>
                 
                 <!-- Información del reporte en layout horizontal -->
                 <div class="header-info-horizontal">
                     <div class="info-group">
-                        <span class="info-label">Start Time:</span>
-                        <span class="info-value">{report_data.start_time.strftime('%Y-%m-%d %H:%M:%S')}</span>
+                        <span class="info-label">Fecha:</span>
+                        <span class="info-value">{report_data.start_time.strftime(project_config['date_format'])}</span>
                     </div>
                     <div class="info-group">
-                        <span class="info-label">Duration:</span>
+                        <span class="info-label">Duración:</span>
                         <span class="info-value">{report_data.duration:.2f}s</span>
                     </div>
                     <div class="info-group">
-                        <span class="info-label">Status:</span>
+                        <span class="info-label">Estado:</span>
                         <span class="status-badge status-{status_class}">
                             {'✓' if status_class == 'success' else '✗'}
                         </span>
@@ -198,38 +352,188 @@ class HTMLReporter:
         </header>
         """
     
-    def _generate_summary_section(self, summary: Dict) -> str:
-        """Generate summary section"""
+    def _generate_project_info(self) -> str:
+        """Generate project information section"""
+        project_config = self.config['project']
+        
+        return f"""
+        <section class="project-info-section">
+            <div class="project-info-grid">
+                <div class="project-info-card">
+                    <div class="info-icon">👨‍💻</div>
+                    <div class="info-content">
+                        <div class="info-title">Ingeniero</div>
+                        <div class="info-value">{project_config['engineer']}</div>
+                    </div>
+                </div>
+                <div class="project-info-card">
+                    <div class="info-icon">👥</div>
+                    <div class="info-content">
+                        <div class="info-title">Equipo</div>
+                        <div class="info-value">{project_config['team']}</div>
+                    </div>
+                </div>
+                <div class="project-info-card">
+                    <div class="info-icon">📦</div>
+                    <div class="info-content">
+                        <div class="info-title">Producto</div>
+                        <div class="info-value">{project_config['product']}</div>
+                    </div>
+                </div>
+                <div class="project-info-card">
+                    <div class="info-icon">🏢</div>
+                    <div class="info-content">
+                        <div class="info-title">Empresa</div>
+                        <div class="info-value">{project_config['company']}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        """
+    
+    def _generate_charts_section(self, summary: Dict) -> str:
+        """Generate charts section with pie charts"""
+        if not self.config['charts']['enabled']:
+            return ""
+        
+        charts_html = """
+        <section class="charts-section">
+            <h2>📊 Gráficos de Resultados</h2>
+            <div class="charts-grid">
+        """
+        
+        if self.config['charts']['show_pie_charts']:
+            charts_html += """
+                <div class="chart-container">
+                    <h3>Distribución de Escenarios</h3>
+                    <canvas id="scenariosChart" width="300" height="300"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Distribución de Pasos</h3>
+                    <canvas id="stepsChart" width="300" height="300"></canvas>
+                </div>
+            """
+        
+        if self.config['charts']['show_bar_charts']:
+            charts_html += """
+                <div class="chart-container chart-wide">
+                    <h3>Comparación de Resultados</h3>
+                    <canvas id="comparisonChart" width="600" height="300"></canvas>
+                </div>
+            """
+        
+        charts_html += """
+            </div>
+        </section>
+        """
+        
+        return charts_html
+    
+    def _generate_summary_section(self, summary: Dict, report_data: ReportData = None) -> str:
+        """Generate summary section with integrated pie charts and execution info"""
+        # Generar gráficos de torta si están habilitados
+        charts_html = ""
+        if self.config['charts']['enabled'] and self.config['charts']['show_pie_charts']:
+            charts_html = f"""
+            <div class="summary-charts-grid">
+                <div class="summary-chart-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">📁</span>
+                        <span class="chart-title">Features</span>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart-number">{summary['total_features']}</div>
+                        <div class="chart-canvas-container">
+                            <canvas id="scenariosChart" width="120" height="120"></canvas>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="stat-item passed">{summary['scenario_counts']['passed']} PASSED</div>
+                            <div class="stat-item failed">{summary['scenario_counts']['failed']} FAILED</div>
+                            <div class="stat-item skipped">{summary['scenario_counts']['skipped']} SKIPPED</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-chart-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">📋</span>
+                        <span class="chart-title">Scenarios</span>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart-number">{summary['total_scenarios']}</div>
+                        <div class="chart-canvas-container">
+                            <canvas id="scenariosChart2" width="120" height="120"></canvas>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="stat-item passed">{summary['scenario_counts']['passed']} PASSED</div>
+                            <div class="stat-item failed">{summary['scenario_counts']['failed']} FAILED</div>
+                            <div class="stat-item skipped">{summary['scenario_counts']['skipped']} SKIPPED</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-chart-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">🔸</span>
+                        <span class="chart-title">Steps</span>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart-number">{summary['total_steps']}</div>
+                        <div class="chart-canvas-container">
+                            <canvas id="stepsChart" width="120" height="120"></canvas>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="stat-item passed">{summary['step_counts']['passed']} PASSED</div>
+                            <div class="stat-item failed">{summary['step_counts']['failed']} FAILED</div>
+                            <div class="stat-item skipped">{summary['step_counts']['skipped']} SKIPPED</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            """
+        
+        # Usar datos reales si están disponibles
+        if report_data:
+            start_time = report_data.start_time.strftime(self.config['project']['date_format'])
+            end_time = (report_data.start_time + timedelta(seconds=report_data.duration)).strftime(self.config['project']['date_format'])
+            duration = f"{report_data.duration:.2f}s"
+            browser = "Chromium"  # Default, could be made configurable
+        else:
+            # Fallback values
+            start_time = "2026-01-07 12:31:59"
+            end_time = "2026-01-07 12:32:26"
+            duration = "27.47s"
+            browser = "Chromium"
+        
         return f"""
         <section class="summary-section">
-            <h2>📊 Test Summary</h2>
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <div class="card-header">Features</div>
-                    <div class="card-value">{summary['total_features']}</div>
-                </div>
-                <div class="summary-card">
-                    <div class="card-header">Scenarios</div>
-                    <div class="card-value">{summary['total_scenarios']}</div>
-                    <div class="card-breakdown">
-                        <span class="passed">{summary['scenario_counts']['passed']} passed</span>
-                        <span class="failed">{summary['scenario_counts']['failed']} failed</span>
-                        <span class="skipped">{summary['scenario_counts']['skipped']} skipped</span>
+            <div class="summary-layout">
+                <!-- Información de ejecución a la izquierda -->
+                <div class="execution-info">
+                    <div class="execution-item">
+                        <span class="execution-icon">🕐</span>
+                        <span class="execution-label">Inicio</span>
+                        <span class="execution-value">{start_time}</span>
+                    </div>
+                    <div class="execution-item">
+                        <span class="execution-icon">🏁</span>
+                        <span class="execution-label">Fin</span>
+                        <span class="execution-value">{end_time}</span>
+                    </div>
+                    <div class="execution-item">
+                        <span class="execution-icon">⏱️</span>
+                        <span class="execution-label">Duración</span>
+                        <span class="execution-value">{duration}</span>
+                    </div>
+                    <div class="execution-item">
+                        <span class="execution-icon">🌐</span>
+                        <span class="execution-label">Navegador</span>
+                        <span class="execution-value">{browser}</span>
                     </div>
                 </div>
-                <div class="summary-card">
-                    <div class="card-header">Steps</div>
-                    <div class="card-value">{summary['total_steps']}</div>
-                    <div class="card-breakdown">
-                        <span class="passed">{summary['step_counts']['passed']} passed</span>
-                        <span class="failed">{summary['step_counts']['failed']} failed</span>
-                        <span class="skipped">{summary['step_counts']['skipped']} skipped</span>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="card-header">Success Rate</div>
-                    <div class="card-value">{summary['success_rate']:.1f}%</div>
-                </div>
+                
+                <!-- Gráficos de resultados a la derecha -->
+                {charts_html}
             </div>
         </section>
         """
@@ -267,26 +571,42 @@ class HTMLReporter:
     
     def _generate_footer(self) -> str:
         """Generate report footer"""
-        logo_html = f'<img src="{self.judo_logo_b64}" alt="Judo Framework Logo" class="judo-logo-footer">' if self.judo_logo_b64 else '<span class="judo-fallback-footer">🥋</span>'
+        footer_config = self.config['footer']
         
-        return f"""
+        footer_html = f"""
         <footer class="report-footer">
             <div class="footer-content">
-                <div class="footer-logo">
-                    {logo_html}
-                    <span class="footer-text">Framework creado por Felipe Farias - </span>
-                    <a href="mailto:felipe.farias@centyc.cl" class="footer-email">felipe.farias@centyc.cl</a>
+        """
+        
+        # Solo mostrar logo si está habilitado
+        if footer_config.get('show_logo', False):
+            if self.primary_logo_b64:
+                footer_html += f"""
+                <div class="footer-logo-only">
+                    <img src="{self.primary_logo_b64}" alt="Logo" class="primary-logo-footer">
                 </div>
+                """
+            else:
+                footer_html += f"""
+                <div class="footer-logo-only">
+                    <span class="primary-fallback-footer">🥋</span>
+                </div>
+                """
+        
+        # Links siempre visibles (pero se pueden ocultar con CSS si se desea)
+        footer_html += f"""
                 <div class="footer-links">
-                    <a href="https://www.centyc.cl" target="_blank" class="footer-link">CENTYC</a>
+                    <a href="{footer_config['company_url']}" target="_blank" class="footer-link">{footer_config['company_name']}</a>
                     <span class="separator">•</span>
-                    <a href="http://centyc.cl/judo-framework/" target="_blank" class="footer-link">Documentación</a>
+                    <a href="{footer_config['documentation_url']}" target="_blank" class="footer-link">Documentación</a>
                     <span class="separator">•</span>
-                    <a href="https://github.com/FelipeFariasAlfaro/Judo-Framework" target="_blank" class="footer-link">GitHub</a>
+                    <a href="{footer_config['github_url']}" target="_blank" class="footer-link">GitHub</a>
                 </div>
             </div>
         </footer>
         """
+        
+        return footer_html
     
     def _generate_scenarios_section(self, scenarios, feature_index) -> str:
         """Generate scenarios section"""
@@ -434,12 +754,6 @@ class HTMLReporter:
             </div>
             """
         
-        # ✅ SCREENSHOTS
-        if hasattr(step, 'screenshot_path') and step.screenshot_path:
-            screenshot_html = self._generate_screenshot_section(step.screenshot_path)
-            if screenshot_html:
-                details_html += screenshot_html
-        
         return details_html
     
     def _generate_headers_section(self, title: str, headers: Dict) -> str:
@@ -520,189 +834,129 @@ class HTMLReporter:
         
         return assertions_html
     
-    def _generate_screenshot_section(self, screenshot_path: str) -> str:
-        """Generate screenshot section with embedded image"""
-        if not screenshot_path:
-            return ""
-        
-        try:
-            # Convert screenshot to base64
-            from pathlib import Path
-            screenshot_file = Path(screenshot_path)
-            
-            if not screenshot_file.exists():
-                return f"""
-                <div class="detail-section">
-                    <h4>📸 Screenshot</h4>
-                    <div class="screenshot-error">Screenshot file not found: {screenshot_path}</div>
-                </div>
-                """
-            
-            with open(screenshot_file, 'rb') as f:
-                screenshot_data = f.read()
-                screenshot_b64 = base64.b64encode(screenshot_data).decode('utf-8')
-            
-            # Determine image type from extension
-            ext = screenshot_file.suffix.lower()
-            mime_type = {
-                '.png': 'image/png',
-                '.jpg': 'image/jpeg',
-                '.jpeg': 'image/jpeg',
-                '.gif': 'image/gif',
-                '.webp': 'image/webp'
-            }.get(ext, 'image/png')
-            
-            return f"""
-            <div class="detail-section screenshot-section">
-                <h4>📸 Screenshot</h4>
-                <div class="screenshot-container">
-                    <img src="data:{mime_type};base64,{screenshot_b64}" 
-                         alt="Step Screenshot" 
-                         class="screenshot-image"
-                         onclick="toggleScreenshotFullscreen(this)">
-                    <div class="screenshot-info">
-                        <span class="screenshot-filename">{screenshot_file.name}</span>
-                        <span class="screenshot-hint">Click to view fullscreen</span>
-                    </div>
-                </div>
-            </div>
-            """
-        except Exception as e:
-            return f"""
-            <div class="detail-section">
-                <h4>📸 Screenshot</h4>
-                <div class="screenshot-error">Error loading screenshot: {str(e)}</div>
-            </div>
-            """
-  
     def _get_css_styles(self) -> str:
         """Get CSS styles for the report"""
-        return """
-        * {
+        branding = self.config['branding']
+        
+        return f"""
+        * {{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+        }}
         
-        body {
+        body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #333;
             background-color: #f5f5f5;
-        }
+        }}
         
-        .container {
+        .container {{
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-        }
+        }}
         
         /* Header Styles */
-        .report-header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+        .report-header {{
+            background: linear-gradient(135deg, {branding['primary_color']} 0%, {branding['secondary_color']} 50%, {branding['accent_color']} 100%);
             color: white;
             padding: 25px 30px;
             border-radius: 15px;
             margin-bottom: 30px;
             box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
-        }
+        }}
         
-        .header-layout {
+        .header-layout {{
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 25px;
             position: relative;
-        }
+        }}
         
-        /* Logo CENTYC en esquina superior izquierda */
-        .centyc-logo {
+        /* Logo secundario/empresa en esquina superior izquierda */
+        .secondary-logo {{
             position: absolute;
             top: 0;
             left: 0;
-        }
+        }}
         
-        .centyc-link {
+        .secondary-link {{
             display: flex;
             align-items: center;
             gap: 8px;
             text-decoration: none;
             color: white;
             transition: opacity 0.3s ease;
-        }
+        }}
         
-        .centyc-link:hover {
+        .secondary-link:hover {{
             opacity: 0.8;
-        }
+        }}
         
-        .centyc-text {
+        .secondary-text {{
             font-size: 0.9em;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
-        }
+        }}
         
-        .centyc-img {
+        .secondary-img {{
             height: 30px;
             width: auto;
             max-width: 120px;
             transition: opacity 0.3s ease;
             border-radius: 4px;
-        }
+        }}
         
-        .centyc-img:hover {
+        .secondary-img:hover {{
             opacity: 0.8;
-        }
+        }}
         
-        .centyc-fallback {
+        .secondary-fallback {{
             font-size: 1.2em;
             font-weight: bold;
             color: white;
-        }
+        }}
         
-        /* Logo Judo Framework y título centrados */
-        .main-title {
+        /* Logo principal y título centrados */
+        .main-title {{
             display: flex;
             align-items: center;
             gap: 15px;
             margin: 0 auto;
             padding-top: 10px;
-        }
+        }}
         
-        .judo-logo-circle {
-            transition: transform 0.3s ease;
-        }
-        
-        .judo-logo-circle:hover {
-            transform: scale(1.05);
-        }
-        
-        .judo-img {
+
+        .primary-img {{
             height: 50px;
             width: 50px;
             border-radius: 50%;
             transition: transform 0.3s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             object-fit: cover;
-        }
+        }}
         
-        .judo-img:hover {
+        .primary-img:hover {{
             transform: scale(1.05);
-        }
+        }}
         
-        .judo-fallback {
+        .primary-fallback {{
             font-size: 2em;
-        }
+        }}
         
-        .report-title {
+        .report-title {{
             font-size: 2.2em;
             margin: 0;
             font-weight: 600;
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        }}
         
         /* Información horizontal */
-        .header-info-horizontal {
+        .header-info-horizontal {{
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -710,29 +964,29 @@ class HTMLReporter:
             padding: 15px 25px;
             border-radius: 10px;
             backdrop-filter: blur(10px);
-        }
+        }}
         
-        .info-group {
+        .info-group {{
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 5px;
-        }
+        }}
         
-        .info-label {
+        .info-label {{
             font-size: 0.85em;
             color: rgba(255, 255, 255, 0.8);
             font-weight: 500;
-        }
+        }}
         
-        .info-value {
+        .info-value {{
             font-size: 1.1em;
             font-weight: 600;
             color: white;
-        }
+        }}
         
         /* Status Badge */
-        .status-badge {
+        .status-badge {{
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: bold;
@@ -741,90 +995,316 @@ class HTMLReporter:
             align-items: center;
             justify-content: center;
             min-width: 80px;
-        }
+        }}
         
-        .status-badge.status-success {
-            background: #22c55e;
+        .status-badge.status-success {{
+            background: {branding['success_color']};
             color: white;
             box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
-        }
+        }}
         
-        .status-badge.status-failure {
-            background: #ef4444;
+        .status-badge.status-failure {{
+            background: {branding['error_color']};
             color: white;
             box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-        }
+        }}
         
-        /* Summary Section */
-        .summary-section {
+        /* Project Info Section */
+        .project-info-section {{
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
+        
+        .project-info-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }}
+        
+        .project-info-card {{
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid {branding['primary_color']};
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }}
+        
+        .project-info-card:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }}
+        
+        .info-icon {{
+            font-size: 2em;
+            opacity: 0.8;
+        }}
+        
+        .info-content {{
+            flex: 1;
+        }}
+        
+        .info-title {{
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }}
+        
+        .info-value {{
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }}
+        
+        /* Charts Section */
+        .charts-section {{
             background: white;
             padding: 30px;
             border-radius: 10px;
             margin-bottom: 30px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        }}
         
-        .summary-section h2 {
-            margin-bottom: 20px;
+        .charts-section h2 {{
+            margin-bottom: 25px;
             color: #333;
-        }
+            text-align: center;
+        }}
         
-        .summary-grid {
+        .charts-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            align-items: start;
+        }}
         
-        .summary-card {
+        .chart-container {{
             background: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
             text-align: center;
-            border-left: 4px solid #667eea;
-        }
+            border: 1px solid #e9ecef;
+        }}
         
-        .card-header {
+        .chart-container h3 {{
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.1em;
+        }}
+        
+        .chart-container canvas {{
+            max-width: 100%;
+            height: 300px !important;
+        }}
+        
+        .chart-wide {{
+            grid-column: 1 / -1;
+        }}
+        
+        .chart-wide canvas {{
+            height: 400px !important;
+        }}
+        
+        /* Summary Section */
+        .summary-section {{
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
+        
+        .summary-layout {{
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }}
+        
+        /* Información de ejecución a la izquierda */
+        .execution-info {{
+            flex: 0 0 200px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid {branding['primary_color']};
+        }}
+        
+        .execution-item {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 8px 0;
+        }}
+        
+        .execution-item:last-child {{
+            margin-bottom: 0;
+        }}
+        
+        .execution-icon {{
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }}
+        
+        .execution-label {{
             font-size: 0.9em;
             color: #666;
-            margin-bottom: 10px;
-        }
+            font-weight: 500;
+            min-width: 70px;
+        }}
         
-        .card-value {
-            font-size: 2em;
-            font-weight: bold;
+        .execution-value {{
+            font-size: 0.9em;
             color: #333;
-            margin-bottom: 10px;
-        }
+            font-weight: 600;
+        }}
         
-        .card-breakdown {
-            font-size: 0.8em;
+        /* Gráficos de resumen */
+        .summary-charts-grid {{
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }}
+        
+        .summary-chart-card {{
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }}
+        
+        .summary-chart-card:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }}
+        
+        .chart-header {{
             display: flex;
-            justify-content: space-around;
-            gap: 10px;
-        }
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid {branding['primary_color']};
+        }}
         
-        .passed {
-            color: #4CAF50;
-        }
+        .chart-icon {{
+            font-size: 1.2em;
+        }}
         
-        .failed {
-            color: #f44336;
-        }
+        .chart-title {{
+            font-size: 1em;
+            font-weight: 600;
+            color: #333;
+        }}
         
-        .skipped {
-            color: #ff9800;
-        }
+        .chart-content {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }}
+        
+        .chart-number {{
+            font-size: 2.5em;
+            font-weight: bold;
+            color: {branding['primary_color']};
+            line-height: 1;
+        }}
+        
+        .chart-canvas-container {{
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }}
+        
+        .chart-canvas-container canvas {{
+            max-width: 100% !important;
+            max-height: 100% !important;
+        }}
+        
+        .chart-stats {{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+        }}
+        
+        .stat-item {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em;
+            font-weight: 500;
+            padding: 2px 0;
+        }}
+        
+        .stat-item.passed {{
+            color: {branding['success_color']};
+        }}
+        
+        .stat-item.failed {{
+            color: {branding['error_color']};
+        }}
+        
+        .stat-item.skipped {{
+            color: {branding['warning_color']};
+        }}
+        
+        /* Responsive design para summary */
+        @media (max-width: 768px) {{
+            .summary-layout {{
+                flex-direction: column;
+            }}
+            
+            .execution-info {{
+                flex: none;
+                width: 100%;
+            }}
+            
+            .summary-charts-grid {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+        
+        @media (max-width: 1024px) {{
+            .summary-charts-grid {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
+        }}
+        
+        .passed {{
+            color: {branding['success_color']};
+        }}
+        
+        .failed {{
+            color: {branding['error_color']};
+        }}
+        
+        .skipped {{
+            color: {branding['warning_color']};
+        }}
         
         /* Feature Section */
-        .feature-section {
+        .feature-section {{
             background: white;
             margin-bottom: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             overflow: hidden;
-        }
+        }}
         
-        .feature-header {
+        .feature-header {{
             background: #f8f9fa;
             padding: 20px;
             cursor: pointer;
@@ -832,235 +1312,235 @@ class HTMLReporter:
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e9ecef;
-        }
+        }}
         
-        .feature-header:hover {
+        .feature-header:hover {{
             background: #e9ecef;
-        }
+        }}
         
-        .feature-header h2 {
+        .feature-header h2 {{
             display: flex;
             align-items: center;
             gap: 10px;
             margin: 0;
-        }
+        }}
         
-        .feature-info {
+        .feature-info {{
             display: flex;
             align-items: center;
             gap: 15px;
             font-size: 0.9em;
             color: #666;
-        }
+        }}
         
-        .feature-content {
+        .feature-content {{
             padding: 20px;
-        }
+        }}
         
         /* Scenario Section */
-        .scenario-section {
+        .scenario-section {{
             margin-bottom: 20px;
             border: 1px solid #e9ecef;
             border-radius: 8px;
             overflow: hidden;
-        }
+        }}
         
-        .scenario-header {
+        .scenario-header {{
             background: #f8f9fa;
             padding: 15px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
+        }}
         
-        .scenario-header:hover {
+        .scenario-header:hover {{
             background: #e9ecef;
-        }
+        }}
         
-        .scenario-header h3 {
+        .scenario-header h3 {{
             display: flex;
             align-items: center;
             gap: 10px;
             margin: 0;
             font-size: 1.1em;
-        }
+        }}
         
-        .scenario-info {
+        .scenario-info {{
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 0.8em;
             color: #666;
-        }
+        }}
         
-        .scenario-content {
+        .scenario-content {{
             padding: 15px;
             background: #fafafa;
-        }
+        }}
         
         /* Step Section */
-        .step-section {
+        .step-section {{
             margin-bottom: 15px;
             border: 1px solid #e9ecef;
             border-radius: 6px;
             overflow: hidden;
-        }
+        }}
         
-        .step-section.status-passed {
-            border-left: 4px solid #4CAF50;
-        }
+        .step-section.status-passed {{
+            border-left: 4px solid {branding['success_color']};
+        }}
         
-        .step-section.status-failed {
-            border-left: 4px solid #f44336;
-        }
+        .step-section.status-failed {{
+            border-left: 4px solid {branding['error_color']};
+        }}
         
-        .step-section.status-skipped {
-            border-left: 4px solid #ff9800;
-        }
+        .step-section.status-skipped {{
+            border-left: 4px solid {branding['warning_color']};
+        }}
         
-        .step-header {
+        .step-header {{
             background: white;
             padding: 12px 15px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
+        }}
         
-        .step-header:hover {
+        .step-header:hover {{
             background: #f8f9fa;
-        }
+        }}
         
-        .step-info {
+        .step-info {{
             display: flex;
             align-items: center;
             gap: 10px;
-        }
+        }}
         
-        .step-text {
+        .step-text {{
             font-family: 'Monaco', 'Menlo', monospace;
             font-size: 0.9em;
-        }
+        }}
         
-        .step-meta {
+        .step-meta {{
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 0.8em;
             color: #666;
-        }
+        }}
         
-        .step-content {
+        .step-content {{
             padding: 15px;
             background: #fafafa;
             display: none;
-        }
+        }}
         
-        .step-content.expanded {
+        .step-content.expanded {{
             display: block;
-        }
+        }}
         
         /* Detail Sections */
-        .detail-section {
+        .detail-section {{
             margin-bottom: 20px;
             background: white;
             border-radius: 6px;
             padding: 15px;
             border: 1px solid #e9ecef;
-        }
+        }}
         
-        .detail-section h4 {
+        .detail-section h4 {{
             margin-bottom: 15px;
             color: #333;
             font-size: 1em;
-        }
+        }}
         
-        .detail-section h5 {
+        .detail-section h5 {{
             margin-bottom: 10px;
             color: #666;
             font-size: 0.9em;
-        }
+        }}
         
         /* Request/Response Styles */
-        .method-url {
+        .method-url {{
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 15px;
-        }
+        }}
         
-        .http-method {
+        .http-method {{
             padding: 4px 8px;
             border-radius: 4px;
             font-weight: bold;
             font-size: 0.8em;
             color: white;
-        }
+        }}
         
-        .method-get { background: #4CAF50; }
-        .method-post { background: #2196F3; }
-        .method-put { background: #ff9800; }
-        .method-patch { background: #9c27b0; }
-        .method-delete { background: #f44336; }
+        .method-get {{ background: {branding['success_color']}; }}
+        .method-post {{ background: #2196F3; }}
+        .method-put {{ background: {branding['warning_color']}; }}
+        .method-patch {{ background: #9c27b0; }}
+        .method-delete {{ background: {branding['error_color']}; }}
         
-        .url {
+        .url {{
             font-family: 'Monaco', 'Menlo', monospace;
             background: #f8f9fa;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.9em;
-        }
+        }}
         
-        .status-line {
+        .status-line {{
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 15px;
-        }
+        }}
         
-        .status-code {
+        .status-code {{
             padding: 4px 8px;
             border-radius: 4px;
             font-weight: bold;
             color: white;
-        }
+        }}
         
-        .status-success { background: #4CAF50; }
-        .status-error { background: #f44336; }
+        .status-success {{ background: {branding['success_color']}; }}
+        .status-error {{ background: {branding['error_color']}; }}
         
-        .response-time {
+        .response-time {{
             font-size: 0.9em;
             color: #666;
-        }
+        }}
         
         /* Headers and Parameters */
-        .headers-section, .params-section, .body-section {
+        .headers-section, .params-section, .body-section {{
             margin-bottom: 15px;
-        }
+        }}
         
-        .headers-list, .params-list {
+        .headers-list, .params-list {{
             background: #f8f9fa;
             border-radius: 4px;
             padding: 10px;
-        }
+        }}
         
-        .header-item, .param-item {
+        .header-item, .param-item {{
             margin-bottom: 5px;
             font-size: 0.9em;
-        }
+        }}
         
-        .header-key, .param-key {
+        .header-key, .param-key {{
             font-weight: bold;
             color: #666;
-        }
+        }}
         
-        .header-value, .param-value {
+        .header-value, .param-value {{
             font-family: 'Monaco', 'Menlo', monospace;
-        }
+        }}
         
         /* Code Content */
-        .json-content, .text-content {
+        .json-content, .text-content {{
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 4px;
@@ -1069,174 +1549,95 @@ class HTMLReporter:
             font-size: 0.8em;
             overflow-x: auto;
             white-space: pre-wrap;
-        }
+        }}
         
         /* Assertions */
-        .assertions-list {
+        .assertions-list {{
             background: #f8f9fa;
             border-radius: 4px;
             padding: 10px;
-        }
+        }}
         
-        .assertion-item {
+        .assertion-item {{
             margin-bottom: 10px;
             padding: 10px;
             border-radius: 4px;
             border-left: 4px solid #ccc;
-        }
+        }}
         
-        .assertion-item.status-passed {
-            border-left-color: #4CAF50;
+        .assertion-item.status-passed {{
+            border-left-color: {branding['success_color']};
             background: #f1f8e9;
-        }
+        }}
         
-        .assertion-item.status-failed {
-            border-left-color: #f44336;
+        .assertion-item.status-failed {{
+            border-left-color: {branding['error_color']};
             background: #ffebee;
-        }
+        }}
         
-        .assertion-header {
+        .assertion-header {{
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 8px;
-        }
+        }}
         
-        .assertion-description {
+        .assertion-description {{
             font-weight: bold;
-        }
+        }}
         
-        .assertion-details {
+        .assertion-details {{
             font-size: 0.9em;
-        }
+        }}
         
-        .assertion-expected, .assertion-actual {
+        .assertion-expected, .assertion-actual {{
             margin-bottom: 4px;
-        }
+        }}
         
-        .assertion-expected code, .assertion-actual code {
+        .assertion-expected code, .assertion-actual code {{
             background: rgba(0,0,0,0.1);
             padding: 2px 4px;
             border-radius: 2px;
             font-family: 'Monaco', 'Menlo', monospace;
-        }
+        }}
         
         /* Error Section */
-        .error-section {
-            border-left: 4px solid #f44336;
+        .error-section {{
+            border-left: 4px solid {branding['error_color']};
             background: #ffebee;
-        }
+        }}
         
-        .error-message {
+        .error-message {{
             color: #d32f2f;
             font-weight: bold;
             margin-bottom: 10px;
-        }
+        }}
         
-        .error-traceback {
+        .error-traceback {{
             background: #ffcdd2;
-            border: 1px solid #f44336;
+            border: 1px solid {branding['error_color']};
             color: #b71c1c;
             font-size: 0.8em;
-        }
-        
-        /* Screenshot Section */
-        .screenshot-section {
-            border-left: 4px solid #2196F3;
-        }
-        
-        .screenshot-container {
-            text-align: center;
-        }
-        
-        .screenshot-image {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #e9ecef;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .screenshot-image:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .screenshot-info {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            font-size: 0.85em;
-            color: #666;
-        }
-        
-        .screenshot-filename {
-            font-family: 'Monaco', 'Menlo', monospace;
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        
-        .screenshot-hint {
-            color: #999;
-            font-style: italic;
-        }
-        
-        .screenshot-error {
-            color: #f44336;
-            padding: 10px;
-            background: #ffebee;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-        
-        /* Screenshot Fullscreen Modal */
-        .screenshot-fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            cursor: pointer;
-        }
-        
-        .screenshot-fullscreen.active {
-            display: flex;
-        }
-        
-        .screenshot-fullscreen img {
-            max-width: 95%;
-            max-height: 95%;
-            object-fit: contain;
-            box-shadow: 0 0 30px rgba(255,255,255,0.3);
-        }
+        }}
         
         /* Toggle Icons */
-        .toggle-icon {
+        .toggle-icon {{
             transition: transform 0.3s ease;
-        }
+        }}
         
-        .toggle-icon.rotated {
+        .toggle-icon.rotated {{
             transform: rotate(180deg);
-        }
+        }}
         
         /* Footer Styles */
-        .report-footer {
+        .report-footer {{
             background: #2c3e50;
             color: white;
             padding: 20px 0;
             margin-top: 40px;
-        }
+        }}
         
-        .footer-content {
+        .footer-content {{
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
@@ -1245,127 +1646,142 @@ class HTMLReporter:
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-        }
+        }}
         
-        .footer-logo {
+        .footer-info {{
             display: flex;
             align-items: center;
             gap: 8px;
-        }
+        }}
         
-        .judo-logo-footer {
+        .footer-logo-only {{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }}
+        
+        .primary-logo-footer {{
             height: 24px;
             width: 24px;
             opacity: 0.8;
             border-radius: 50%;
             object-fit: cover;
-        }
+        }}
         
-        .judo-fallback-footer {
+        .primary-fallback-footer {{
             font-size: 1.2em;
-        }
+        }}
         
-        .footer-text {
+        .footer-text {{
             font-size: 0.9em;
             color: rgba(255, 255, 255, 0.8);
-        }
+        }}
         
-        .footer-email {
+        .footer-email {{
             color: #3498db;
             text-decoration: none;
             font-weight: 500;
-        }
+        }}
         
-        .footer-email:hover {
+        .footer-email:hover {{
             color: #5dade2;
             text-decoration: underline;
-        }
+        }}
         
-        .footer-links {
+        .footer-links {{
             display: flex;
             align-items: center;
             gap: 10px;
-        }
+        }}
         
-        .footer-link {
+        .footer-link {{
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             font-size: 0.9em;
             transition: color 0.3s ease;
-        }
+        }}
         
-        .footer-link:hover {
+        .footer-link:hover {{
             color: white;
             text-decoration: underline;
-        }
+        }}
         
-        .separator {
+        .separator {{
             color: rgba(255, 255, 255, 0.5);
             font-size: 0.8em;
-        }
+        }}
         
         /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
+        @media (max-width: 768px) {{
+            .container {{
                 padding: 10px;
-            }
+            }}
             
-            .header-layout {
+            .header-layout {{
                 flex-direction: column;
                 align-items: center;
                 gap: 20px;
-            }
+            }}
             
-            .centyc-logo {
+            .secondary-logo {{
                 position: static;
                 order: -1;
-            }
+            }}
             
-            .main-title {
+            .main-title {{
                 flex-direction: column;
                 gap: 10px;
                 text-align: center;
-            }
+            }}
             
-            .report-title {
+            .report-title {{
                 font-size: 1.8em;
-            }
+            }}
             
-            .header-info-horizontal {
+            .header-info-horizontal {{
                 flex-direction: column;
                 gap: 15px;
-            }
+            }}
             
-            .info-group {
+            .info-group {{
                 flex-direction: row;
                 gap: 10px;
-            }
+            }}
             
-            .summary-grid {
+            .summary-grid {{
                 grid-template-columns: 1fr;
-            }
+            }}
             
-            .method-url {
+            .project-info-grid {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .charts-grid {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .method-url {{
                 flex-direction: column;
                 align-items: flex-start;
-            }
+            }}
             
-            .feature-header, .scenario-header, .step-header {
+            .feature-header, .scenario-header, .step-header {{
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
-            }
+            }}
             
-            .footer-content {
+            .footer-content {{
                 flex-direction: column;
                 text-align: center;
                 gap: 10px;
-            }
+            }}
             
-            .footer-links {
+            .footer-links {{
                 justify-content: center;
-            }
-        }
+            }}
+        }}
         """
     
     def _get_javascript(self) -> str:
@@ -1410,31 +1826,6 @@ class HTMLReporter:
             }
         }
         
-        // Screenshot fullscreen functionality
-        function toggleScreenshotFullscreen(img) {
-            // Create fullscreen modal if it doesn't exist
-            let modal = document.getElementById('screenshot-fullscreen-modal');
-            if (!modal) {
-                modal = document.createElement('div');
-                modal.id = 'screenshot-fullscreen-modal';
-                modal.className = 'screenshot-fullscreen';
-                modal.onclick = function() {
-                    this.classList.remove('active');
-                };
-                document.body.appendChild(modal);
-            }
-            
-            // Clone the image and show in fullscreen
-            const fullscreenImg = img.cloneNode(true);
-            fullscreenImg.onclick = function(e) {
-                e.stopPropagation();
-            };
-            
-            modal.innerHTML = '';
-            modal.appendChild(fullscreenImg);
-            modal.classList.add('active');
-        }
-        
         // Initialize collapsed state
         document.addEventListener('DOMContentLoaded', function() {
             // Collapse all features initially
@@ -1452,4 +1843,130 @@ class HTMLReporter:
                 icon.classList.add('rotated');
             });
         });
+        """
+    
+    def _get_charts_javascript(self, summary: Dict) -> str:
+        """Get JavaScript for charts"""
+        chart_colors = self.config['charts']['colors']
+        
+        return f"""
+        // Chart.js configuration and initialization
+        document.addEventListener('DOMContentLoaded', function() {{
+            // Features Pie Chart (first chart in summary)
+            if (document.getElementById('scenariosChart')) {{
+                const featuresCtx = document.getElementById('scenariosChart').getContext('2d');
+                new Chart(featuresCtx, {{
+                    type: 'pie',
+                    data: {{
+                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
+                        datasets: [{{
+                            data: [{summary['scenario_counts']['passed']}, {summary['scenario_counts']['failed']}, {summary['scenario_counts']['skipped']}],
+                            backgroundColor: [
+                                '{chart_colors['passed']}',
+                                '{chart_colors['failed']}',
+                                '{chart_colors['skipped']}'
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#ffffff'
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {{
+                            legend: {{
+                                display: false
+                            }},
+                            tooltip: {{
+                                callbacks: {{
+                                    label: function(context) {{
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+                }});
+            }}
+            
+            // Scenarios Pie Chart (second chart in summary)
+            if (document.getElementById('scenariosChart2')) {{
+                const scenariosCtx = document.getElementById('scenariosChart2').getContext('2d');
+                new Chart(scenariosCtx, {{
+                    type: 'pie',
+                    data: {{
+                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
+                        datasets: [{{
+                            data: [{summary['scenario_counts']['passed']}, {summary['scenario_counts']['failed']}, {summary['scenario_counts']['skipped']}],
+                            backgroundColor: [
+                                '{chart_colors['passed']}',
+                                '{chart_colors['failed']}',
+                                '{chart_colors['skipped']}'
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#ffffff'
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {{
+                            legend: {{
+                                display: false
+                            }},
+                            tooltip: {{
+                                callbacks: {{
+                                    label: function(context) {{
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+                }});
+            }}
+            
+            // Steps Pie Chart (third chart in summary)
+            if (document.getElementById('stepsChart')) {{
+                const stepsCtx = document.getElementById('stepsChart').getContext('2d');
+                new Chart(stepsCtx, {{
+                    type: 'pie',
+                    data: {{
+                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
+                        datasets: [{{
+                            data: [{summary['step_counts']['passed']}, {summary['step_counts']['failed']}, {summary['step_counts']['skipped']}],
+                            backgroundColor: [
+                                '{chart_colors['passed']}',
+                                '{chart_colors['failed']}',
+                                '{chart_colors['skipped']}'
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#ffffff'
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {{
+                            legend: {{
+                                display: false
+                            }},
+                            tooltip: {{
+                                callbacks: {{
+                                    label: function(context) {{
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+                }});
+            }}
+        }});
         """

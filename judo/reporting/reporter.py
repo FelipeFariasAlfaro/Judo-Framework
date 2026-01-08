@@ -15,7 +15,7 @@ class JudoReporter:
     Integrated reporter that captures test execution data
     """
     
-    def __init__(self, title: str = "Judo Framework Test Report", output_dir: str = None):
+    def __init__(self, title: str = "Judo Framework Test Report", output_dir: str = None, config_file: str = None):
         """Initialize reporter"""
         self.report_data = ReportData(title=title)
         self.current_feature: Optional[FeatureReport] = None
@@ -27,7 +27,7 @@ class JudoReporter:
             import os
             output_dir = os.path.join(os.getcwd(), "judo_reports")
         
-        self.html_reporter = HTMLReporter(output_dir)
+        self.html_reporter = HTMLReporter(output_dir, config_file)
         
         # Capture environment info
         import os
@@ -92,11 +92,6 @@ class JudoReporter:
         """Log variable assignment"""
         if self.current_step:
             self.current_step.variables_set[name] = value
-    
-    def attach_screenshot(self, screenshot_path: str):
-        """Attach screenshot to current step"""
-        if self.current_step:
-            self.current_step.screenshot_path = screenshot_path
     
     def finish_step(self, status: StepStatus = StepStatus.PASSED, 
                    error_message: str = None, error_traceback: str = None):

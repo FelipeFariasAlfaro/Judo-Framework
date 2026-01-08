@@ -818,37 +818,35 @@ def step_validate_performance_metrics_es(context):
 @step('ejecuto consulta GraphQL')
 def step_execute_graphql_query_es(context):
     """Ejecutar consulta GraphQL"""
-    from judo.features.graphql import GraphQLClient
-    
     if not hasattr(context, 'judo_context'):
         from judo.behave import setup_judo_context
         setup_judo_context(context)
     
     query = context.text
     
-    graphql_client = GraphQLClient(context.judo_context)
-    response = graphql_client.query(query)
+    # Ejecutar consulta usando POST al endpoint base (asumiendo que es GraphQL)
+    payload = {"query": query}
+    response = context.judo_context.make_request('POST', '', json=payload)
     
-    context.judo_context.response = type('Response', (), {
-        'json': response,
-        'status': 200,
-        'is_success': lambda: True
-    })()
+    # Almacenar respuesta en formato estándar
+    context.judo_context.response = response
 
 
 @step('ejecuto mutación GraphQL')
 def step_execute_graphql_mutation_es(context):
     """Ejecutar mutación GraphQL"""
-    from judo.features.graphql import GraphQLClient
-    
     if not hasattr(context, 'judo_context'):
         from judo.behave import setup_judo_context
         setup_judo_context(context)
     
     mutation = context.text
     
-    graphql_client = GraphQLClient(context.judo_context)
-    response = graphql_client.mutation(mutation)
+    # Ejecutar mutación usando POST al endpoint base (asumiendo que es GraphQL)
+    payload = {"query": mutation}
+    response = context.judo_context.make_request('POST', '', json=payload)
+    
+    # Almacenar respuesta en formato estándar
+    context.judo_context.response = response
     
     context.judo_context.response = type('Response', (), {
         'json': response,
@@ -1025,6 +1023,370 @@ def step_load_openapi_spec_es(context, spec_file):
 @step('la respuesta debe coincidir con contrato OpenAPI para {method} {path}')
 def step_validate_openapi_contract_es(context, method, path):
     """Validar respuesta contra contrato OpenAPI"""
+    from ..features.contract import ContractValidator
+    
+    # Get contract file from context or environment
+    contract_file = getattr(context, 'contract_file', None)
+    if not contract_file:
+        contract_file = os.getenv('OPENAPI_SPEC_FILE')
+    
+    if not contract_file:
+        raise ValueError("Archivo de especificación OpenAPI no configurado. Establece context.contract_file o variable OPENAPI_SPEC_FILE")
+    
+    validator = ContractValidator(contract_file)
+    
+    # Get response from context
+    response_data = context.judo.get_response_json()
+    status_code = context.judo.get_response_status()
+    
+    # Validate
+    validator.validate_openapi(method.upper(), path, response_data, status_code)
+
+
+# ============================================================
+# PASOS DE VALIDACIÓN DE CONTRATOS
+# ============================================================
+
+@step('cargo el contrato OpenAPI desde "{contract_file}"')
+def step_load_openapi_contract_es(context, contract_file):
+    """Cargar especificación de contrato OpenAPI"""
+    from ..features.contract import ContractValidator
+    
+    context.contract_validator = ContractValidator(contract_file)
+    context.contract_file = contract_file
+
+
+@step('cargo el contrato AsyncAPI desde "{contract_file}"')
+def step_load_asyncapi_contract_es(context, contract_file):
+    """Cargar especificación de contrato AsyncAPI"""
+    from ..features.contract import ContractValidator
+    
+    context.contract_validator = ContractValidator(contract_file)
+    context.contract_file = contract_file
+
+
+@step('la respuesta debe coincidir con el esquema del contrato')
+def step_validate_response_contract_es(context):
+    """Validar respuesta contra contrato cargado"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No hay contrato cargado. Usa el paso 'cargo el contrato OpenAPI' primero")
+    
+    # Get current request info from context
+    method = getattr(context, 'last_method', 'GET')
+    path = getattr(context, 'last_path', '/')
+    
+    response_data = context.judo.get_response_json()
+    status_code = context.judo.get_response_status()
+    
+    context.contract_validator.validate_openapi(method, path, response_data, status_code)
+
+
+@step('la respuesta debe coincidir con el esquema "{schema_name}"')
+def step_validate_response_schema_by_name_es(context, schema_name):
+    """Validar respuesta contra esquema específico del contrato"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No hay contrato cargado. Usa el paso 'cargo el contrato OpenAPI' primero")
+    
+    schemas = context.contract_validator.get_schemas()
+    if schema_name not in schemas:
+        raise ValueError(f"Esquema '{schema_name}' no encontrado en el contrato")
+    
+    schema = schemas[schema_name]
+    response_data = context.judo.get_response_json()
+    
+    try:
+        import jsonschema
+        jsonschema.validate(response_data, schema)
+    except ImportError:
+        raise ImportError("jsonschema requerido: pip install jsonschema")
+    except jsonschema.ValidationError as e:
+        raise AssertionError(f"Validación de esquema falló: {e.message}")
+
+
+@step('el campo de respuesta "{field_path}" debe ser de tipo "{expected_type}"')
+def step_validate_field_type_es(context, field_path, expected_type):
+    """Validar que un campo específico tenga el tipo esperado"""
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field using dot notation
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"No se puede navegar al campo '{field_path}'")
+    
+    # Check type
+    type_mapping = {
+        'cadena': str,
+        'string': str,
+        'numero': (int, float),
+        'number': (int, float),
+        'entero': int,
+        'integer': int,
+        'booleano': bool,
+        'boolean': bool,
+        'array': list,
+        'lista': list,
+        'objeto': dict,
+        'object': dict,
+        'nulo': type(None),
+        'null': type(None)
+    }
+    
+    expected_python_type = type_mapping.get(expected_type.lower())
+    if not expected_python_type:
+        raise ValueError(f"Tipo desconocido '{expected_type}'. Usa: cadena, numero, entero, booleano, array, objeto, nulo")
+    
+    if not isinstance(field_value, expected_python_type):
+        actual_type = type(field_value).__name__
+        raise AssertionError(f"Campo '{field_path}' es {actual_type}, se esperaba {expected_type}")
+
+
+@step('la respuesta debe tener los campos requeridos')
+def step_validate_required_fields_es(context):
+    """Validar que la respuesta tenga todos los campos requeridos de la tabla"""
+    response_data = context.judo.get_response_json()
+    
+    if not hasattr(context, 'table') or not context.table:
+        raise ValueError("El paso requiere una tabla con nombres de campos y tipos")
+    
+    for row in context.table:
+        field_name = row['campo']
+        expected_type = row.get('tipo', 'cadena')
+        required = row.get('requerido', 'true').lower() == 'true'
+        
+        # Check if field exists
+        if field_name not in response_data:
+            if required:
+                raise AssertionError(f"Campo requerido '{field_name}' está ausente")
+            continue
+        
+        # Check type if specified
+        if expected_type and expected_type != 'cualquiera':
+            field_value = response_data[field_name]
+            type_mapping = {
+                'cadena': str,
+                'string': str,
+                'numero': (int, float),
+                'number': (int, float),
+                'entero': int,
+                'integer': int,
+                'booleano': bool,
+                'boolean': bool,
+                'array': list,
+                'lista': list,
+                'objeto': dict,
+                'object': dict,
+                'nulo': type(None),
+                'null': type(None)
+            }
+            
+            expected_python_type = type_mapping.get(expected_type.lower())
+            if expected_python_type and not isinstance(field_value, expected_python_type):
+                actual_type = type(field_value).__name__
+                raise AssertionError(f"Campo '{field_name}' es {actual_type}, se esperaba {expected_type}")
+
+
+@step('el array de respuesta debe contener objetos con estructura')
+def step_validate_array_structure_es(context):
+    """Validar que el array de respuesta contenga objetos con estructura esperada"""
+    response_data = context.judo.get_response_json()
+    
+    if not isinstance(response_data, list):
+        raise AssertionError("La respuesta no es un array")
+    
+    if not hasattr(context, 'table') or not context.table:
+        raise ValueError("El paso requiere una tabla con nombres de campos y tipos")
+    
+    if not response_data:
+        return  # Empty array is valid
+    
+    # Validate first item structure (assuming all items have same structure)
+    first_item = response_data[0]
+    
+    for row in context.table:
+        field_name = row['campo']
+        expected_type = row.get('tipo', 'cadena')
+        required = row.get('requerido', 'true').lower() == 'true'
+        
+        # Check if field exists
+        if field_name not in first_item:
+            if required:
+                raise AssertionError(f"Campo requerido '{field_name}' está ausente en elementos del array")
+            continue
+        
+        # Check type if specified
+        if expected_type and expected_type != 'cualquiera':
+            field_value = first_item[field_name]
+            type_mapping = {
+                'cadena': str,
+                'string': str,
+                'numero': (int, float),
+                'number': (int, float),
+                'entero': int,
+                'integer': int,
+                'booleano': bool,
+                'boolean': bool,
+                'array': list,
+                'lista': list,
+                'objeto': dict,
+                'object': dict,
+                'nulo': type(None),
+                'null': type(None)
+            }
+            
+            expected_python_type = type_mapping.get(expected_type.lower())
+            if expected_python_type and not isinstance(field_value, expected_python_type):
+                actual_type = type(field_value).__name__
+                raise AssertionError(f"Campo '{field_name}' en elementos del array es {actual_type}, se esperaba {expected_type}")
+
+
+@step('la respuesta debe cumplir con el esquema JSON')
+def step_validate_json_schema_inline_es(context):
+    """Validar respuesta contra esquema JSON del texto del paso"""
+    import json
+    
+    response_data = context.judo.get_response_json()
+    
+    if not context.text:
+        raise ValueError("El paso requiere esquema JSON en el texto del paso")
+    
+    try:
+        schema = json.loads(context.text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Esquema JSON inválido: {e}")
+    
+    try:
+        import jsonschema
+        jsonschema.validate(response_data, schema)
+    except ImportError:
+        raise ImportError("jsonschema requerido: pip install jsonschema")
+    except jsonschema.ValidationError as e:
+        raise AssertionError(f"Validación de esquema JSON falló: {e.message}")
+
+
+@step('la respuesta debe cumplir con el esquema JSON del archivo "{schema_file}"')
+def step_validate_json_schema_file_es(context, schema_file):
+    """Validar respuesta contra esquema JSON desde archivo"""
+    import json
+    
+    response_data = context.judo.get_response_json()
+    
+    try:
+        with open(schema_file, 'r', encoding='utf-8') as f:
+            schema = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Archivo de esquema no encontrado: {schema_file}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Esquema JSON inválido en archivo: {e}")
+    
+    try:
+        import jsonschema
+        jsonschema.validate(response_data, schema)
+    except ImportError:
+        raise ImportError("jsonschema requerido: pip install jsonschema")
+    except jsonschema.ValidationError as e:
+        raise AssertionError(f"Validación de esquema JSON falló: {e.message}")
+
+
+@step('el campo de respuesta "{field_path}" debe coincidir con el patrón "{pattern}"')
+def step_validate_field_pattern_es(context, field_path, pattern):
+    """Validar que un campo coincida con un patrón regex"""
+    import re
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"No se puede navegar al campo '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Campo '{field_path}' es nulo")
+    
+    field_str = str(field_value)
+    if not re.match(pattern, field_str):
+        raise AssertionError(f"Campo '{field_path}' valor '{field_str}' no coincide con patrón '{pattern}'")
+
+
+@step('la respuesta debe tener tipos de datos consistentes en elementos del array')
+def step_validate_array_consistency_es(context):
+    """Validar que todos los elementos del array tengan tipos de datos consistentes"""
+    response_data = context.judo.get_response_json()
+    
+    if not isinstance(response_data, list):
+        raise AssertionError("La respuesta no es un array")
+    
+    if len(response_data) < 2:
+        return  # Nothing to compare
+    
+    # Get structure from first item
+    first_item = response_data[0]
+    if not isinstance(first_item, dict):
+        return  # Simple array, check type consistency
+    
+    first_structure = {key: type(value).__name__ for key, value in first_item.items()}
+    
+    # Check all other items
+    for i, item in enumerate(response_data[1:], 1):
+        if not isinstance(item, dict):
+            raise AssertionError(f"Elemento {i} no es un objeto como el elemento 0")
+        
+        item_structure = {key: type(value).__name__ for key, value in item.items()}
+        
+        # Check for missing fields
+        missing_fields = set(first_structure.keys()) - set(item_structure.keys())
+        if missing_fields:
+            raise AssertionError(f"Elemento {i} le faltan campos: {missing_fields}")
+        
+        # Check for extra fields
+        extra_fields = set(item_structure.keys()) - set(first_structure.keys())
+        if extra_fields:
+            raise AssertionError(f"Elemento {i} tiene campos extra: {extra_fields}")
+        
+        # Check type consistency
+        for field, expected_type in first_structure.items():
+            actual_type = item_structure[field]
+            if actual_type != expected_type:
+                raise AssertionError(f"Elemento {i} campo '{field}' es {actual_type}, se esperaba {expected_type}")
+
+
+@step('valido los endpoints del contrato de API')
+def step_validate_contract_endpoints_es(context):
+    """Validar que todos los endpoints del contrato sean accesibles"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No hay contrato cargado. Usa el paso 'cargo el contrato OpenAPI' primero")
+    
+    endpoints = context.contract_validator.get_endpoints()
+    
+    # Store endpoints in context for potential use
+    context.contract_endpoints = endpoints
+    
+    print(f"El contrato contiene {len(endpoints)} endpoints:")
+    for path, methods in endpoints.items():
+        print(f"  {path}: {', '.join(methods)}")
+
+
+@step('el mensaje debe coincidir con el contrato AsyncAPI para canal "{channel}"')
+def step_validate_asyncapi_message_es(context, channel):
+    """Validar mensaje contra contrato AsyncAPI"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No hay contrato AsyncAPI cargado. Usa el paso 'cargo el contrato AsyncAPI' primero")
+    
+    # Get message from context (assuming it's stored from previous step)
+    message_data = getattr(context, 'last_message', None)
+    if not message_data:
+        raise ValueError("No hay datos de mensaje disponibles. Almacena mensaje en context.last_message")
+    
+    context.contract_validator.validate_asyncapi(channel, message_data)
     if not hasattr(context.judo_context, 'contract_validator'):
         raise AssertionError("Especificación OpenAPI no cargada")
     
@@ -1187,18 +1549,6 @@ def step_add_response_logging_interceptor_es(context):
     context.judo_context.interceptor_chain.add_response_interceptor(interceptor)
 
 
-@step('establezco el límite de velocidad adaptativo con inicial {rps:f} solicitudes por segundo')
-def step_set_adaptive_rate_limit_es(context, rps):
-    """Establecer limitador de velocidad adaptativo"""
-    from judo.features.rate_limiter import AdaptiveRateLimiter
-    
-    if not hasattr(context, 'judo_context'):
-        from judo.behave import setup_judo_context
-        setup_judo_context(context)
-    
-    context.judo_context.adaptive_rate_limiter = AdaptiveRateLimiter(initial_rps=rps)
-
-
 @step('el limitador de velocidad debe tener {remaining:d} solicitudes restantes')
 def step_validate_rate_limiter_remaining_es(context, remaining):
     """Validar solicitudes restantes en limitador de velocidad"""
@@ -1260,6 +1610,9 @@ def step_validate_cache_entries_es(context, count):
     
     assert actual_count == count, \
         f"Caché tiene {actual_count} entradas, se esperaban {count}"
+
+
+
 
 
 @step('el tiempo promedio de respuesta debe ser menor a {max_time:d} milisegundos')
@@ -1512,18 +1865,6 @@ def step_validate_field_in_range_es(context, field, min_val, max_val):
         f"Valor del campo '{field}' {actual_value} no está en rango [{min_val}, {max_val}]"
 
 
-@step('el campo "{field}" debe coincidir con patrón "{pattern}"')
-def step_validate_field_matches_pattern_es(context, field, pattern):
-    """Validar que campo de respuesta coincide con patrón regex"""
-    import re
-    response = context.judo_context.response
-    actual_value = response.json.get(field)
-    
-    assert actual_value is not None, f"Campo '{field}' no encontrado en respuesta"
-    assert re.match(pattern, str(actual_value)), \
-        f"Valor del campo '{field}' '{actual_value}' no coincide con patrón '{pattern}'"
-
-
 @step('el tiempo de respuesta debe ser menor a {milliseconds:d} milisegundos')
 def step_validate_response_time_ms_es(context, milliseconds):
     """Validar tiempo de respuesta en milisegundos"""
@@ -1557,25 +1898,186 @@ def step_validate_cache_single_entry_es(context, count):
         f"Caché tiene {actual_count} entradas, se esperaban {count}"
 
 
-@step('agrego un interceptor de timestamp con nombre de encabezado "{header_name}"')
-def step_add_timestamp_interceptor_alt_es(context, header_name):
-    """Agregar interceptor de timestamp (sintaxis alternativa)"""
-    from judo.features.interceptors import TimestampInterceptor, InterceptorChain
+
+
+
+
+
+
+# ============================================================
+# ADDITIONAL SPANISH STEPS - Integer Parameter Variants
+# ============================================================
+
+
+
+
+# Retry Policy - Additional variants
+
+@step('que establezco la política de reintentos con max_retries={count:d} y backoff_strategy="{strategy}"')
+@step('establezco la política de reintentos con max_retries={count:d} y backoff_strategy="{strategy}"')
+def step_set_retry_policy_backoff_es(context, count, strategy):
+    """Establecer política de reintentos con estrategia de backoff"""
+    from judo.features.retry import RetryPolicy, BackoffStrategy
     
     if not hasattr(context, 'judo_context'):
         from judo.behave import setup_judo_context
         setup_judo_context(context)
     
-    if not hasattr(context.judo_context, 'interceptor_chain'):
-        context.judo_context.interceptor_chain = InterceptorChain()
+    backoff = BackoffStrategy[strategy.upper()]
+    context.judo_context.retry_policy = RetryPolicy(
+        max_retries=count,
+        backoff_strategy=backoff
+    )
+
+
+@step('que establezco la política de reintentos con max_retries={count:d}, initial_delay={delay:f}, y max_delay={max_delay:f}')
+@step('establezco la política de reintentos con max_retries={count:d}, initial_delay={delay:f}, y max_delay={max_delay:f}')
+def step_set_retry_policy_delays_es(context, count, delay, max_delay):
+    """Establecer política de reintentos con retrasos personalizados"""
+    from judo.features.retry import RetryPolicy, BackoffStrategy
     
-    interceptor = TimestampInterceptor(header_name=header_name)
-    context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.retry_policy = RetryPolicy(
+        max_retries=count,
+        backoff_strategy=BackoffStrategy.EXPONENTIAL,
+        initial_delay=delay,
+        max_delay=max_delay
+    )
 
 
-@step('agrego un interceptor de autorización con token "{token}"')
-def step_add_auth_interceptor_alt_es(context, token):
-    """Agregar interceptor de autorización (sintaxis alternativa)"""
+
+
+# ============================================================
+# RATE LIMITING STEPS - English and Spanish variants
+# ============================================================
+
+@step('I set rate limit to {count:d} requests per second')
+@step('que establezco el límite de velocidad a {count:d} peticiones por segundo')
+@step('establezco el límite de velocidad a {count:d} peticiones por segundo')
+def step_set_rate_limit_int_es(context, count):
+    """Set rate limit with integer requests per second"""
+    from judo.features.rate_limiter import RateLimiter
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.rate_limiter = RateLimiter(requests_per_second=float(count))
+
+
+@step('I set throttle with delay {delay:d} milliseconds')
+@step('que establezco throttle con retraso {delay:d} milisegundos')
+@step('establezco throttle con retraso {delay:d} milisegundos')
+def step_set_throttle_int_es(context, delay):
+    """Set throttle with integer delay in milliseconds"""
+    from judo.features.rate_limiter import Throttle
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.throttle = Throttle(delay_ms=float(delay))
+
+
+@step('I set adaptive rate limit with initial {rps:d} requests per second')
+@step('que establezco límite de velocidad adaptativo con inicial {rps:d} peticiones por segundo')
+@step('establezco límite de velocidad adaptativo con inicial {rps:d} peticiones por segundo')
+def step_set_adaptive_rate_limit_int_es(context, rps):
+    """Set adaptive rate limit with integer initial RPS"""
+    from judo.features.rate_limiter import AdaptiveRateLimiter
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.adaptive_rate_limiter = AdaptiveRateLimiter(initial_rps=float(rps))
+
+
+# ============================================================
+# MULTIPLE REQUEST STEPS - English and Spanish variants
+# ============================================================
+
+@step('envío {count:d} peticiones GET a "{endpoint}"')
+def step_send_multiple_get_requests_es(context, count, endpoint):
+    """Send multiple GET requests to an endpoint"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
+    
+    for i in range(count):
+        if hasattr(context.judo_context, 'rate_limiter'):
+            context.judo_context.rate_limiter.wait_if_needed()
+        
+        if hasattr(context.judo_context, 'throttle'):
+            context.judo_context.throttle.wait_if_needed()
+        
+        context.judo_context.make_request('GET', endpoint)
+
+
+@step('when I send the same GET request to "{endpoint}" again')
+@step('cuando hago la misma petición GET a "{endpoint}" nuevamente')
+def step_send_same_get_request_again_es(context, endpoint):
+    """Send the same GET request again"""
+    endpoint = context.judo_context.interpolate_string(endpoint)
+    
+    if hasattr(context.judo_context, 'rate_limiter'):
+        context.judo_context.rate_limiter.wait_if_needed()
+    
+    if hasattr(context.judo_context, 'throttle'):
+        context.judo_context.throttle.wait_if_needed()
+    
+    context.judo_context.make_request('GET', endpoint)
+
+
+# ============================================================
+# CACHING STEPS - English and Spanish variants
+# ============================================================
+
+@step('que habilito caching de respuestas con TTL {ttl:d} segundos')
+def step_enable_response_caching_ttl_es(context, ttl):
+    """Enable response caching with TTL"""
+    from judo.features.caching import ResponseCache
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.response_cache = ResponseCache(enabled=True, default_ttl=ttl)
+
+
+@step('la segunda respuesta debe venir del cache')
+def step_validate_response_from_cache_es(context):
+    """Validate that response came from cache"""
+    if not hasattr(context.judo_context, 'response_cache'):
+        raise AssertionError("Response cache not enabled")
+    
+    # Check if last response was from cache
+    if hasattr(context.judo_context.response, 'from_cache'):
+        assert context.judo_context.response.from_cache, \
+            "Response did not come from cache"
+
+
+@step('el cache debe contener {count:d} entradas')
+def step_validate_cache_entries_es(context, count):
+    """Validate number of entries in cache"""
+    if not hasattr(context.judo_context, 'response_cache'):
+        raise AssertionError("Response cache not enabled")
+    
+    stats = context.judo_context.response_cache.get_stats()
+    actual_count = stats.get('total_entries', 0)
+    
+    assert actual_count == count, \
+        f"Cache has {actual_count} entries, expected {count}"
+
+
+# ============================================================
+# INTERCEPTOR STEPS - Additional variants with schema
+# ============================================================
+
+@step('que agrego un interceptor de autorización con token "{token}" y esquema "{schema}"')
+def step_add_auth_interceptor_with_schema_es(context, token, schema):
+    """Add authorization interceptor with custom schema"""
     from judo.features.interceptors import AuthorizationInterceptor, InterceptorChain
     
     if not hasattr(context, 'judo_context'):
@@ -1585,35 +2087,267 @@ def step_add_auth_interceptor_alt_es(context, token):
     if not hasattr(context.judo_context, 'interceptor_chain'):
         context.judo_context.interceptor_chain = InterceptorChain()
     
-    interceptor = AuthorizationInterceptor(token=token)
+    interceptor = AuthorizationInterceptor(token=token, schema=schema)
     context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
 
 
-@step('establezco alerta de rendimiento para umbral de response_time de {threshold:d} milisegundos')
-def step_set_performance_alert_response_time_es(context, threshold):
-    """Establecer alerta de rendimiento para tiempo de respuesta"""
-    from judo.features.performance import PerformanceAlert, PerformanceMonitor
-    
-    if not hasattr(context.judo_context, 'performance_monitor'):
-        context.judo_context.performance_monitor = PerformanceMonitor()
-    
-    alert = PerformanceAlert(metric='response_time', threshold=threshold)
-    context.judo_context.performance_monitor.add_alert(alert)
+# ============================================================
+# AUTHENTICATION STEPS - OAuth2, JWT, Authorization
+# ============================================================
 
-
-@step('creo circuit breaker con failure_threshold={threshold:d}')
-def step_create_circuit_breaker_simple_es(context, threshold):
-    """Crear circuit breaker (sintaxis simplificada)"""
-    from judo.features.retry import CircuitBreaker
+@step('que configuro OAuth2 con:')
+def step_configure_oauth2_table_es(context):
+    """Configure OAuth2 with table"""
+    from judo.features.auth import OAuth2Handler
     
     if not hasattr(context, 'judo_context'):
         from judo.behave import setup_judo_context
         setup_judo_context(context)
     
-    if not hasattr(context.judo_context, 'circuit_breakers'):
-        context.judo_context.circuit_breakers = {}
+    oauth2_config = {}
+    for row in context.table:
+        oauth2_config[row['clave']] = row['valor']
     
-    context.judo_context.circuit_breakers['default'] = CircuitBreaker(
-        failure_threshold=threshold,
-        name='default'
+    context.judo_context.oauth2_handler = OAuth2Handler(
+        client_id=oauth2_config.get('client_id'),
+        client_secret=oauth2_config.get('client_secret'),
+        token_url=oauth2_config.get('token_url')
     )
+
+
+@step('que configuro JWT con secret "{secret}" y algoritmo "{algorithm}"')
+def step_configure_jwt_secret_algo_es(context, secret, algorithm):
+    """Configure JWT with secret and algorithm"""
+    from judo.features.auth import JWTHandler
+    
+    if not hasattr(context, 'judo_context'):
+        from judo.behave import setup_judo_context
+        setup_judo_context(context)
+    
+    context.judo_context.jwt_handler = JWTHandler(secret=secret, algorithm=algorithm)
+
+
+@step('creo token JWT con payload:')
+def step_create_jwt_token_payload_es(context):
+    """Create JWT token with payload"""
+    import json
+    
+    if not hasattr(context.judo_context, 'jwt_handler'):
+        raise AssertionError("JWT not configured")
+    
+    payload = json.loads(context.text)
+    token = context.judo_context.jwt_handler.create_token(payload)
+    context.judo_context.jwt_token = token
+
+
+@step('el token debe ser válido')
+def step_validate_jwt_token_es(context):
+    """Validate JWT token is valid"""
+    if not hasattr(context.judo_context, 'jwt_token'):
+        raise AssertionError("JWT token not created")
+    
+    if not hasattr(context.judo_context, 'jwt_handler'):
+        raise AssertionError("JWT not configured")
+    
+    try:
+        context.judo_context.jwt_handler.verify_token(context.judo_context.jwt_token)
+    except Exception as e:
+        raise AssertionError(f"JWT token validation failed: {e}")
+
+
+@step('la petición debe incluir encabezado Authorization')
+def step_validate_auth_header_es(context):
+    """Validate Authorization header is present"""
+    if not hasattr(context.judo_context, 'response'):
+        raise AssertionError("No response available")
+    
+    # Check if Authorization header was sent in the request
+    if hasattr(context.judo_context, 'last_request_headers'):
+        headers = context.judo_context.last_request_headers
+        assert 'Authorization' in headers, \
+            "Authorization header not found in request"
+
+
+# ============================================================
+# RESPONSE VALIDATION STEPS - Additional variants
+# ============================================================
+
+@step('la respuesta debe tener más de 0 elementos')
+def step_validate_response_has_items_es(context):
+    """Validate response has more than 0 items"""
+    response = context.judo_context.response
+    
+    assert isinstance(response.json, list), "Response is not an array"
+    assert len(response.json) > 0, "Response array has no items"
+# ============================================================
+# PASOS DE VALIDACIÓN AVANZADA DE FORMATOS DE DATOS
+# ============================================================
+
+@step('el campo de respuesta "{field_path}" debe ser un email válido')
+def step_validate_email_format_es(context, field_path):
+    """Validar que un campo contenga una dirección de email válida"""
+    from ..features.contract import DataTypeValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"No se puede navegar al campo '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Campo '{field_path}' es nulo")
+    
+    if not DataTypeValidator.validate_email_format(str(field_value)):
+        raise AssertionError(f"Campo '{field_path}' valor '{field_value}' no es un email válido")
+
+
+@step('el campo de respuesta "{field_path}" debe ser una URL válida')
+def step_validate_url_format_es(context, field_path):
+    """Validar que un campo contenga una URL válida"""
+    from ..features.contract import DataTypeValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"No se puede navegar al campo '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Campo '{field_path}' es nulo")
+    
+    if not DataTypeValidator.validate_url_format(str(field_value)):
+        raise AssertionError(f"Campo '{field_path}' valor '{field_value}' no es una URL válida")
+
+
+@step('el campo de respuesta "{field_path}" debe ser un UUID válido')
+def step_validate_uuid_format_es(context, field_path):
+    """Validar que un campo contenga un UUID válido"""
+    from ..features.contract import DataTypeValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"No se puede navegar al campo '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Campo '{field_path}' es nulo")
+    
+    if not DataTypeValidator.validate_uuid_format(str(field_value)):
+        raise AssertionError(f"Campo '{field_path}' valor '{field_value}' no es un UUID válido")
+
+
+@step('el campo de respuesta "{field_path}" debe ser una fecha ISO válida')
+def step_validate_iso_date_format_es(context, field_path):
+    """Validar que un campo contenga una fecha ISO válida"""
+    from ..features.contract import DataTypeValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"No se puede navegar al campo '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Campo '{field_path}' es nulo")
+    
+    if not DataTypeValidator.validate_iso_date_format(str(field_value)):
+        raise AssertionError(f"Campo '{field_path}' valor '{field_value}' no es una fecha ISO válida")
+
+
+@step('la respuesta debe tener estructura anidada')
+def step_validate_nested_structure_es(context):
+    """Validar que la respuesta tenga estructura anidada esperada del texto del paso"""
+    import json
+    from ..features.contract import StructureValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    if not context.text:
+        raise ValueError("El paso requiere definición de estructura esperada en el texto del paso")
+    
+    try:
+        expected_structure = json.loads(context.text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Definición de estructura inválida: {e}")
+    
+    errors = StructureValidator.validate_nested_structure(response_data, expected_structure)
+    
+    if errors:
+        error_msg = "Validación de estructura falló:\n" + "\n".join(errors)
+        raise AssertionError(error_msg)
+
+
+@step('valido el cuerpo de petición contra contrato para {method} {path}')
+def step_validate_request_body_contract_es(context, method, path):
+    """Validar cuerpo de petición contra contrato OpenAPI"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No hay contrato cargado. Usa el paso 'cargo el contrato OpenAPI' primero")
+    
+    # Get request body from context (should be set by previous steps)
+    request_body = getattr(context, 'last_request_body', None)
+    if not request_body:
+        raise ValueError("No hay cuerpo de petición disponible. Almacena cuerpo de petición en context.last_request_body")
+    
+    context.contract_validator.validate_request_body(method.upper(), path, request_body)
+
+
+@step('valido los headers de respuesta contra contrato')
+def step_validate_response_headers_contract_es(context):
+    """Validar headers de respuesta contra contrato OpenAPI"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No hay contrato cargado. Usa el paso 'cargo el contrato OpenAPI' primero")
+    
+    # Get current request info and response headers
+    method = getattr(context, 'last_method', 'GET')
+    path = getattr(context, 'last_path', '/')
+    headers = context.judo.get_response_headers()
+    status_code = context.judo.get_response_status()
+    
+    context.contract_validator.validate_headers(method, path, headers, status_code)
+
+
+@step('la respuesta debe coincidir con especificación completa del contrato de datos')
+def step_validate_full_data_contract_es(context):
+    """Validación comprensiva contra contrato cargado incluyendo headers y cuerpo"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No hay contrato cargado. Usa el paso 'cargo el contrato OpenAPI' primero")
+    
+    # Get all necessary data
+    method = getattr(context, 'last_method', 'GET')
+    path = getattr(context, 'last_path', '/')
+    response_data = context.judo.get_response_json()
+    status_code = context.judo.get_response_status()
+    headers = context.judo.get_response_headers()
+    
+    # Validate response body
+    context.contract_validator.validate_openapi(method, path, response_data, status_code)
+    
+    # Validate headers
+    context.contract_validator.validate_headers(method, path, headers, status_code)
+    
+    print(f"✅ Validación completa de contrato pasó para {method} {path}")

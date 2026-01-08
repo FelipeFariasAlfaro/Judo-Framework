@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "judo-framework"
-version = "1.5.2"
+version = "1.5.9.5"
 description = "A comprehensive API testing framework for Python, inspired by Karate Framework"
 readme = "README.md"
 license = {file = "LICENSE"}

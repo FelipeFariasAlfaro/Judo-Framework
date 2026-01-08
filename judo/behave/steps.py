@@ -899,15 +899,15 @@ def step_execute_graphql_query(context):
     
     query = context.text
     
+    # Create GraphQL client with proper HTTP client
     graphql_client = GraphQLClient(context.judo_context)
-    response = graphql_client.query(query)
     
-    # Store response
-    context.judo_context.response = type('Response', (), {
-        'json': response,
-        'status': 200,
-        'is_success': lambda: True
-    })()
+    # Execute query using POST to the base URL (assuming it's a GraphQL endpoint)
+    payload = {"query": query}
+    response = context.judo_context.make_request('POST', '', json=payload)
+    
+    # Store response in the standard format
+    context.judo_context.response = response
 
 
 @step('I execute GraphQL mutation')
@@ -920,10 +920,12 @@ def step_execute_graphql_mutation(context):
     
     mutation = context.text
     
-    graphql_client = GraphQLClient(context.judo_context)
-    response = graphql_client.mutation(mutation)
+    # Execute mutation using POST to the base URL (assuming it's a GraphQL endpoint)
+    payload = {"query": mutation}
+    response = context.judo_context.make_request('POST', '', json=payload)
     
-    # Store response
+    # Store response in the standard format
+    context.judo_context.response = response
     context.judo_context.response = type('Response', (), {
         'json': response,
         'status': 200,
@@ -1142,6 +1144,349 @@ def step_load_openapi_spec(context, spec_file):
 @step('response should match OpenAPI contract for {method} {path}')
 def step_validate_openapi_contract(context, method, path):
     """Validate response against OpenAPI contract"""
+    from ..features.contract import ContractValidator
+    
+    # Get contract file from context or environment
+    contract_file = getattr(context, 'contract_file', None)
+    if not contract_file:
+        contract_file = os.getenv('OPENAPI_SPEC_FILE')
+    
+    if not contract_file:
+        raise ValueError("OpenAPI spec file not configured. Set context.contract_file or OPENAPI_SPEC_FILE env var")
+    
+    validator = ContractValidator(contract_file)
+    
+    # Get response from context
+    response_data = context.judo.get_response_json()
+    status_code = context.judo.get_response_status()
+    
+    # Validate
+    validator.validate_openapi(method.upper(), path, response_data, status_code)
+
+
+# ============================================================
+# CONTRACT VALIDATION STEPS
+# ============================================================
+
+@step('I load OpenAPI contract from "{contract_file}"')
+def step_load_openapi_contract(context, contract_file):
+    """Load OpenAPI contract specification"""
+    from ..features.contract import ContractValidator
+    
+    context.contract_validator = ContractValidator(contract_file)
+    context.contract_file = contract_file
+
+
+@step('I load AsyncAPI contract from "{contract_file}"')
+def step_load_asyncapi_contract(context, contract_file):
+    """Load AsyncAPI contract specification"""
+    from ..features.contract import ContractValidator
+    
+    context.contract_validator = ContractValidator(contract_file)
+    context.contract_file = contract_file
+
+
+@step('the response should match the contract schema')
+def step_validate_response_contract(context):
+    """Validate response against loaded contract"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No contract loaded. Use 'I load OpenAPI contract' step first")
+    
+    # Get current request info from context
+    method = getattr(context, 'last_method', 'GET')
+    path = getattr(context, 'last_path', '/')
+    
+    response_data = context.judo.get_response_json()
+    status_code = context.judo.get_response_status()
+    
+    context.contract_validator.validate_openapi(method, path, response_data, status_code)
+
+
+@step('the response should match schema "{schema_name}"')
+def step_validate_response_schema_by_name(context, schema_name):
+    """Validate response against specific schema from contract"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No contract loaded. Use 'I load OpenAPI contract' step first")
+    
+    schemas = context.contract_validator.get_schemas()
+    if schema_name not in schemas:
+        raise ValueError(f"Schema '{schema_name}' not found in contract")
+    
+    schema = schemas[schema_name]
+    response_data = context.judo.get_response_json()
+    
+    try:
+        import jsonschema
+        jsonschema.validate(response_data, schema)
+    except ImportError:
+        raise ImportError("jsonschema required: pip install jsonschema")
+    except jsonschema.ValidationError as e:
+        raise AssertionError(f"Schema validation failed: {e.message}")
+
+
+@step('the response field "{field_path}" should be of type "{expected_type}"')
+def step_validate_field_type(context, field_path, expected_type):
+    """Validate that a specific field has the expected type"""
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field using dot notation
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"Cannot navigate to field '{field_path}'")
+    
+    # Check type
+    type_mapping = {
+        'string': str,
+        'number': (int, float),
+        'integer': int,
+        'boolean': bool,
+        'array': list,
+        'object': dict,
+        'null': type(None)
+    }
+    
+    expected_python_type = type_mapping.get(expected_type.lower())
+    if not expected_python_type:
+        raise ValueError(f"Unknown type '{expected_type}'. Use: string, number, integer, boolean, array, object, null")
+    
+    if not isinstance(field_value, expected_python_type):
+        actual_type = type(field_value).__name__
+        raise AssertionError(f"Field '{field_path}' is {actual_type}, expected {expected_type}")
+
+
+@step('the response should have required fields')
+def step_validate_required_fields(context):
+    """Validate response has all required fields from step table"""
+    response_data = context.judo.get_response_json()
+    
+    if not hasattr(context, 'table') or not context.table:
+        raise ValueError("Step requires a table with field names and types")
+    
+    for row in context.table:
+        field_name = row['field']
+        expected_type = row.get('type', 'string')
+        required = row.get('required', 'true').lower() == 'true'
+        
+        # Check if field exists
+        if field_name not in response_data:
+            if required:
+                raise AssertionError(f"Required field '{field_name}' is missing")
+            continue
+        
+        # Check type if specified
+        if expected_type and expected_type != 'any':
+            field_value = response_data[field_name]
+            type_mapping = {
+                'string': str,
+                'number': (int, float),
+                'integer': int,
+                'boolean': bool,
+                'array': list,
+                'object': dict,
+                'null': type(None)
+            }
+            
+            expected_python_type = type_mapping.get(expected_type.lower())
+            if expected_python_type and not isinstance(field_value, expected_python_type):
+                actual_type = type(field_value).__name__
+                raise AssertionError(f"Field '{field_name}' is {actual_type}, expected {expected_type}")
+
+
+@step('the response array should contain objects with structure')
+def step_validate_array_structure(context):
+    """Validate that response array contains objects with expected structure"""
+    response_data = context.judo.get_response_json()
+    
+    if not isinstance(response_data, list):
+        raise AssertionError("Response is not an array")
+    
+    if not hasattr(context, 'table') or not context.table:
+        raise ValueError("Step requires a table with field names and types")
+    
+    if not response_data:
+        return  # Empty array is valid
+    
+    # Validate first item structure (assuming all items have same structure)
+    first_item = response_data[0]
+    
+    for row in context.table:
+        field_name = row['field']
+        expected_type = row.get('type', 'string')
+        required = row.get('required', 'true').lower() == 'true'
+        
+        # Check if field exists
+        if field_name not in first_item:
+            if required:
+                raise AssertionError(f"Required field '{field_name}' is missing in array items")
+            continue
+        
+        # Check type if specified
+        if expected_type and expected_type != 'any':
+            field_value = first_item[field_name]
+            type_mapping = {
+                'string': str,
+                'number': (int, float),
+                'integer': int,
+                'boolean': bool,
+                'array': list,
+                'object': dict,
+                'null': type(None)
+            }
+            
+            expected_python_type = type_mapping.get(expected_type.lower())
+            if expected_python_type and not isinstance(field_value, expected_python_type):
+                actual_type = type(field_value).__name__
+                raise AssertionError(f"Field '{field_name}' in array items is {actual_type}, expected {expected_type}")
+
+
+@step('the response should conform to JSON Schema')
+def step_validate_json_schema_inline(context):
+    """Validate response against JSON Schema from step text"""
+    import json
+    
+    response_data = context.judo.get_response_json()
+    
+    if not context.text:
+        raise ValueError("Step requires JSON Schema in step text")
+    
+    try:
+        schema = json.loads(context.text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON Schema: {e}")
+    
+    try:
+        import jsonschema
+        jsonschema.validate(response_data, schema)
+    except ImportError:
+        raise ImportError("jsonschema required: pip install jsonschema")
+    except jsonschema.ValidationError as e:
+        raise AssertionError(f"JSON Schema validation failed: {e.message}")
+
+
+@step('the response should conform to JSON Schema from file "{schema_file}"')
+def step_validate_json_schema_file(context, schema_file):
+    """Validate response against JSON Schema from file"""
+    import json
+    
+    response_data = context.judo.get_response_json()
+    
+    try:
+        with open(schema_file, 'r', encoding='utf-8') as f:
+            schema = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Schema file not found: {schema_file}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON Schema in file: {e}")
+    
+    try:
+        import jsonschema
+        jsonschema.validate(response_data, schema)
+    except ImportError:
+        raise ImportError("jsonschema required: pip install jsonschema")
+    except jsonschema.ValidationError as e:
+        raise AssertionError(f"JSON Schema validation failed: {e.message}")
+
+
+@step('the response field "{field_path}" should match pattern "{pattern}"')
+def step_validate_field_pattern(context, field_path, pattern):
+    """Validate that a field matches a regex pattern"""
+    import re
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"Cannot navigate to field '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Field '{field_path}' is null")
+    
+    field_str = str(field_value)
+    if not re.match(pattern, field_str):
+        raise AssertionError(f"Field '{field_path}' value '{field_str}' does not match pattern '{pattern}'")
+
+
+@step('the response should have consistent data types across array items')
+def step_validate_array_consistency(context):
+    """Validate that all items in response array have consistent data types"""
+    response_data = context.judo.get_response_json()
+    
+    if not isinstance(response_data, list):
+        raise AssertionError("Response is not an array")
+    
+    if len(response_data) < 2:
+        return  # Nothing to compare
+    
+    # Get structure from first item
+    first_item = response_data[0]
+    if not isinstance(first_item, dict):
+        return  # Simple array, check type consistency
+    
+    first_structure = {key: type(value).__name__ for key, value in first_item.items()}
+    
+    # Check all other items
+    for i, item in enumerate(response_data[1:], 1):
+        if not isinstance(item, dict):
+            raise AssertionError(f"Item {i} is not an object like item 0")
+        
+        item_structure = {key: type(value).__name__ for key, value in item.items()}
+        
+        # Check for missing fields
+        missing_fields = set(first_structure.keys()) - set(item_structure.keys())
+        if missing_fields:
+            raise AssertionError(f"Item {i} is missing fields: {missing_fields}")
+        
+        # Check for extra fields
+        extra_fields = set(item_structure.keys()) - set(first_structure.keys())
+        if extra_fields:
+            raise AssertionError(f"Item {i} has extra fields: {extra_fields}")
+        
+        # Check type consistency
+        for field, expected_type in first_structure.items():
+            actual_type = item_structure[field]
+            if actual_type != expected_type:
+                raise AssertionError(f"Item {i} field '{field}' is {actual_type}, expected {expected_type}")
+
+
+@step('I validate the API contract endpoints')
+def step_validate_contract_endpoints(context):
+    """Validate that all endpoints in contract are accessible"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No contract loaded. Use 'I load OpenAPI contract' step first")
+    
+    endpoints = context.contract_validator.get_endpoints()
+    
+    # Store endpoints in context for potential use
+    context.contract_endpoints = endpoints
+    
+    print(f"Contract contains {len(endpoints)} endpoints:")
+    for path, methods in endpoints.items():
+        print(f"  {path}: {', '.join(methods)}")
+
+
+@step('the message should match AsyncAPI contract for channel "{channel}"')
+def step_validate_asyncapi_message(context, channel):
+    """Validate message against AsyncAPI contract"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No AsyncAPI contract loaded. Use 'I load AsyncAPI contract' step first")
+    
+    # Get message from context (assuming it's stored from previous step)
+    message_data = getattr(context, 'last_message', None)
+    if not message_data:
+        raise ValueError("No message data available. Store message in context.last_message")
+    
+    context.contract_validator.validate_asyncapi(channel, message_data)
     if not hasattr(context.judo_context, 'contract_validator'):
         raise AssertionError("OpenAPI spec not loaded")
     
@@ -1624,18 +1969,6 @@ def step_validate_field_in_range(context, field, min_val, max_val):
         f"Field '{field}' value {actual_value} is not in range [{min_val}, {max_val}]"
 
 
-@step('the response field "{field}" should match pattern "{pattern}"')
-def step_validate_field_matches_pattern(context, field, pattern):
-    """Validate response field matches regex pattern"""
-    import re
-    response = context.judo_context.response
-    actual_value = response.json.get(field)
-    
-    assert actual_value is not None, f"Field '{field}' not found in response"
-    assert re.match(pattern, str(actual_value)), \
-        f"Field '{field}' value '{actual_value}' does not match pattern '{pattern}'"
-
-
 @step('the response time should be less than {milliseconds:d} milliseconds')
 def step_validate_response_time_ms(context, milliseconds):
     """Validate response time in milliseconds"""
@@ -1656,22 +1989,9 @@ def step_validate_performance_metrics_collected(context):
     assert metrics['total_requests'] > 0, "No requests recorded in metrics"
 
 
-@step('cache should contain {count:d} entry')
-def step_validate_cache_single_entry(context, count):
-    """Validate cache contains specific number of entries"""
-    if not hasattr(context.judo_context, 'response_cache'):
-        raise AssertionError("Response cache not enabled")
-    
-    stats = context.judo_context.response_cache.get_stats()
-    actual_count = stats['total_entries']
-    
-    assert actual_count == count, \
-        f"Cache has {actual_count} entries, expected {count}"
-
-
 @step('I add a timestamp interceptor with header name "{header_name}"')
-def step_add_timestamp_interceptor_alt(context, header_name):
-    """Add timestamp interceptor (alternative syntax)"""
+def step_add_timestamp_interceptor_with_a(context, header_name):
+    """Add timestamp interceptor (with article 'a')"""
     from judo.features.interceptors import TimestampInterceptor, InterceptorChain
     
     if not hasattr(context, 'judo_context'):
@@ -1685,8 +2005,8 @@ def step_add_timestamp_interceptor_alt(context, header_name):
 
 
 @step('I add an authorization interceptor with token "{token}"')
-def step_add_auth_interceptor_alt(context, token):
-    """Add authorization interceptor (alternative syntax)"""
+def step_add_auth_interceptor_with_an(context, token):
+    """Add authorization interceptor (with article 'an')"""
     from judo.features.interceptors import AuthorizationInterceptor, InterceptorChain
     
     if not hasattr(context, 'judo_context'):
@@ -1699,30 +2019,177 @@ def step_add_auth_interceptor_alt(context, token):
     context.judo_context.interceptor_chain.add_request_interceptor(interceptor)
 
 
-@step('I set performance alert for response_time threshold {threshold:d} milliseconds')
-def step_set_performance_alert_response_time(context, threshold):
-    """Set performance alert for response time"""
-    from judo.features.performance import PerformanceAlert, PerformanceMonitor
-    
-    if not hasattr(context.judo_context, 'performance_monitor'):
-        context.judo_context.performance_monitor = PerformanceMonitor()
-    
-    alert = PerformanceAlert(metric='response_time', threshold=threshold)
-    context.judo_context.performance_monitor.add_alert(alert)
 
 
-@step('I create a circuit breaker with failure_threshold={threshold:d}')
-def step_create_circuit_breaker_simple(context, threshold):
-    """Create circuit breaker (simplified syntax)"""
-    from judo.features.retry import CircuitBreaker
+# ============================================================
+# ADVANCED DATA FORMAT VALIDATION STEPS
+# ============================================================
+
+@step('the response field "{field_path}" should be a valid email')
+def step_validate_email_format(context, field_path):
+    """Validate that a field contains a valid email address"""
+    from ..features.contract import DataTypeValidator
     
-    if not hasattr(context, 'judo_context'):
-        context.judo_context = JudoContext(context)
+    response_data = context.judo.get_response_json()
     
-    if not hasattr(context.judo_context, 'circuit_breakers'):
-        context.judo_context.circuit_breakers = {}
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"Cannot navigate to field '{field_path}'")
     
-    context.judo_context.circuit_breakers['default'] = CircuitBreaker(
-        failure_threshold=threshold,
-        name='default'
-    )
+    if field_value is None:
+        raise AssertionError(f"Field '{field_path}' is null")
+    
+    if not DataTypeValidator.validate_email_format(str(field_value)):
+        raise AssertionError(f"Field '{field_path}' value '{field_value}' is not a valid email")
+
+
+@step('the response field "{field_path}" should be a valid URL')
+def step_validate_url_format(context, field_path):
+    """Validate that a field contains a valid URL"""
+    from ..features.contract import DataTypeValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"Cannot navigate to field '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Field '{field_path}' is null")
+    
+    if not DataTypeValidator.validate_url_format(str(field_value)):
+        raise AssertionError(f"Field '{field_path}' value '{field_value}' is not a valid URL")
+
+
+@step('the response field "{field_path}" should be a valid UUID')
+def step_validate_uuid_format(context, field_path):
+    """Validate that a field contains a valid UUID"""
+    from ..features.contract import DataTypeValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"Cannot navigate to field '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Field '{field_path}' is null")
+    
+    if not DataTypeValidator.validate_uuid_format(str(field_value)):
+        raise AssertionError(f"Field '{field_path}' value '{field_value}' is not a valid UUID")
+
+
+@step('the response field "{field_path}" should be a valid ISO date')
+def step_validate_iso_date_format(context, field_path):
+    """Validate that a field contains a valid ISO date"""
+    from ..features.contract import DataTypeValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    # Navigate to field
+    field_value = response_data
+    for part in field_path.split('.'):
+        if isinstance(field_value, dict):
+            field_value = field_value.get(part)
+        elif isinstance(field_value, list) and part.isdigit():
+            field_value = field_value[int(part)]
+        else:
+            raise AssertionError(f"Cannot navigate to field '{field_path}'")
+    
+    if field_value is None:
+        raise AssertionError(f"Field '{field_path}' is null")
+    
+    if not DataTypeValidator.validate_iso_date_format(str(field_value)):
+        raise AssertionError(f"Field '{field_path}' value '{field_value}' is not a valid ISO date")
+
+
+@step('the response should have nested structure')
+def step_validate_nested_structure(context):
+    """Validate response has expected nested structure from step text"""
+    import json
+    from ..features.contract import StructureValidator
+    
+    response_data = context.judo.get_response_json()
+    
+    if not context.text:
+        raise ValueError("Step requires expected structure definition in step text")
+    
+    try:
+        expected_structure = json.loads(context.text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid structure definition: {e}")
+    
+    errors = StructureValidator.validate_nested_structure(response_data, expected_structure)
+    
+    if errors:
+        error_msg = "Structure validation failed:\n" + "\n".join(errors)
+        raise AssertionError(error_msg)
+
+
+@step('I validate request body against contract for {method} {path}')
+def step_validate_request_body_contract(context, method, path):
+    """Validate request body against OpenAPI contract"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No contract loaded. Use 'I load OpenAPI contract' step first")
+    
+    # Get request body from context (should be set by previous steps)
+    request_body = getattr(context, 'last_request_body', None)
+    if not request_body:
+        raise ValueError("No request body available. Store request body in context.last_request_body")
+    
+    context.contract_validator.validate_request_body(method.upper(), path, request_body)
+
+
+@step('I validate response headers against contract')
+def step_validate_response_headers_contract(context):
+    """Validate response headers against OpenAPI contract"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No contract loaded. Use 'I load OpenAPI contract' step first")
+    
+    # Get current request info and response headers
+    method = getattr(context, 'last_method', 'GET')
+    path = getattr(context, 'last_path', '/')
+    headers = context.judo.get_response_headers()
+    status_code = context.judo.get_response_status()
+    
+    context.contract_validator.validate_headers(method, path, headers, status_code)
+
+
+@step('the response should match data contract specification')
+def step_validate_full_data_contract(context):
+    """Comprehensive validation against loaded contract including headers and body"""
+    if not hasattr(context, 'contract_validator'):
+        raise ValueError("No contract loaded. Use 'I load OpenAPI contract' step first")
+    
+    # Get all necessary data
+    method = getattr(context, 'last_method', 'GET')
+    path = getattr(context, 'last_path', '/')
+    response_data = context.judo.get_response_json()
+    status_code = context.judo.get_response_status()
+    headers = context.judo.get_response_headers()
+    
+    # Validate response body
+    context.contract_validator.validate_openapi(method, path, response_data, status_code)
+    
+    # Validate headers
+    context.contract_validator.validate_headers(method, path, headers, status_code)
+    
+    print(f"✅ Full contract validation passed for {method} {path}")

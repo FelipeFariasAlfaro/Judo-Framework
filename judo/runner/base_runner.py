@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any, Optional, Callable
 from pathlib import Path
 import subprocess
+from dotenv import load_dotenv
 
 from ..reporting.reporter import JudoReporter
 
@@ -19,69 +20,113 @@ class BaseRunner:
     """
     Clase base para crear runners personalizados
     Los usuarios pueden heredar de esta clase para crear sus propios runners
+    
+    CONFIGURACIÓN VÍA .env:
+    Todas las configuraciones ahora se pueden especificar en el archivo .env
+    para simplificar los runners y centralizar la configuración.
     """
     
     def __init__(self, 
-                 features_dir: str = "features",
-                 output_dir: str = "judo_reports",
-                 parallel: bool = False,
-                 max_workers: int = 4,
-                 generate_cucumber_json: bool = True,
+                 features_dir: str = None,
+                 output_dir: str = None,
+                 parallel: bool = None,
+                 max_workers: int = None,
+                 generate_cucumber_json: bool = None,
                  cucumber_json_dir: str = None,
-                 console_format: str = "progress",
-                 save_requests_responses: bool = False,
+                 console_format: str = None,
+                 save_requests_responses: bool = None,
                  requests_responses_dir: str = None,
-                 run_all_features_together: bool = True):
+                 run_all_features_together: bool = None):
         """
         Inicializar runner base
         
-        Args:
-            features_dir: Directorio con archivos .feature
-            output_dir: Directorio para reportes
-            parallel: Ejecutar en paralelo
-            max_workers: Número máximo de hilos
-            generate_cucumber_json: Generar JSON en formato Cucumber
-            cucumber_json_dir: Directorio para JSON Cucumber (default: output_dir/cucumber-json)
-            console_format: Formato de salida en consola ('progress', 'progress2', 'pretty', 'plain', 'none')
-                           'progress' (default) es limpio y minimalista
-                           'pretty' muestra todos los detalles de cada step
-            save_requests_responses: Guardar automáticamente requests y responses en archivos JSON
-            requests_responses_dir: Directorio para guardar requests/responses (default: output_dir/requests_responses)
-            run_all_features_together: Ejecutar todos los features en una sola llamada a behave (genera un solo reporte HTML)
-                                      Si es False, ejecuta cada feature por separado (útil para paralelo)
+        NOTA: Todos los parámetros son opcionales. Si no se especifican,
+        se cargarán desde variables de entorno (.env file).
+        
+        Variables de entorno soportadas:
+        - JUDO_FEATURES_DIR: Directorio con archivos .feature (default: "features")
+        - JUDO_OUTPUT_DIR: Directorio para reportes (default: "judo_reports")
+        - JUDO_PARALLEL: Ejecutar en paralelo (true/false, default: false)
+        - JUDO_MAX_WORKERS: Número máximo de hilos (default: 4)
+        - JUDO_GENERATE_CUCUMBER_JSON: Generar JSON Cucumber (true/false, default: true)
+        - JUDO_CUCUMBER_JSON_DIR: Directorio para JSON Cucumber (default: output_dir/cucumber-json)
+        - JUDO_CONSOLE_FORMAT: Formato consola (progress/pretty/plain/none, default: progress)
+        - JUDO_SAVE_REQUESTS_RESPONSES: Guardar requests/responses (true/false, default: false)
+        - JUDO_REQUESTS_RESPONSES_DIR: Directorio para logs API (default: output_dir/requests_responses)
+        - JUDO_RUN_ALL_FEATURES_TOGETHER: Ejecutar todos juntos (true/false, default: true)
+        - JUDO_TIMEOUT: Timeout en segundos (default: 300)
+        - JUDO_RETRY_COUNT: Número de reintentos (default: 0)
+        - JUDO_FAIL_FAST: Parar en primer fallo (true/false, default: false)
+        - JUDO_VERBOSE: Salida verbose (true/false, default: true)
+        - JUDO_DEBUG_REPORTER: Debug del reporter (true/false, default: false)
         """
-        self.features_dir = Path(features_dir)
-        self.output_dir = Path(output_dir)
-        self.parallel = parallel
-        self.max_workers = max_workers
-        self.console_format = console_format
-        self.run_all_features_together = run_all_features_together
+        # Cargar variables de entorno desde .env
+        # Buscar .env en el directorio actual y directorios padre
+        env_paths = [
+            Path.cwd() / ".env",
+            Path.cwd().parent / ".env",
+            Path(__file__).parent.parent.parent / ".env"  # Directorio raíz del proyecto
+        ]
+        
+        env_loaded = False
+        for env_path in env_paths:
+            if env_path.exists():
+                load_dotenv(env_path)
+                env_loaded = True
+                break
+        
+        if not env_loaded:
+            # Si no se encuentra .env, usar load_dotenv() sin parámetros (busca automáticamente)
+            load_dotenv()
+        
+        # Configurar directorio de features
+        self.features_dir = Path(features_dir or self._get_env_value('JUDO_FEATURES_DIR', 'features'))
+        
+        # Configurar directorio de salida
+        self.output_dir = Path(output_dir or self._get_env_value('JUDO_OUTPUT_DIR', 'judo_reports'))
+        
+        # Configurar ejecución paralela
+        self.parallel = self._get_bool_env('JUDO_PARALLEL', parallel, False)
+        self.max_workers = int(max_workers or self._get_env_value('JUDO_MAX_WORKERS', '4'))
+        
+        # Configurar formato de consola
+        self.console_format = console_format or self._get_env_value('JUDO_CONSOLE_FORMAT', 'progress')
+        
+        # Configurar ejecución conjunta
+        self.run_all_features_together = self._get_bool_env('JUDO_RUN_ALL_FEATURES_TOGETHER', run_all_features_together, True)
         
         # Configurar el reporter global para que el formatter lo use
         from ..reporting.reporter import set_reporter
-        self.reporter = JudoReporter("Test Execution Report", str(output_dir))
+        self.reporter = JudoReporter("Test Execution Report", str(self.output_dir))
         set_reporter(self.reporter)
         
         # Configuración de Cucumber JSON
-        self.generate_cucumber_json = generate_cucumber_json
+        self.generate_cucumber_json = self._get_bool_env('JUDO_GENERATE_CUCUMBER_JSON', generate_cucumber_json, True)
         if cucumber_json_dir:
             self.cucumber_json_dir = Path(cucumber_json_dir)
         else:
-            self.cucumber_json_dir = self.output_dir / "cucumber-json"
+            cucumber_json_env = self._get_env_value('JUDO_CUCUMBER_JSON_DIR', None)
+            if cucumber_json_env:
+                self.cucumber_json_dir = Path(cucumber_json_env)
+            else:
+                self.cucumber_json_dir = self.output_dir / "cucumber-json"
         
         # Crear directorio si no existe
         if self.generate_cucumber_json:
             self.cucumber_json_dir.mkdir(parents=True, exist_ok=True)
         
         # Configuración de Request/Response logging
-        self.save_requests_responses = save_requests_responses
+        self.save_requests_responses = self._get_bool_env('JUDO_SAVE_REQUESTS_RESPONSES', save_requests_responses, False)
         if requests_responses_dir:
             self.requests_responses_dir = Path(requests_responses_dir)
         else:
-            self.requests_responses_dir = self.output_dir / "requests_responses"
+            requests_responses_env = self._get_env_value('JUDO_REQUESTS_RESPONSES_DIR', None)
+            if requests_responses_env:
+                self.requests_responses_dir = Path(requests_responses_env)
+            else:
+                self.requests_responses_dir = self.output_dir / "requests_responses"
         
         # Configurar variables de entorno para que los hooks las usen
-        import os
         # IMPORTANTE: Configurar el directorio de salida para que el formatter lo use
         os.environ['JUDO_REPORT_OUTPUT_DIR'] = str(self.output_dir)
         
@@ -91,13 +136,17 @@ class BaseRunner:
             # Crear directorio si no existe
             self.requests_responses_dir.mkdir(parents=True, exist_ok=True)
         
-        # Configuración
+        # Configuración desde .env
         self.config = {
-            "timeout": 300,  # 5 minutos por defecto
-            "retry_count": 0,
-            "fail_fast": False,
-            "verbose": True
+            "timeout": int(self._get_env_value('JUDO_TIMEOUT', '300')),
+            "retry_count": int(self._get_env_value('JUDO_RETRY_COUNT', '0')),
+            "fail_fast": self._get_bool_env('JUDO_FAIL_FAST', None, False),
+            "verbose": self._get_bool_env('JUDO_VERBOSE', None, True)
         }
+        
+        # Configurar debug del reporter
+        debug_reporter = self._get_bool_env('JUDO_DEBUG_REPORTER', None, False)
+        os.environ['JUDO_DEBUG_REPORTER'] = str(debug_reporter).lower()
         
         # Resultados
         self.results = {
@@ -119,6 +168,58 @@ class BaseRunner:
         self.after_all_callback: Optional[Callable] = None
         self.before_feature_callback: Optional[Callable] = None
         self.after_feature_callback: Optional[Callable] = None
+        
+        # Log de configuración cargada
+        self._log_configuration()
+    
+    def _get_env_value(self, key: str, default: str) -> str:
+        """Obtener valor de variable de entorno con default"""
+        return os.getenv(key, default)
+    
+    def _get_bool_env(self, key: str, override_value: bool = None, default: bool = False) -> bool:
+        """Obtener valor booleano de variable de entorno"""
+        if override_value is not None:
+            return override_value
+        
+        env_value = os.getenv(key, '').lower()
+        if env_value in ('true', '1', 'yes', 'on'):
+            return True
+        elif env_value in ('false', '0', 'no', 'off'):
+            return False
+        else:
+            return default
+    
+    def _log_configuration(self):
+        """Log de la configuración cargada"""
+        self.log("🔧 Configuración cargada desde .env:")
+        self.log(f"   📁 Features dir: {self.features_dir}")
+        self.log(f"   📊 Output dir: {self.output_dir}")
+        self.log(f"   🚀 Parallel: {self.parallel}")
+        if self.parallel:
+            self.log(f"   👥 Max workers: {self.max_workers}")
+        self.log(f"   🖥️  Console format: {self.console_format}")
+        self.log(f"   🥒 Generate Cucumber JSON: {self.generate_cucumber_json}")
+        if self.generate_cucumber_json:
+            self.log(f"   📁 Cucumber JSON dir: {self.cucumber_json_dir}")
+        self.log(f"   💾 Save requests/responses: {self.save_requests_responses}")
+        if self.save_requests_responses:
+            self.log(f"   📁 Requests/responses dir: {self.requests_responses_dir}")
+        self.log(f"   🎯 Run all features together: {self.run_all_features_together}")
+        self.log(f"   ⏱️  Timeout: {self.config['timeout']}s")
+        self.log(f"   🔄 Retry count: {self.config['retry_count']}")
+        self.log(f"   🛑 Fail fast: {self.config['fail_fast']}")
+        self.log(f"   📢 Verbose: {self.config['verbose']}")
+    
+    @classmethod
+    def create_simple_runner(cls):
+        """
+        Crear un runner simple que usa solo configuración desde .env
+        
+        Ejemplo de uso:
+            runner = BaseRunner.create_simple_runner()
+            results = runner.run(tags=["@smoke"])
+        """
+        return cls()
     
     def configure(self, **kwargs):
         """Configurar el runner"""
@@ -475,12 +576,13 @@ class BaseRunner:
         
         cmd.extend(["--format", "json", "--outfile", json_output_path])
         
-        # Cucumber JSON si está habilitado
+        # Cucumber JSON si está habilitado (usar formato diferente para evitar conflictos)
         cucumber_json_path = None
         if self.generate_cucumber_json:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             cucumber_json_path = self.cucumber_json_dir / f"all_features_{timestamp}.json"
-            cmd.extend(["--format", "json", "--outfile", str(cucumber_json_path)])
+            # Usar formato json.pretty para evitar conflictos con el formato json principal
+            cmd.extend(["--format", "json.pretty", "--outfile", str(cucumber_json_path)])
         
         # Formato de consola
         if self.console_format != "none":
@@ -822,6 +924,39 @@ class BaseRunner:
         except Exception as e:
             self.log(f"⚠️ Error procesando datos de feature: {e}")
     
+    def _fix_malformed_json(self, content):
+        """
+        Intenta arreglar JSON malformado común
+        """
+        try:
+            import re
+            
+            # Remover trailing commas antes de } o ]
+            content = re.sub(r',(\s*[}\]])', r'\1', content)
+            
+            # Si termina con coma, removerla
+            if content.rstrip().endswith(','):
+                content = content.rstrip().rstrip(',')
+            
+            # Intentar cerrar estructuras abiertas
+            open_braces = content.count('{') - content.count('}')
+            open_brackets = content.count('[') - content.count(']')
+            
+            # Cerrar objetos abiertos
+            for _ in range(open_braces):
+                content += '}'
+            
+            # Cerrar arrays abiertos
+            for _ in range(open_brackets):
+                content += ']'
+            
+            # Verificar que sea JSON válido
+            json.loads(content)
+            return content
+            
+        except Exception:
+            return None
+    
     def consolidate_cucumber_json(self, output_file: str = "cucumber-consolidated.json"):
         """
         Consolidar todos los archivos Cucumber JSON en uno solo
@@ -837,12 +972,37 @@ class BaseRunner:
         # Leer todos los archivos JSON en el directorio
         for json_file in self.cucumber_json_dir.glob("*.json"):
             try:
-                with open(json_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
+                with open(json_file, 'r', encoding='utf-8', errors='replace') as f:
+                    content = f.read().strip()
+                    if not content:
+                        self.log(f"⚠️ Archivo JSON vacío: {json_file.name}")
+                        continue
+                    
+                    data = json.loads(content)
                     if isinstance(data, list):
                         consolidated.extend(data)
                     else:
                         consolidated.append(data)
+            except json.JSONDecodeError as e:
+                self.log(f"⚠️ Error leyendo {json_file.name}: JSON malformado - {e}")
+                # Intentar recuperación más robusta
+                try:
+                    with open(json_file, 'r', encoding='utf-8', errors='replace') as f:
+                        content = f.read().strip()
+                    
+                    # Estrategia de recuperación: remover trailing commas y cerrar estructuras
+                    fixed_content = self._fix_malformed_json(content)
+                    if fixed_content:
+                        data = json.loads(fixed_content)
+                        if isinstance(data, list):
+                            consolidated.extend(data)
+                        else:
+                            consolidated.append(data)
+                        self.log(f"✅ Recuperado contenido de {json_file.name}")
+                    else:
+                        self.log(f"❌ No se pudo recuperar {json_file.name}")
+                except Exception:
+                    self.log(f"❌ Recuperación fallida para {json_file.name}")
             except Exception as e:
                 self.log(f"⚠️ Error leyendo {json_file.name}: {e}")
         

@@ -1,0 +1,48 @@
+{
+  "project": {
+    "name": "Mi Proyecto API Tests",
+    "engineer": "Juan Pérez",
+    "team": "Equipo QA",
+    "product": "Sistema de Gestión",
+    "company": "Mi Empresa S.A.",
+    "date_format": "%d/%m/%Y %H:%M:%S"
+  },
+  "branding": {
+    "primary_logo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+    "secondary_logo": "",
+    "company_logo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+    "primary_color": "#1e40af",
+    "secondary_color": "#3b82f6",
+    "accent_color": "#60a5fa",
+    "success_color": "#10b981",
+    "error_color": "#f87171",
+    "warning_color": "#fbbf24"
+  },
+  "charts": {
+    "enabled": true,
+    "show_pie_charts": true,
+    "show_bar_charts": true,
+    "colors": {
+      "passed": "#10b981",
+      "failed": "#f87171",
+      "skipped": "#fbbf24"
+    }
+  },
+  "footer": {
+    "show_creator": true,
+    "creator_name": "Juan Pérez",
+    "creator_email": "juan.perez@miempresa.com",
+    "company_name": "Mi Empresa S.A.",
+    "company_url": "https://www.miempresa.com",
+    "documentation_url": "https://docs.miempresa.com/testing",
+    "github_url": "https://github.com/miempresa/testing-framework"
+  },
+  "display": {
+    "show_request_details": true,
+    "show_response_details": true,
+    "show_variables": true,
+    "show_assertions": true,
+    "collapse_sections_by_default": false,
+    "show_duration_in_ms": true
+  }
+}
