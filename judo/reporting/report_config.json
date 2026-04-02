@@ -11,39 +11,101 @@
     "primary_logo": "",
     "secondary_logo": "",
     "company_logo": "",
-    "primary_color": "#8b5cf6",
-    "secondary_color": "#a855f7",
-    "accent_color": "#9333ea",
+    "primary_color": "#632078",
+    "secondary_color": "#632078",
+    "accent_color": "#632078",
     "success_color": "#22c55e",
     "error_color": "#ef4444",
-    "warning_color": "#f59e0b"
+    "warning_color": "#f59e0b",
+    "info_color": "#3b82f6"
+  },
+  "theme": {
+    "background_color": "#f0f2f5",
+    "surface_color": "#ffffff",
+    "surface_alt_color": "#f8f9fa",
+    "border_color": "#e5e7eb",
+    "text_primary": "#111827",
+    "text_secondary": "#6b7280",
+    "text_muted": "#9ca3af",
+    "header_text_color": "#ffffff",
+    "font_family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif",
+    "font_size_base": "14px",
+    "border_radius": "10px",
+    "shadow": "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)",
+    "shadow_md": "0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05)"
   },
   "charts": {
     "enabled": true,
-    "show_pie_charts": true,
-    "show_bar_charts": false,
+    "type": "doughnut",
+    "show_scenarios_chart": true,
+    "show_steps_chart": true,
+    "show_features_chart": true,
+    "show_bar_chart": false,
+    "animation": true,
+    "cutout": "72%",
     "colors": {
       "passed": "#22c55e",
       "failed": "#ef4444",
       "skipped": "#f59e0b"
     }
   },
+  "header": {
+    "show_company_logo": true,
+    "show_status_badge": true,
+    "show_duration": true,
+    "show_date": true,
+    "gradient": true
+  },
+  "project_info": {
+    "show_section": true,
+    "show_engineer": true,
+    "show_team": true,
+    "show_product": true,
+    "show_company": true,
+    "icon_size": "1.4em"
+  },
+  "summary": {
+    "show_execution_info": true,
+    "show_pass_rate": true,
+    "show_environment": false,
+    "environment_name": ""
+  },
+  "features": {
+    "collapsed_by_default": true,
+    "show_duration": true,
+    "show_scenario_count": true
+  },
+  "scenarios": {
+    "collapsed_by_default": true,
+    "show_duration": true,
+    "show_step_count": true,
+    "show_tags": true
+  },
+  "steps": {
+    "show_duration": true,
+    "show_request_details": true,
+    "show_response_details": true,
+    "show_request_headers": true,
+    "show_response_headers": true,
+    "show_request_body": true,
+    "show_response_body": true,
+    "show_query_params": true,
+    "show_variables": true,
+    "show_assertions": true,
+    "show_error_traceback": true,
+    "max_body_length": 5000
+  },
   "footer": {
-    "show_creator": true,
+    "show_creator": false,
+    "show_logo": true,
+    "show_links": true,
     "creator_name": "Felipe Farias",
     "creator_email": "felipe.farias@centyc.cl",
     "company_name": "CENTYC",
     "company_url": "https://www.centyc.cl",
     "documentation_url": "http://centyc.cl/judo-framework/",
-    "github_url": "https://github.com/FelipeFariasAlfaro/Judo-Framework"
-  },
-  "display": {
-    "show_request_details": true,
-    "show_response_details": true,
-    "show_variables": true,
-    "show_assertions": true,
-    "show_screenshots": true,
-    "collapse_sections_by_default": true,
-    "show_duration_in_ms": false
+    "github_url": "https://github.com/FelipeFariasAlfaro/Judo-Framework",
+    "background_color": "#1e293b",
+    "text_color": "rgba(255,255,255,0.75)"
   }
 }

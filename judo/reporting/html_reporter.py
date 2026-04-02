@@ -20,9 +20,12 @@ class HTMLReporter:
     def __init__(self, output_dir: str = None, config_file: str = None):
         """Initialize HTML reporter"""
         if output_dir is None:
-            # Usar directorio actual del proyecto del usuario
-            import os
-            output_dir = os.path.join(os.getcwd(), "judo_reports")
+            # Preferir la variable de entorno seteada por el runner (ya es ruta absoluta)
+            env_output = os.environ.get('JUDO_REPORT_OUTPUT_DIR')
+            if env_output:
+                output_dir = env_output
+            else:
+                output_dir = os.path.join(os.getcwd(), "judo_reports")
         
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -251,1722 +254,691 @@ class HTMLReporter:
             print(f"Warning: Could not load logo {logo_filename}: {e}")
             return ""
     
+    def _cfg(self, *keys, default=None):
+        """Safe nested config getter: self._cfg('theme','background_color')"""
+        node = self.config
+        for k in keys:
+            if not isinstance(node, dict):
+                return default
+            node = node.get(k, default)
+        return node if node is not None else default
+
     def generate_report(self, report_data: ReportData, filename: str = None) -> str:
         """Generate HTML report"""
         if not filename:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"judo_report_{timestamp}.html"
-        
+
         report_path = self.output_dir / filename
-        
-        # Generate HTML content
         html_content = self._generate_html(report_data)
-        
-        # Write to file
         with open(report_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        
         return str(report_path)
-    
-    def _generate_html(self, report_data: ReportData) -> str:
-        """Generate complete HTML report"""
-        summary = report_data.get_summary()
-        
-        html = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{self.config['project']['name']}</title>
-    <style>
-        {self._get_css_styles()}
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container">
-        {self._generate_header(report_data, summary)}
-        {self._generate_project_info()}
-        {self._generate_summary_section(summary, report_data)}
-        {self._generate_features_section(report_data.features)}
-    </div>
-    
-    {self._generate_footer()}
-    
-    <script>
-        {self._get_javascript()}
-        {self._get_charts_javascript(summary) if self.config['charts']['enabled'] else ''}
-    </script>
-</body>
-</html>
-        """
-        return html
-    
-    def _generate_header(self, report_data: ReportData, summary: Dict) -> str:
-        """Generate report header"""
-        status_class = "success" if summary["scenario_counts"]["failed"] == 0 else "failure"
-        project_config = self.config['project']
-        branding_config = self.config['branding']
-        
-        # Usar logos configurados o fallbacks
-        secondary_logo = self.secondary_logo_b64 or self.company_logo_b64
-        primary_logo = self.primary_logo_b64
-        
-        return f"""
-        <header class="report-header">
-            <div class="header-content">
-                <div class="header-layout">
-                    <!-- Logo secundario/empresa en esquina superior izquierda -->
-                    <div class="secondary-logo">
-                        {f'<a href="{self.config["footer"]["company_url"]}" target="_blank" class="secondary-link">' if self.config["footer"]["company_url"] else '<div class="secondary-link">'}
-                            {f'<img src="{secondary_logo}" alt="Company Logo" class="secondary-img">' if secondary_logo else f'<span class="secondary-fallback">{project_config["company"]}</span>'}
-                            <span class="secondary-text">{project_config["company"]}</span>
-                        {f'</a>' if self.config["footer"]["company_url"] else '</div>'}
-                    </div>
-                    
-                    <!-- Título centrado sin logo -->
-                    <div class="main-title">
-                        <h1 class="report-title">{project_config['name']}</h1>
-                    </div>
-                </div>
-                
-                <!-- Información del reporte en layout horizontal -->
-                <div class="header-info-horizontal">
-                    <div class="info-group">
-                        <span class="info-label">Fecha:</span>
-                        <span class="info-value">{report_data.start_time.strftime(project_config['date_format'])}</span>
-                    </div>
-                    <div class="info-group">
-                        <span class="info-label">Duración:</span>
-                        <span class="info-value">{report_data.duration:.2f}s</span>
-                    </div>
-                    <div class="info-group">
-                        <span class="info-label">Estado:</span>
-                        <span class="status-badge status-{status_class}">
-                            {'✓' if status_class == 'success' else '✗'}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </header>
-        """
-    
-    def _generate_project_info(self) -> str:
-        """Generate project information section"""
-        project_config = self.config['project']
-        
-        return f"""
-        <section class="project-info-section">
-            <div class="project-info-grid">
-                <div class="project-info-card">
-                    <div class="info-icon">👨‍💻</div>
-                    <div class="info-content">
-                        <div class="info-title">Ingeniero</div>
-                        <div class="info-value">{project_config['engineer']}</div>
-                    </div>
-                </div>
-                <div class="project-info-card">
-                    <div class="info-icon">👥</div>
-                    <div class="info-content">
-                        <div class="info-title">Equipo</div>
-                        <div class="info-value">{project_config['team']}</div>
-                    </div>
-                </div>
-                <div class="project-info-card">
-                    <div class="info-icon">📦</div>
-                    <div class="info-content">
-                        <div class="info-title">Producto</div>
-                        <div class="info-value">{project_config['product']}</div>
-                    </div>
-                </div>
-                <div class="project-info-card">
-                    <div class="info-icon">🏢</div>
-                    <div class="info-content">
-                        <div class="info-title">Empresa</div>
-                        <div class="info-value">{project_config['company']}</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        """
-    
-    def _generate_charts_section(self, summary: Dict) -> str:
-        """Generate charts section with pie charts"""
-        if not self.config['charts']['enabled']:
-            return ""
-        
-        charts_html = """
-        <section class="charts-section">
-            <h2>📊 Gráficos de Resultados</h2>
-            <div class="charts-grid">
-        """
-        
-        if self.config['charts']['show_pie_charts']:
-            charts_html += """
-                <div class="chart-container">
-                    <h3>Distribución de Escenarios</h3>
-                    <canvas id="scenariosChart" width="300" height="300"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h3>Distribución de Pasos</h3>
-                    <canvas id="stepsChart" width="300" height="300"></canvas>
-                </div>
-            """
-        
-        if self.config['charts']['show_bar_charts']:
-            charts_html += """
-                <div class="chart-container chart-wide">
-                    <h3>Comparación de Resultados</h3>
-                    <canvas id="comparisonChart" width="600" height="300"></canvas>
-                </div>
-            """
-        
-        charts_html += """
-            </div>
-        </section>
-        """
-        
-        return charts_html
-    
-    def _generate_summary_section(self, summary: Dict, report_data: ReportData = None) -> str:
-        """Generate summary section with integrated pie charts and execution info"""
-        # Generar gráficos de torta si están habilitados
-        charts_html = ""
-        if self.config['charts']['enabled'] and self.config['charts']['show_pie_charts']:
-            charts_html = f"""
-            <div class="summary-charts-grid">
-                <div class="summary-chart-card">
-                    <div class="chart-header">
-                        <span class="chart-icon">📁</span>
-                        <span class="chart-title">Features</span>
-                    </div>
-                    <div class="chart-content">
-                        <div class="chart-number">{summary['total_features']}</div>
-                        <div class="chart-canvas-container">
-                            <canvas id="scenariosChart" width="120" height="120"></canvas>
-                        </div>
-                        <div class="chart-stats">
-                            <div class="stat-item passed">{summary['scenario_counts']['passed']} PASSED</div>
-                            <div class="stat-item failed">{summary['scenario_counts']['failed']} FAILED</div>
-                            <div class="stat-item skipped">{summary['scenario_counts']['skipped']} SKIPPED</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="summary-chart-card">
-                    <div class="chart-header">
-                        <span class="chart-icon">📋</span>
-                        <span class="chart-title">Scenarios</span>
-                    </div>
-                    <div class="chart-content">
-                        <div class="chart-number">{summary['total_scenarios']}</div>
-                        <div class="chart-canvas-container">
-                            <canvas id="scenariosChart2" width="120" height="120"></canvas>
-                        </div>
-                        <div class="chart-stats">
-                            <div class="stat-item passed">{summary['scenario_counts']['passed']} PASSED</div>
-                            <div class="stat-item failed">{summary['scenario_counts']['failed']} FAILED</div>
-                            <div class="stat-item skipped">{summary['scenario_counts']['skipped']} SKIPPED</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="summary-chart-card">
-                    <div class="chart-header">
-                        <span class="chart-icon">🔸</span>
-                        <span class="chart-title">Steps</span>
-                    </div>
-                    <div class="chart-content">
-                        <div class="chart-number">{summary['total_steps']}</div>
-                        <div class="chart-canvas-container">
-                            <canvas id="stepsChart" width="120" height="120"></canvas>
-                        </div>
-                        <div class="chart-stats">
-                            <div class="stat-item passed">{summary['step_counts']['passed']} PASSED</div>
-                            <div class="stat-item failed">{summary['step_counts']['failed']} FAILED</div>
-                            <div class="stat-item skipped">{summary['step_counts']['skipped']} SKIPPED</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            """
-        
-        # Usar datos reales si están disponibles
-        if report_data:
-            start_time = report_data.start_time.strftime(self.config['project']['date_format'])
-            end_time = (report_data.start_time + timedelta(seconds=report_data.duration)).strftime(self.config['project']['date_format'])
-            duration = f"{report_data.duration:.2f}s"
-            browser = "Chromium"  # Default, could be made configurable
-        else:
-            # Fallback values
-            start_time = "2026-01-07 12:31:59"
-            end_time = "2026-01-07 12:32:26"
-            duration = "27.47s"
-            browser = "Chromium"
-        
-        return f"""
-        <section class="summary-section">
-            <div class="summary-layout">
-                <!-- Información de ejecución a la izquierda -->
-                <div class="execution-info">
-                    <div class="execution-item">
-                        <span class="execution-icon">🕐</span>
-                        <span class="execution-label">Inicio</span>
-                        <span class="execution-value">{start_time}</span>
-                    </div>
-                    <div class="execution-item">
-                        <span class="execution-icon">🏁</span>
-                        <span class="execution-label">Fin</span>
-                        <span class="execution-value">{end_time}</span>
-                    </div>
-                    <div class="execution-item">
-                        <span class="execution-icon">⏱️</span>
-                        <span class="execution-label">Duración</span>
-                        <span class="execution-value">{duration}</span>
-                    </div>
-                    <div class="execution-item">
-                        <span class="execution-icon">🌐</span>
-                        <span class="execution-label">Navegador</span>
-                        <span class="execution-value">{browser}</span>
-                    </div>
-                </div>
-                
-                <!-- Gráficos de resultados a la derecha -->
-                {charts_html}
-            </div>
-        </section>
-        """
-    
-    def _generate_features_section(self, features) -> str:
-        """Generate features section"""
-        features_html = ""
-        
-        for i, feature in enumerate(features):
-            feature_status = "passed" if all(s.status.value == "passed" for s in feature.scenarios) else "failed"
-            
-            features_html += f"""
-            <section class="feature-section">
-                <div class="feature-header" onclick="toggleFeature({i})">
-                    <h2>
-                        <span class="status-icon status-{feature_status}">
-                            {'✅' if feature_status == 'passed' else '❌'}
-                        </span>
-                        📋 {feature.name}
-                    </h2>
-                    <div class="feature-info">
-                        <span class="duration">{feature.duration:.2f}s</span>
-                        <span class="scenario-count">{len(feature.scenarios)} scenarios</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                </div>
-                
-                <div class="feature-content" id="feature-{i}">
-                    {self._generate_scenarios_section(feature.scenarios, i)}
-                </div>
-            </section>
-            """
-        
-        return features_html
-    
-    def _generate_footer(self) -> str:
-        """Generate report footer"""
-        footer_config = self.config['footer']
-        
-        footer_html = f"""
-        <footer class="report-footer">
-            <div class="footer-content">
-        """
-        
-        # Solo mostrar logo si está habilitado
-        if footer_config.get('show_logo', False):
-            if self.primary_logo_b64:
-                footer_html += f"""
-                <div class="footer-logo-only">
-                    <img src="{self.primary_logo_b64}" alt="Logo" class="primary-logo-footer">
-                </div>
-                """
-            else:
-                footer_html += f"""
-                <div class="footer-logo-only">
-                    <span class="primary-fallback-footer">🥋</span>
-                </div>
-                """
-        
-        # Links siempre visibles (pero se pueden ocultar con CSS si se desea)
-        footer_html += f"""
-                <div class="footer-links">
-                    <a href="{footer_config['company_url']}" target="_blank" class="footer-link">{footer_config['company_name']}</a>
-                    <span class="separator">•</span>
-                    <a href="{footer_config['documentation_url']}" target="_blank" class="footer-link">Documentación</a>
-                    <span class="separator">•</span>
-                    <a href="{footer_config['github_url']}" target="_blank" class="footer-link">GitHub</a>
-                </div>
-            </div>
-        </footer>
-        """
-        
-        return footer_html
-    
-    def _generate_scenarios_section(self, scenarios, feature_index) -> str:
-        """Generate scenarios section"""
-        scenarios_html = ""
-        
-        for j, scenario in enumerate(scenarios):
-            status_class = scenario.status.value
-            
-            scenarios_html += f"""
-            <div class="scenario-section">
-                <div class="scenario-header" onclick="toggleScenario({feature_index}, {j})">
-                    <h3>
-                        <span class="status-icon status-{status_class}">
-                            {'✅' if status_class == 'passed' else '❌' if status_class == 'failed' else '⏭️'}
-                        </span>
-                        🎯 {scenario.name}
-                    </h3>
-                    <div class="scenario-info">
-                        <span class="duration">{scenario.duration:.2f}s</span>
-                        <span class="step-count">{len(scenario.steps)} steps</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                </div>
-                
-                <div class="scenario-content" id="scenario-{feature_index}-{j}">
-                    {self._generate_steps_section(scenario.background_steps + scenario.steps)}
-                </div>
-            </div>
-            """
-        
-        return scenarios_html
-    
-    def _generate_steps_section(self, steps) -> str:
-        """Generate steps section"""
-        steps_html = ""
-        
-        for k, step in enumerate(steps):
-            status_class = step.status.value
-            
-            steps_html += f"""
-            <div class="step-section status-{status_class}">
-                <div class="step-header" onclick="toggleStep(this)">
-                    <div class="step-info">
-                        <span class="status-icon">
-                            {'✅' if status_class == 'passed' else '❌' if status_class == 'failed' else '⏭️'}
-                        </span>
-                        <span class="step-text">{step.step_text}</span>
-                    </div>
-                    <div class="step-meta">
-                        <span class="duration">{step.duration:.3f}s</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                </div>
-                
-                <div class="step-content">
-                    {self._generate_step_details(step)}
-                </div>
-            </div>
-            """
-        
-        return steps_html
-    
-    def _generate_step_details(self, step) -> str:
-        """Generate detailed step information"""
-        details_html = ""
-        
-        # Variables used
-        if step.variables_used:
-            details_html += f"""
-            <div class="detail-section">
-                <h4>📝 Variables Used</h4>
-                <pre class="json-content">{json.dumps(step.variables_used, indent=2)}</pre>
-            </div>
-            """
-        
-        # Request details
-        if step.request_data:
-            req = step.request_data
-            details_html += f"""
-            <div class="detail-section">
-                <h4>📤 Request</h4>
-                <div class="request-info">
-                    <div class="method-url">
-                        <span class="http-method method-{req.method.lower()}">{req.method}</span>
-                        <span class="url">{req.url}</span>
-                    </div>
-                    
-                    {self._generate_headers_section("Request Headers", req.headers)}
-                    
-                    {self._generate_params_section(req.params) if req.params else ""}
-                    
-                    {self._generate_body_section("Request Body", req.body, req.body_type) if req.body else ""}
-                </div>
-            </div>
-            """
-        
-        # Response details
-        if step.response_data:
-            resp = step.response_data
-            status_class = "success" if 200 <= resp.status_code < 300 else "error"
-            
-            details_html += f"""
-            <div class="detail-section">
-                <h4>📥 Response</h4>
-                <div class="response-info">
-                    <div class="status-line">
-                        <span class="status-code status-{status_class}">{resp.status_code}</span>
-                        <span class="response-time">{resp.elapsed_time:.3f}s</span>
-                    </div>
-                    
-                    {self._generate_headers_section("Response Headers", resp.headers)}
-                    
-                    {self._generate_body_section("Response Body", resp.body, resp.body_type) if resp.body else ""}
-                </div>
-            </div>
-            """
-        
-        # Assertions
-        if step.assertions:
-            details_html += f"""
-            <div class="detail-section">
-                <h4>✅ Assertions</h4>
-                <div class="assertions-list">
-                    {self._generate_assertions_section(step.assertions)}
-                </div>
-            </div>
-            """
-        
-        # Variables set
-        if step.variables_set:
-            details_html += f"""
-            <div class="detail-section">
-                <h4>💾 Variables Set</h4>
-                <pre class="json-content">{json.dumps(step.variables_set, indent=2)}</pre>
-            </div>
-            """
-        
-        # Error details
-        if step.error_message:
-            details_html += f"""
-            <div class="detail-section error-section">
-                <h4>❌ Error</h4>
-                <div class="error-message">{step.error_message}</div>
-                {f'<pre class="error-traceback">{step.error_traceback}</pre>' if step.error_traceback else ''}
-            </div>
-            """
-        
-        return details_html
-    
-    def _generate_headers_section(self, title: str, headers: Dict) -> str:
-        """Generate headers section"""
-        if not headers:
-            return ""
-        
-        headers_html = ""
-        for key, value in headers.items():
-            headers_html += f'<div class="header-item"><span class="header-key">{key}:</span> <span class="header-value">{value}</span></div>'
-        
-        return f"""
-        <div class="headers-section">
-            <h5>{title}</h5>
-            <div class="headers-list">
-                {headers_html}
-            </div>
-        </div>
-        """
-    
-    def _generate_params_section(self, params: Dict) -> str:
-        """Generate query parameters section"""
-        if not params:
-            return ""
-        
-        params_html = ""
-        for key, value in params.items():
-            params_html += f'<div class="param-item"><span class="param-key">{key}:</span> <span class="param-value">{value}</span></div>'
-        
-        return f"""
-        <div class="params-section">
-            <h5>Query Parameters</h5>
-            <div class="params-list">
-                {params_html}
-            </div>
-        </div>
-        """
-    
-    def _generate_body_section(self, title: str, body: Any, body_type: str) -> str:
-        """Generate body section"""
-        if body is None:
-            return ""
-        
-        if body_type == "json":
-            body_content = json.dumps(body, indent=2) if isinstance(body, (dict, list)) else str(body)
-            css_class = "json-content"
-        else:
-            body_content = str(body)
-            css_class = "text-content"
-        
-        return f"""
-        <div class="body-section">
-            <h5>{title}</h5>
-            <pre class="{css_class}">{body_content}</pre>
-        </div>
-        """
-    
-    def _generate_assertions_section(self, assertions: list) -> str:
-        """Generate assertions section"""
-        assertions_html = ""
-        
-        for assertion in assertions:
-            status_class = "passed" if assertion["passed"] else "failed"
-            icon = "✅" if assertion["passed"] else "❌"
-            
-            assertions_html += f"""
-            <div class="assertion-item status-{status_class}">
-                <div class="assertion-header">
-                    <span class="assertion-icon">{icon}</span>
-                    <span class="assertion-description">{assertion['description']}</span>
-                </div>
-                <div class="assertion-details">
-                    <div class="assertion-expected">Expected: <code>{json.dumps(assertion['expected'])}</code></div>
-                    <div class="assertion-actual">Actual: <code>{json.dumps(assertion['actual'])}</code></div>
-                </div>
-            </div>
-            """
-        
-        return assertions_html
-    
-    def _get_css_styles(self) -> str:
-        """Get CSS styles for the report"""
-        branding = self.config['branding']
-        
-        return f"""
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-        
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
-        }}
-        
-        .container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }}
-        
-        /* Header Styles */
-        .report-header {{
-            background: linear-gradient(135deg, {branding['primary_color']} 0%, {branding['secondary_color']} 50%, {branding['accent_color']} 100%);
-            color: white;
-            padding: 25px 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
-        }}
-        
-        .header-layout {{
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 25px;
-            position: relative;
-        }}
-        
-        /* Logo secundario/empresa en esquina superior izquierda */
-        .secondary-logo {{
-            position: absolute;
-            top: 0;
-            left: 0;
-        }}
-        
-        .secondary-link {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: white;
-            transition: opacity 0.3s ease;
-        }}
-        
-        .secondary-link:hover {{
-            opacity: 0.8;
-        }}
-        
-        .secondary-text {{
-            font-size: 0.9em;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
-        }}
-        
-        .secondary-img {{
-            height: 30px;
-            width: auto;
-            max-width: 120px;
-            transition: opacity 0.3s ease;
-            border-radius: 4px;
-        }}
-        
-        .secondary-img:hover {{
-            opacity: 0.8;
-        }}
-        
-        .secondary-fallback {{
-            font-size: 1.2em;
-            font-weight: bold;
-            color: white;
-        }}
-        
-        /* Logo principal y título centrados */
-        .main-title {{
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 0 auto;
-            padding-top: 10px;
-        }}
-        
 
-        .primary-img {{
-            height: 50px;
-            width: 50px;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            object-fit: cover;
-        }}
-        
-        .primary-img:hover {{
-            transform: scale(1.05);
-        }}
-        
-        .primary-fallback {{
-            font-size: 2em;
-        }}
-        
-        .report-title {{
-            font-size: 2.2em;
-            margin: 0;
-            font-weight: 600;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }}
-        
-        /* Información horizontal */
-        .header-info-horizontal {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px 25px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }}
-        
-        .info-group {{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }}
-        
-        .info-label {{
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 500;
-        }}
-        
-        .info-value {{
-            font-size: 1.1em;
-            font-weight: 600;
-            color: white;
-        }}
-        
-        /* Status Badge */
-        .status-badge {{
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9em;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 80px;
-        }}
-        
-        .status-badge.status-success {{
-            background: {branding['success_color']};
-            color: white;
-            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
-        }}
-        
-        .status-badge.status-failure {{
-            background: {branding['error_color']};
-            color: white;
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-        }}
-        
-        /* Project Info Section */
-        .project-info-section {{
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }}
-        
-        .project-info-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }}
-        
-        .project-info-card {{
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid {branding['primary_color']};
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }}
-        
-        .project-info-card:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }}
-        
-        .info-icon {{
-            font-size: 2em;
-            opacity: 0.8;
-        }}
-        
-        .info-content {{
-            flex: 1;
-        }}
-        
-        .info-title {{
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }}
-        
-        .info-value {{
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #333;
-        }}
-        
-        /* Charts Section */
-        .charts-section {{
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }}
-        
-        .charts-section h2 {{
-            margin-bottom: 25px;
-            color: #333;
-            text-align: center;
-        }}
-        
-        .charts-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            align-items: start;
-        }}
-        
-        .chart-container {{
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }}
-        
-        .chart-container h3 {{
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 1.1em;
-        }}
-        
-        .chart-container canvas {{
-            max-width: 100%;
-            height: 300px !important;
-        }}
-        
-        .chart-wide {{
-            grid-column: 1 / -1;
-        }}
-        
-        .chart-wide canvas {{
-            height: 400px !important;
-        }}
-        
-        /* Summary Section */
-        .summary-section {{
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }}
-        
-        .summary-layout {{
-            display: flex;
-            gap: 30px;
-            align-items: flex-start;
-        }}
-        
-        /* Información de ejecución a la izquierda */
-        .execution-info {{
-            flex: 0 0 200px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid {branding['primary_color']};
-        }}
-        
-        .execution-item {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding: 8px 0;
-        }}
-        
-        .execution-item:last-child {{
-            margin-bottom: 0;
-        }}
-        
-        .execution-icon {{
-            font-size: 1.2em;
-            width: 24px;
-            text-align: center;
-        }}
-        
-        .execution-label {{
-            font-size: 0.9em;
-            color: #666;
-            font-weight: 500;
-            min-width: 70px;
-        }}
-        
-        .execution-value {{
-            font-size: 0.9em;
-            color: #333;
-            font-weight: 600;
-        }}
-        
-        /* Gráficos de resumen */
-        .summary-charts-grid {{
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }}
-        
-        .summary-chart-card {{
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }}
-        
-        .summary-chart-card:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }}
-        
-        .chart-header {{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid {branding['primary_color']};
-        }}
-        
-        .chart-icon {{
-            font-size: 1.2em;
-        }}
-        
-        .chart-title {{
-            font-size: 1em;
-            font-weight: 600;
-            color: #333;
-        }}
-        
-        .chart-content {{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }}
-        
-        .chart-number {{
-            font-size: 2.5em;
-            font-weight: bold;
-            color: {branding['primary_color']};
-            line-height: 1;
-        }}
-        
-        .chart-canvas-container {{
-            position: relative;
-            width: 120px;
-            height: 120px;
-        }}
-        
-        .chart-canvas-container canvas {{
-            max-width: 100% !important;
-            max-height: 100% !important;
-        }}
-        
-        .chart-stats {{
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            width: 100%;
-        }}
-        
-        .stat-item {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8em;
-            font-weight: 500;
-            padding: 2px 0;
-        }}
-        
-        .stat-item.passed {{
-            color: {branding['success_color']};
-        }}
-        
-        .stat-item.failed {{
-            color: {branding['error_color']};
-        }}
-        
-        .stat-item.skipped {{
-            color: {branding['warning_color']};
-        }}
-        
-        /* Responsive design para summary */
-        @media (max-width: 768px) {{
-            .summary-layout {{
-                flex-direction: column;
-            }}
-            
-            .execution-info {{
-                flex: none;
-                width: 100%;
-            }}
-            
-            .summary-charts-grid {{
-                grid-template-columns: 1fr;
-            }}
-        }}
-        
-        @media (max-width: 1024px) {{
-            .summary-charts-grid {{
-                grid-template-columns: repeat(2, 1fr);
-            }}
-        }}
-        
-        .passed {{
-            color: {branding['success_color']};
-        }}
-        
-        .failed {{
-            color: {branding['error_color']};
-        }}
-        
-        .skipped {{
-            color: {branding['warning_color']};
-        }}
-        
-        /* Feature Section */
-        .feature-section {{
-            background: white;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }}
-        
-        .feature-header {{
-            background: #f8f9fa;
-            padding: 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e9ecef;
-        }}
-        
-        .feature-header:hover {{
-            background: #e9ecef;
-        }}
-        
-        .feature-header h2 {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 0;
-        }}
-        
-        .feature-info {{
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 0.9em;
-            color: #666;
-        }}
-        
-        .feature-content {{
-            padding: 20px;
-        }}
-        
-        /* Scenario Section */
-        .scenario-section {{
-            margin-bottom: 20px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            overflow: hidden;
-        }}
-        
-        .scenario-header {{
-            background: #f8f9fa;
-            padding: 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }}
-        
-        .scenario-header:hover {{
-            background: #e9ecef;
-        }}
-        
-        .scenario-header h3 {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 0;
-            font-size: 1.1em;
-        }}
-        
-        .scenario-info {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8em;
-            color: #666;
-        }}
-        
-        .scenario-content {{
-            padding: 15px;
-            background: #fafafa;
-        }}
-        
-        /* Step Section */
-        .step-section {{
-            margin-bottom: 15px;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            overflow: hidden;
-        }}
-        
-        .step-section.status-passed {{
-            border-left: 4px solid {branding['success_color']};
-        }}
-        
-        .step-section.status-failed {{
-            border-left: 4px solid {branding['error_color']};
-        }}
-        
-        .step-section.status-skipped {{
-            border-left: 4px solid {branding['warning_color']};
-        }}
-        
-        .step-header {{
-            background: white;
-            padding: 12px 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }}
-        
-        .step-header:hover {{
-            background: #f8f9fa;
-        }}
-        
-        .step-info {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }}
-        
-        .step-text {{
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.9em;
-        }}
-        
-        .step-meta {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8em;
-            color: #666;
-        }}
-        
-        .step-content {{
-            padding: 15px;
-            background: #fafafa;
-            display: none;
-        }}
-        
-        .step-content.expanded {{
-            display: block;
-        }}
-        
-        /* Detail Sections */
-        .detail-section {{
-            margin-bottom: 20px;
-            background: white;
-            border-radius: 6px;
-            padding: 15px;
-            border: 1px solid #e9ecef;
-        }}
-        
-        .detail-section h4 {{
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1em;
-        }}
-        
-        .detail-section h5 {{
-            margin-bottom: 10px;
-            color: #666;
-            font-size: 0.9em;
-        }}
-        
-        /* Request/Response Styles */
-        .method-url {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }}
-        
-        .http-method {{
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.8em;
-            color: white;
-        }}
-        
-        .method-get {{ background: {branding['success_color']}; }}
-        .method-post {{ background: #2196F3; }}
-        .method-put {{ background: {branding['warning_color']}; }}
-        .method-patch {{ background: #9c27b0; }}
-        .method-delete {{ background: {branding['error_color']}; }}
-        
-        .url {{
-            font-family: 'Monaco', 'Menlo', monospace;
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }}
-        
-        .status-line {{
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }}
-        
-        .status-code {{
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: white;
-        }}
-        
-        .status-success {{ background: {branding['success_color']}; }}
-        .status-error {{ background: {branding['error_color']}; }}
-        
-        .response-time {{
-            font-size: 0.9em;
-            color: #666;
-        }}
-        
-        /* Headers and Parameters */
-        .headers-section, .params-section, .body-section {{
-            margin-bottom: 15px;
-        }}
-        
-        .headers-list, .params-list {{
-            background: #f8f9fa;
-            border-radius: 4px;
-            padding: 10px;
-        }}
-        
-        .header-item, .param-item {{
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }}
-        
-        .header-key, .param-key {{
-            font-weight: bold;
-            color: #666;
-        }}
-        
-        .header-value, .param-value {{
-            font-family: 'Monaco', 'Menlo', monospace;
-        }}
-        
-        /* Code Content */
-        .json-content, .text-content {{
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 4px;
-            padding: 15px;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.8em;
-            overflow-x: auto;
-            white-space: pre-wrap;
-        }}
-        
-        /* Assertions */
-        .assertions-list {{
-            background: #f8f9fa;
-            border-radius: 4px;
-            padding: 10px;
-        }}
-        
-        .assertion-item {{
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            border-left: 4px solid #ccc;
-        }}
-        
-        .assertion-item.status-passed {{
-            border-left-color: {branding['success_color']};
-            background: #f1f8e9;
-        }}
-        
-        .assertion-item.status-failed {{
-            border-left-color: {branding['error_color']};
-            background: #ffebee;
-        }}
-        
-        .assertion-header {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }}
-        
-        .assertion-description {{
-            font-weight: bold;
-        }}
-        
-        .assertion-details {{
-            font-size: 0.9em;
-        }}
-        
-        .assertion-expected, .assertion-actual {{
-            margin-bottom: 4px;
-        }}
-        
-        .assertion-expected code, .assertion-actual code {{
-            background: rgba(0,0,0,0.1);
-            padding: 2px 4px;
-            border-radius: 2px;
-            font-family: 'Monaco', 'Menlo', monospace;
-        }}
-        
-        /* Error Section */
-        .error-section {{
-            border-left: 4px solid {branding['error_color']};
-            background: #ffebee;
-        }}
-        
-        .error-message {{
-            color: #d32f2f;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }}
-        
-        .error-traceback {{
-            background: #ffcdd2;
-            border: 1px solid {branding['error_color']};
-            color: #b71c1c;
-            font-size: 0.8em;
-        }}
-        
-        /* Toggle Icons */
-        .toggle-icon {{
-            transition: transform 0.3s ease;
-        }}
-        
-        .toggle-icon.rotated {{
-            transform: rotate(180deg);
-        }}
-        
-        /* Footer Styles */
-        .report-footer {{
-            background: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            margin-top: 40px;
-        }}
-        
-        .footer-content {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }}
-        
-        .footer-info {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }}
-        
-        .footer-logo-only {{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-        }}
-        
-        .primary-logo-footer {{
-            height: 24px;
-            width: 24px;
-            opacity: 0.8;
-            border-radius: 50%;
-            object-fit: cover;
-        }}
-        
-        .primary-fallback-footer {{
-            font-size: 1.2em;
-        }}
-        
-        .footer-text {{
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.8);
-        }}
-        
-        .footer-email {{
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 500;
-        }}
-        
-        .footer-email:hover {{
-            color: #5dade2;
-            text-decoration: underline;
-        }}
-        
-        .footer-links {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }}
-        
-        .footer-link {{
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-size: 0.9em;
-            transition: color 0.3s ease;
-        }}
-        
-        .footer-link:hover {{
-            color: white;
-            text-decoration: underline;
-        }}
-        
-        .separator {{
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.8em;
-        }}
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {{
-            .container {{
-                padding: 10px;
-            }}
-            
-            .header-layout {{
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }}
-            
-            .secondary-logo {{
-                position: static;
-                order: -1;
-            }}
-            
-            .main-title {{
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }}
-            
-            .report-title {{
-                font-size: 1.8em;
-            }}
-            
-            .header-info-horizontal {{
-                flex-direction: column;
-                gap: 15px;
-            }}
-            
-            .info-group {{
-                flex-direction: row;
-                gap: 10px;
-            }}
-            
-            .summary-grid {{
-                grid-template-columns: 1fr;
-            }}
-            
-            .project-info-grid {{
-                grid-template-columns: 1fr;
-            }}
-            
-            .charts-grid {{
-                grid-template-columns: 1fr;
-            }}
-            
-            .method-url {{
-                flex-direction: column;
-                align-items: flex-start;
-            }}
-            
-            .feature-header, .scenario-header, .step-header {{
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }}
-            
-            .footer-content {{
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-            }}
-            
-            .footer-links {{
-                justify-content: center;
-            }}
-        }}
-        """
-    
-    def _get_javascript(self) -> str:
-        """Get JavaScript for interactive features"""
-        return """
-        function toggleFeature(index) {
-            const content = document.getElementById(`feature-${index}`);
-            const icon = content.previousElementSibling.querySelector('.toggle-icon');
-            
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                icon.classList.remove('rotated');
-            } else {
-                content.style.display = 'none';
-                icon.classList.add('rotated');
-            }
-        }
-        
-        function toggleScenario(featureIndex, scenarioIndex) {
-            const content = document.getElementById(`scenario-${featureIndex}-${scenarioIndex}`);
-            const icon = content.previousElementSibling.querySelector('.toggle-icon');
-            
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                icon.classList.remove('rotated');
-            } else {
-                content.style.display = 'none';
-                icon.classList.add('rotated');
-            }
-        }
-        
-        function toggleStep(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('.toggle-icon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.add('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.remove('rotated');
-            }
-        }
-        
-        // Initialize collapsed state
-        document.addEventListener('DOMContentLoaded', function() {
-            // Collapse all features initially
-            document.querySelectorAll('[id^="feature-"]').forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            // Collapse all scenarios initially
-            document.querySelectorAll('[id^="scenario-"]').forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            // Rotate all toggle icons initially
-            document.querySelectorAll('.toggle-icon').forEach(icon => {
-                icon.classList.add('rotated');
-            });
-        });
-        """
-    
-    def _get_charts_javascript(self, summary: Dict) -> str:
-        """Get JavaScript for charts"""
-        chart_colors = self.config['charts']['colors']
-        
+
+
+    # ------------------------------------------------------------------ #
+    #  HTML GENERATION                                                     #
+    # ------------------------------------------------------------------ #
+
+    def _generate_html(self, report_data: ReportData) -> str:
+        summary = report_data.get_summary()
+        charts_enabled = self._cfg("charts", "enabled", default=True)
+        title = self._cfg("project", "name", default="Judo Report")
+        css = self._get_css_styles()
+        header = self._generate_header(report_data, summary)
+        proj = self._generate_project_info()
+        summ = self._generate_summary_section(summary, report_data)
+        feats = self._generate_features_section(report_data.features)
+        footer = self._generate_footer()
+        js = self._get_javascript()
+        charts_js = self._get_charts_javascript(summary) if charts_enabled else ""
+        return (
+            "<!DOCTYPE html>\n"
+            '<html lang="en">\n'
+            "<head>\n"
+            '<meta charset="UTF-8">\n'
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
+            f"<title>{title}</title>\n"
+            '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>\n'
+            f"<style>{css}</style>\n"
+            "</head>\n"
+            "<body>\n"
+            '<div class="app">\n'
+            f"{header}\n"
+            '<main class="main">\n'
+            f"{proj}\n"
+            f"{summ}\n"
+            f"{feats}\n"
+            "</main>\n"
+            f"{footer}\n"
+            "</div>\n"
+            "<script>\n"
+            f"{js}\n"
+            f"{charts_js}\n"
+            "</script>\n"
+            "</body>\n"
+            "</html>\n"
+        )
+
+
+    def _generate_header(self, report_data: ReportData, summary: Dict) -> str:
+        b = self.config.get("branding", {})
+        p = self.config.get("project", {})
+        hcfg = self.config.get("header", {})
+        failed = summary["scenario_counts"]["failed"]
+        status_ok = failed == 0
+        status_label = "PASSED" if status_ok else "FAILED"
+        status_cls = "badge-pass" if status_ok else "badge-fail"
+        duration = f"{report_data.duration:.2f}s"
+        date_str = report_data.start_time.strftime(p.get("date_format", "%Y-%m-%d %H:%M:%S"))
+        secondary = self.secondary_logo_b64 or self.company_logo_b64
+        footer_cfg = self.config.get("footer", {})
+        company_url = footer_cfg.get("company_url", "#")
+
+        logo_html = ""
+        if hcfg.get("show_company_logo", True) and secondary:
+            logo_html = (
+                f'<a href="{company_url}" target="_blank" class="header-logo-link">'
+                f'<img src="{secondary}" alt="Logo" class="header-logo-img"></a>'
+            )
+        elif hcfg.get("show_company_logo", True):
+            logo_html = f'<span class="header-logo-text">{p.get("company","")}</span>'
+
+        badge_html = ""
+        if hcfg.get("show_status_badge", True):
+            badge_html = f'<span class="status-badge {status_cls}">{status_label}</span>'
+
+        meta_items = []
+        if hcfg.get("show_date", True):
+            meta_items.append(f'<div class="header-meta-item"><span class="meta-label">Fecha</span><span class="meta-val">{date_str}</span></div>')
+        if hcfg.get("show_duration", True):
+            meta_items.append(f'<div class="header-meta-item"><span class="meta-label">Duración</span><span class="meta-val">{duration}</span></div>')
+        meta_html = "\n".join(meta_items)
+
+        return (
+            '<header class="report-header">\n'
+            '  <div class="header-inner">\n'
+            '    <div class="header-top">\n'
+            f'      <div class="header-logo">{logo_html}</div>\n'
+            f'      <h1 class="header-title">{p.get("name","Test Report")}</h1>\n'
+            f'      <div class="header-right">{badge_html}</div>\n'
+            '    </div>\n'
+            f'    <div class="header-meta">{meta_html}</div>\n'
+            '  </div>\n'
+            '</header>\n'
+        )
+
+    def _generate_project_info(self) -> str:
+        p = self.config.get("project", {})
+        pcfg = self.config.get("project_info", {})
+        if not pcfg.get("show_section", True):
+            return ""
+        icon_size = pcfg.get("icon_size", "1.4em")
+        cards = []
+        if pcfg.get("show_engineer", True):
+            cards.append(("&#128104;&#8205;&#128187;", "Ingeniero", p.get("engineer", "")))
+        if pcfg.get("show_team", True):
+            cards.append(("&#128101;", "Equipo", p.get("team", "")))
+        if pcfg.get("show_product", True):
+            cards.append(("&#128230;", "Producto", p.get("product", "")))
+        if pcfg.get("show_company", True):
+            cards.append(("&#127970;", "Empresa", p.get("company", "")))
+        items = ""
+        for icon, label, val in cards:
+            items += (
+                '<div class="info-card">'
+                f'<span class="info-card-icon" style="font-size:{icon_size}">{icon}</span>'
+                '<div class="info-card-body">'
+                f'<div class="info-card-label">{label}</div>'
+                f'<div class="info-card-value">{val}</div>'
+                '</div></div>\n'
+            )
+        return f'<section class="project-info"><div class="info-cards">{items}</div></section>\n'
+
+
+    def _generate_summary_section(self, summary: Dict, report_data: ReportData = None) -> str:
+        b = self.config.get("branding", {})
+        ccfg = self.config.get("charts", {})
+        scfg = self.config.get("summary", {})
+        sc = summary["scenario_counts"]
+        stc = summary["step_counts"]
+        total_sc = summary["total_scenarios"]
+        total_st = summary["total_steps"]
+        total_fe = summary["total_features"]
+        pass_rate = round(sc["passed"] / max(total_sc, 1) * 100, 1)
+
+        # Execution info
+        exec_html = ""
+        if scfg.get("show_execution_info", True) and report_data:
+            start = report_data.start_time.strftime(
+                self.config.get("project", {}).get("date_format", "%Y-%m-%d %H:%M:%S")
+            )
+            end = (report_data.start_time + __import__("datetime").timedelta(seconds=report_data.duration)).strftime(
+                self.config.get("project", {}).get("date_format", "%Y-%m-%d %H:%M:%S")
+            )
+            dur = f"{report_data.duration:.2f}s"
+            env_name = scfg.get("environment_name", "")
+            env_row = f'<div class="exec-row"><span class="exec-label">Entorno</span><span class="exec-val">{env_name}</span></div>' if scfg.get("show_environment") and env_name else ""
+            exec_html = (
+                '<div class="exec-info">'
+                f'<div class="exec-row"><span class="exec-label">Inicio</span><span class="exec-val">{start}</span></div>'
+                f'<div class="exec-row"><span class="exec-label">Fin</span><span class="exec-val">{end}</span></div>'
+                f'<div class="exec-row"><span class="exec-label">Duración</span><span class="exec-val">{dur}</span></div>'
+                f'{env_row}'
+                '</div>'
+            )
+
+        # Pass rate pill
+        rate_html = ""
+        if scfg.get("show_pass_rate", True):
+            rate_color = b.get("success_color", "#22c55e") if pass_rate >= 80 else (b.get("warning_color", "#f59e0b") if pass_rate >= 50 else b.get("error_color", "#ef4444"))
+            rate_html = f'<div class="pass-rate" style="color:{rate_color}"><span class="rate-num">{pass_rate}%</span><span class="rate-label">Pass Rate</span></div>'
+
+        # Chart cards
+        charts_html = ""
+        if ccfg.get("enabled", True):
+            cards = []
+            if ccfg.get("show_features_chart", True):
+                cards.append(("&#128193;", "Features", total_fe, "featuresChart", sc["passed"], sc["failed"], sc["skipped"]))
+            if ccfg.get("show_scenarios_chart", True):
+                cards.append(("&#128203;", "Scenarios", total_sc, "scenariosChart", sc["passed"], sc["failed"], sc["skipped"]))
+            if ccfg.get("show_steps_chart", True):
+                cards.append(("&#128312;", "Steps", total_st, "stepsChart", stc["passed"], stc["failed"], stc["skipped"]))
+            card_html = ""
+            for icon, label, total, cid, passed, failed, skipped in cards:
+                card_html += (
+                    '<div class="chart-card">'
+                    f'<div class="chart-card-header"><span class="chart-card-icon">{icon}</span><span class="chart-card-title">{label}</span></div>'
+                    f'<div class="chart-card-total">{total}</div>'
+                    f'<div class="chart-wrap"><canvas id="{cid}" width="110" height="110"></canvas></div>'
+                    '<div class="chart-legend">'
+                    f'<span class="leg-dot" style="background:{b.get("success_color","#22c55e")}"></span><span class="leg-txt">{passed} Pass</span>'
+                    f'<span class="leg-dot" style="background:{b.get("error_color","#ef4444")}"></span><span class="leg-txt">{failed} Fail</span>'
+                    f'<span class="leg-dot" style="background:{b.get("warning_color","#f59e0b")}"></span><span class="leg-txt">{skipped} Skip</span>'
+                    '</div></div>\n'
+                )
+            charts_html = f'<div class="charts-row">{card_html}</div>'
+
+        return (
+            '<section class="summary-section">'
+            '<div class="summary-inner">'
+            f'{exec_html}'
+            f'{rate_html}'
+            f'{charts_html}'
+            '</div>'
+            '</section>\n'
+        )
+
+
+    def _generate_features_section(self, features) -> str:
+        fcfg = self.config.get("features", {})
+        collapsed = fcfg.get("collapsed_by_default", True)
+        html = '<div class="features-list">\n'
+        for i, feature in enumerate(features):
+            all_passed = all(s.status.value == "passed" for s in feature.scenarios)
+            fstatus = "passed" if all_passed else "failed"
+            icon = "&#9989;" if all_passed else "&#10060;"
+            dur = f"{feature.duration:.2f}s" if fcfg.get("show_duration", True) else ""
+            sc_count = f"{len(feature.scenarios)} scenarios" if fcfg.get("show_scenario_count", True) else ""
+            display = "none" if collapsed else "block"
+            html += (
+                f'<div class="feature-block">'
+                f'<div class="feature-hdr status-{fstatus}" onclick="toggleEl(\'feat-{i}\')">'
+                f'<span class="fhdr-icon">{icon}</span>'
+                f'<span class="fhdr-name">{feature.name}</span>'
+                f'<span class="fhdr-meta">{dur} &nbsp; {sc_count}</span>'
+                f'<span class="toggle-arrow" id="arr-feat-{i}">&#9660;</span>'
+                f'</div>'
+                f'<div class="feature-body" id="feat-{i}" style="display:{display}">'
+                f'{self._generate_scenarios_section(feature.scenarios, i)}'
+                f'</div></div>\n'
+            )
+        html += '</div>\n'
+        return html
+
+    def _generate_scenarios_section(self, scenarios, fi) -> str:
+        scfg = self.config.get("scenarios", {})
+        collapsed = scfg.get("collapsed_by_default", True)
+        html = ""
+        for j, sc in enumerate(scenarios):
+            st = sc.status.value
+            icon = "&#9989;" if st == "passed" else ("&#10060;" if st == "failed" else "&#9193;")
+            dur = f"{sc.duration:.2f}s" if scfg.get("show_duration", True) else ""
+            step_count = f"{len(sc.steps)} steps" if scfg.get("show_step_count", True) else ""
+            tags_html = ""
+            if scfg.get("show_tags", True) and getattr(sc, "tags", None):
+                tags_html = " ".join(f'<span class="tag">@{t}</span>' for t in sc.tags)
+            display = "none" if collapsed else "block"
+            html += (
+                f'<div class="scenario-block">'
+                f'<div class="scenario-hdr status-{st}" onclick="toggleEl(\'sc-{fi}-{j}\')">'
+                f'<span class="shdr-icon">{icon}</span>'
+                f'<span class="shdr-name">{sc.name}</span>'
+                f'<span class="shdr-meta">{tags_html} {dur} &nbsp; {step_count}</span>'
+                f'<span class="toggle-arrow" id="arr-sc-{fi}-{j}">&#9660;</span>'
+                f'</div>'
+                f'<div class="scenario-body" id="sc-{fi}-{j}" style="display:{display}">'
+                f'{self._generate_steps_section(list(getattr(sc,"background_steps",None) or []) + list(sc.steps or []))}'
+                f'</div></div>\n'
+            )
+        return html
+
+    def _generate_steps_section(self, steps) -> str:
+        html = '<div class="steps-list">\n'
+        for step in steps:
+            st = step.status.value
+            icon = "&#9989;" if st == "passed" else ("&#10060;" if st == "failed" else "&#9193;")
+            dur = f"{step.duration:.3f}s"
+            details = self._generate_step_details(step)
+            has_details = bool(details.strip())
+            sid = str(id(step))
+            onclick = f'onclick="toggleEl(\'step-{sid}\')"'  if has_details else ""
+            arrow = f'<span class="toggle-arrow" id="arr-step-{sid}">&#9660;</span>' if has_details else ""
+            cursor = "cursor:pointer" if has_details else ""
+            html += (
+                f'<div class="step-block status-{st}">'
+                f'<div class="step-hdr" style="{cursor}" {onclick}>'
+                f'<span class="step-icon">{icon}</span>'
+                f'<span class="step-text">{step.step_text}</span>'
+                f'<span class="step-dur">{dur}</span>'
+                f'{arrow}'
+                f'</div>'
+            )
+            if has_details:
+                html += f'<div class="step-details" id="step-{sid}" style="display:none">{details}</div>'
+            html += '</div>\n'
+        html += '</div>\n'
+        return html
+
+    def _generate_step_details(self, step) -> str:
+        scfg = self.config.get("steps", {})
+        html = ""
+        max_body = scfg.get("max_body_length", 5000)
+        if scfg.get("show_variables", True) and getattr(step, "variables_used", None):
+            html += self._detail_block("&#128221; Variables", f'<pre class="code-block">{json.dumps(step.variables_used, indent=2, ensure_ascii=False)}</pre>')
+        if scfg.get("show_request_details", True) and getattr(step, "request_data", None):
+            req = step.request_data
+            method = getattr(req, "method", "")
+            url = getattr(req, "url", "")
+            inner = f'<div class="req-url"><span class="http-badge method-{method.lower()}">{method}</span><code class="url-code">{url}</code></div>\n'
+            if scfg.get("show_request_headers", True) and getattr(req, "headers", None):
+                inner += self._kv_table("Headers", req.headers)
+            if scfg.get("show_query_params", True) and getattr(req, "params", None):
+                inner += self._kv_table("Query Params", req.params)
+            if scfg.get("show_request_body", True) and getattr(req, "body", None):
+                body_str = json.dumps(req.body, indent=2, ensure_ascii=False) if isinstance(req.body, (dict, list)) else str(req.body)
+                inner += f'<div class="body-block"><div class="block-label">Body</div><pre class="code-block">{body_str[:max_body]}</pre></div>\n'
+            html += self._detail_block("&#128228; Request", inner)
+        if scfg.get("show_response_details", True) and getattr(step, "response_data", None):
+            resp = step.response_data
+            status_code = getattr(resp, "status_code", "")
+            elapsed = getattr(resp, "elapsed_time", 0)
+            elapsed_ms = round(elapsed * 1000) if elapsed else 0
+            sc_cls = "status-ok" if str(status_code).startswith("2") else "status-err"
+            inner = f'<div class="resp-status"><span class="status-code-badge {sc_cls}">{status_code}</span><span class="resp-time">{elapsed_ms}ms</span></div>\n'
+            if scfg.get("show_response_headers", True) and getattr(resp, "headers", None):
+                inner += self._kv_table("Headers", resp.headers)
+            if scfg.get("show_response_body", True) and getattr(resp, "body", None):
+                body_str = json.dumps(resp.body, indent=2, ensure_ascii=False) if isinstance(resp.body, (dict, list)) else str(resp.body)
+                inner += f'<div class="body-block"><div class="block-label">Body</div><pre class="code-block">{body_str[:max_body]}</pre></div>\n'
+            html += self._detail_block("&#128229; Response", inner)
+        if scfg.get("show_assertions", True) and getattr(step, "assertions", None):
+            html += self._generate_assertions_section(step.assertions)
+        if getattr(step, "error_message", None):
+            tb = ""
+            if scfg.get("show_error_traceback", True) and getattr(step, "error_traceback", None):
+                tb = f'<pre class="code-block error-tb">{step.error_traceback}</pre>'
+            html += self._detail_block("&#10060; Error", f'<div class="error-msg">{step.error_message}</div>{tb}')
+        return html
+
+    def _detail_block(self, title: str, content: str) -> str:
+        return f'<div class="detail-block"><div class="detail-title">{title}</div><div class="detail-content">{content}</div></div>\n'
+
+    def _kv_table(self, title: str, data: dict) -> str:
+        if not data:
+            return ""
+        rows = "".join(f'<tr><td class="kv-key">{k}</td><td class="kv-val"><code>{v}</code></td></tr>' for k, v in data.items())
+        return f'<div class="kv-block"><div class="block-label">{title}</div><table class="kv-table">{rows}</table></div>\n'
+
+    def _generate_headers_section(self, title, headers):
+        return self._kv_table(title, headers)
+
+    def _generate_params_section(self, params):
+        return self._kv_table("Params", params)
+
+    def _generate_body_section(self, title, body, body_type):
+        if not body:
+            return ""
+        body_str = json.dumps(body, indent=2, ensure_ascii=False) if isinstance(body, (dict, list)) else str(body)
+        return f'<div class="body-block"><div class="block-label">{title}</div><pre class="code-block">{body_str}</pre></div>\n'
+
+    def _generate_assertions_section(self, assertions: list) -> str:
+        if not assertions:
+            return ""
+        rows = ""
+        for a in assertions:
+            st = getattr(a, "status", None)
+            st_val = st.value if hasattr(st, "value") else str(st)
+            icon = "&#9989;" if st_val == "passed" else "&#10060;"
+            desc = getattr(a, "description", "")
+            exp = getattr(a, "expected", "")
+            act = getattr(a, "actual", "")
+            rows += (
+                f'<div class="assertion-row status-{st_val}">'
+                f'<span class="assert-icon">{icon}</span>'
+                f'<span class="assert-desc">{desc}</span>'
+                f'<span class="assert-exp">Expected: <code>{exp}</code></span>'
+                f'<span class="assert-act">Actual: <code>{act}</code></span>'
+                f'</div>\n'
+            )
+        return self._detail_block("&#9989; Assertions", rows)
+
+    def _generate_footer(self) -> str:
+        fc = self.config.get("footer", {})
+        bg = fc.get("background_color", "#1e293b")
+        tc = fc.get("text_color", "rgba(255,255,255,0.75)")
+        inner = ""
+        if fc.get("show_logo", True) and self.primary_logo_b64:
+            inner += f'<img src="{self.primary_logo_b64}" alt="Logo" class="footer-logo">'
+        if fc.get("show_links", True):
+            links = []
+            if fc.get("company_url") and fc.get("company_name"):
+                links.append(f'<a href="{fc["company_url"]}" target="_blank" class="footer-link">{fc["company_name"]}</a>')
+            if fc.get("documentation_url"):
+                links.append(f'<a href="{fc["documentation_url"]}" target="_blank" class="footer-link">Docs</a>')
+            if fc.get("github_url"):
+                links.append(f'<a href="{fc["github_url"]}" target="_blank" class="footer-link">GitHub</a>')
+            if links:
+                inner += '<div class="footer-links">' + '<span class="footer-sep">·</span>'.join(links) + '</div>'
+        if fc.get("show_creator", False):
+            name = fc.get("creator_name", "")
+            email = fc.get("creator_email", "")
+            inner += f'<div class="footer-creator">Created by <a href="mailto:{email}" class="footer-link">{name}</a></div>'
+        return (
+            f'<footer class="report-footer" style="background:{bg};color:{tc}">'
+            f'<div class="footer-inner">{inner}</div>'
+            f'</footer>\n'
+        )
+
+
+    def _get_css_styles(self) -> str:
+        b = self.config.get("branding", {})
+        t = self.config.get("theme", {})
+        pc  = b.get("primary_color",   "#8b5cf6")
+        sc  = b.get("secondary_color", "#a855f7")
+        ac  = b.get("accent_color",    "#9333ea")
+        ok  = b.get("success_color",   "#22c55e")
+        err = b.get("error_color",     "#ef4444")
+        wrn = b.get("warning_color",   "#f59e0b")
+        inf = b.get("info_color",      "#3b82f6")
+        bg      = t.get("background_color", "#f0f2f5")
+        surf    = t.get("surface_color",    "#ffffff")
+        surf2   = t.get("surface_alt_color","#f8f9fa")
+        border  = t.get("border_color",     "#e5e7eb")
+        txt1    = t.get("text_primary",     "#111827")
+        txt2    = t.get("text_secondary",   "#6b7280")
+        txt3    = t.get("text_muted",       "#9ca3af")
+        htc     = t.get("header_text_color","#ffffff")
+        font    = t.get("font_family",      "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif")
+        fsize   = t.get("font_size_base",   "14px")
+        radius  = t.get("border_radius",    "10px")
+        shadow  = t.get("shadow",           "0 1px 3px rgba(0,0,0,0.08)")
+        shadow2 = t.get("shadow_md",        "0 4px 6px rgba(0,0,0,0.07)")
+        fc = self.config.get("footer", {})
+        footer_bg = fc.get("background_color", "#1e293b")
+
         return f"""
-        // Chart.js configuration and initialization
-        document.addEventListener('DOMContentLoaded', function() {{
-            // Features Pie Chart (first chart in summary)
-            if (document.getElementById('scenariosChart')) {{
-                const featuresCtx = document.getElementById('scenariosChart').getContext('2d');
-                new Chart(featuresCtx, {{
-                    type: 'pie',
-                    data: {{
-                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
-                        datasets: [{{
-                            data: [{summary['scenario_counts']['passed']}, {summary['scenario_counts']['failed']}, {summary['scenario_counts']['skipped']}],
-                            backgroundColor: [
-                                '{chart_colors['passed']}',
-                                '{chart_colors['failed']}',
-                                '{chart_colors['skipped']}'
-                            ],
-                            borderWidth: 1,
-                            borderColor: '#ffffff'
-                        }}]
-                    }},
-                    options: {{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {{
-                            legend: {{
-                                display: false
-                            }},
-                            tooltip: {{
-                                callbacks: {{
-                                    label: function(context) {{
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
-                                    }}
-                                }}
-                            }}
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:{font};font-size:{fsize};line-height:1.6;color:{txt1};background:{bg}}}
+a{{color:inherit;text-decoration:none}}
+.app{{min-height:100vh;display:flex;flex-direction:column}}
+
+/* ── HEADER ─────────────────────────────────────────── */
+.report-header{{
+  background:linear-gradient(135deg,{pc} 0%,{sc} 55%,{ac} 100%);
+  color:{htc};padding:20px 28px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.15)
+}}
+.header-inner{{max-width:1280px;margin:0 auto}}
+.header-top{{display:flex;align-items:center;gap:16px;margin-bottom:14px}}
+.header-logo{{flex:0 0 auto}}
+.header-logo-img{{height:32px;width:auto;border-radius:6px;opacity:.92}}
+.header-logo-text{{font-size:.95em;font-weight:600;opacity:.9}}
+.header-title{{flex:1;font-size:1.6em;font-weight:700;letter-spacing:-.3px;color:{htc}}}
+.header-right{{flex:0 0 auto}}
+.status-badge{{display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;font-size:.8em;font-weight:700;letter-spacing:.5px}}
+.badge-pass{{background:rgba(34,197,94,.25);border:1px solid rgba(34,197,94,.5);color:#bbf7d0}}
+.badge-fail{{background:rgba(239,68,68,.25);border:1px solid rgba(239,68,68,.5);color:#fecaca}}
+.header-meta{{display:flex;gap:24px;background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;backdrop-filter:blur(8px)}}
+.header-meta-item{{display:flex;flex-direction:column;gap:2px}}
+.meta-label{{font-size:.72em;opacity:.75;text-transform:uppercase;letter-spacing:.5px}}
+.meta-val{{font-size:.9em;font-weight:600}}
+
+/* ── MAIN ────────────────────────────────────────────── */
+.main{{flex:1;max-width:1280px;width:100%;margin:0 auto;padding:20px 20px 40px}}
+
+/* ── PROJECT INFO ────────────────────────────────────── */
+.project-info{{background:{surf};border-radius:{radius};box-shadow:{shadow};padding:18px 20px;margin-bottom:18px}}
+.info-cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}}
+.info-card{{display:flex;align-items:center;gap:12px;padding:14px 16px;background:{surf2};border-radius:8px;border-left:3px solid {pc}}}
+.info-card-icon{{font-size:1.4em;line-height:1}}
+.info-card-label{{font-size:.75em;color:{txt2};text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}}
+.info-card-value{{font-size:.95em;font-weight:600;color:{txt1}}}
+
+/* ── SUMMARY ─────────────────────────────────────────── */
+.summary-section{{background:{surf};border-radius:{radius};box-shadow:{shadow};padding:20px;margin-bottom:18px}}
+.summary-inner{{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}}
+.exec-info{{flex:0 0 200px;background:{surf2};border-radius:8px;padding:14px 16px;border-left:3px solid {pc}}}
+.exec-row{{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid {border}}}
+.exec-row:last-child{{border-bottom:none}}
+.exec-label{{font-size:.78em;color:{txt2};font-weight:500}}
+.exec-val{{font-size:.82em;font-weight:600;color:{txt1}}}
+.pass-rate{{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 20px;background:{surf2};border-radius:8px;min-width:90px}}
+.rate-num{{font-size:2em;font-weight:800;line-height:1}}
+.rate-label{{font-size:.72em;color:{txt2};text-transform:uppercase;letter-spacing:.5px;margin-top:2px}}
+.charts-row{{flex:1;display:flex;flex-wrap:wrap;gap:14px}}
+.chart-card{{flex:1;min-width:150px;background:{surf2};border-radius:10px;padding:16px;text-align:center;border:1px solid {border};transition:box-shadow .2s}}
+.chart-card:hover{{box-shadow:{shadow2}}}
+.chart-card-header{{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid {pc}}}
+.chart-card-icon{{font-size:1em}}
+.chart-card-title{{font-size:.85em;font-weight:700;color:{txt1}}}
+.chart-card-total{{font-size:2em;font-weight:800;color:{pc};line-height:1;margin-bottom:8px}}
+.chart-wrap{{width:110px;height:110px;margin:0 auto 10px}}
+.chart-wrap canvas{{width:110px!important;height:110px!important}}
+.chart-legend{{display:flex;flex-direction:column;gap:4px;text-align:left}}
+.leg-dot{{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}}
+.leg-txt{{font-size:.75em;color:{txt2}}}
+
+/* ── FEATURES ────────────────────────────────────────── */
+.features-list{{display:flex;flex-direction:column;gap:12px}}
+.feature-block{{background:{surf};border-radius:{radius};box-shadow:{shadow};overflow:hidden}}
+.feature-hdr{{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;transition:background .15s}}
+.feature-hdr:hover{{background:{surf2}}}
+.feature-hdr.status-passed{{border-left:4px solid {ok}}}
+.feature-hdr.status-failed{{border-left:4px solid {err}}}
+.fhdr-icon{{font-size:.95em}}
+.fhdr-name{{flex:1;font-size:1em;font-weight:600;color:{txt1}}}
+.fhdr-meta{{font-size:.78em;color:{txt2}}}
+.toggle-arrow{{font-size:.7em;color:{txt3};transition:transform .2s;margin-left:6px}}
+.toggle-arrow.open{{transform:rotate(180deg)}}
+.feature-body{{padding:14px 18px;background:{surf2}}}
+
+/* ── SCENARIOS ───────────────────────────────────────── */
+.scenario-block{{background:{surf};border-radius:8px;margin-bottom:10px;overflow:hidden;border:1px solid {border}}}
+.scenario-hdr{{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;user-select:none;transition:background .15s}}
+.scenario-hdr:hover{{background:{surf2}}}
+.scenario-hdr.status-passed{{border-left:3px solid {ok}}}
+.scenario-hdr.status-failed{{border-left:3px solid {err}}}
+.scenario-hdr.status-skipped{{border-left:3px solid {wrn}}}
+.shdr-icon{{font-size:.85em}}
+.shdr-name{{flex:1;font-size:.92em;font-weight:600;color:{txt1}}}
+.shdr-meta{{font-size:.75em;color:{txt2};display:flex;align-items:center;gap:6px;flex-wrap:wrap}}
+.tag{{background:{surf2};border:1px solid {border};border-radius:4px;padding:1px 6px;font-size:.72em;color:{txt2}}}
+.scenario-body{{padding:12px 14px;background:{surf2}}}
+
+/* ── STEPS ───────────────────────────────────────────── */
+.steps-list{{display:flex;flex-direction:column;gap:6px}}
+.step-block{{background:{surf};border-radius:6px;overflow:hidden;border:1px solid {border}}}
+.step-block.status-passed{{border-left:3px solid {ok}}}
+.step-block.status-failed{{border-left:3px solid {err}}}
+.step-block.status-skipped{{border-left:3px solid {wrn}}}
+.step-hdr{{display:flex;align-items:center;gap:8px;padding:8px 12px;transition:background .15s}}
+.step-hdr:hover{{background:{surf2}}}
+.step-icon{{font-size:.8em;flex:0 0 auto}}
+.step-text{{flex:1;font-family:'Monaco','Menlo','Consolas',monospace;font-size:.82em;color:{txt1}}}
+.step-dur{{font-size:.72em;color:{txt3};flex:0 0 auto}}
+.step-details{{padding:12px 14px;background:{surf2};border-top:1px solid {border}}}
+
+/* ── DETAIL BLOCKS ───────────────────────────────────── */
+.detail-block{{margin-bottom:12px;background:{surf};border-radius:6px;border:1px solid {border};overflow:hidden}}
+.detail-title{{padding:7px 12px;background:{surf2};font-size:.78em;font-weight:700;color:{txt2};text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid {border}}}
+.detail-content{{padding:10px 12px}}
+.req-url{{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}}
+.http-badge{{padding:3px 8px;border-radius:4px;font-size:.72em;font-weight:700;color:#fff}}
+.method-get{{background:{ok}}}
+.method-post{{background:{inf}}}
+.method-put{{background:{wrn}}}
+.method-patch{{background:#8b5cf6}}
+.method-delete{{background:{err}}}
+.url-code{{font-family:monospace;font-size:.82em;background:{surf2};padding:3px 7px;border-radius:4px;color:{txt1};word-break:break-all}}
+.resp-status{{display:flex;align-items:center;gap:10px;margin-bottom:8px}}
+.status-code-badge{{padding:3px 8px;border-radius:4px;font-size:.78em;font-weight:700;color:#fff}}
+.status-ok{{background:{ok}}}
+.status-err{{background:{err}}}
+.resp-time{{font-size:.78em;color:{txt2}}}
+.kv-block{{margin-bottom:8px}}
+.block-label{{font-size:.72em;font-weight:700;color:{txt2};text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}}
+.kv-table{{width:100%;border-collapse:collapse;font-size:.8em}}
+.kv-key{{padding:3px 8px;color:{txt2};font-weight:600;white-space:nowrap;width:35%;vertical-align:top}}
+.kv-val{{padding:3px 8px;color:{txt1};word-break:break-all}}
+.kv-table tr:nth-child(even){{background:{surf2}}}
+.body-block{{margin-top:6px}}
+.code-block{{background:#1e293b;color:#e2e8f0;padding:10px 12px;border-radius:6px;font-family:'Monaco','Menlo','Consolas',monospace;font-size:.78em;overflow-x:auto;white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto}}
+.error-tb{{background:#450a0a;color:#fca5a5}}
+.error-msg{{color:{err};font-weight:600;font-size:.88em;margin-bottom:6px}}
+.assertion-row{{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:4px;margin-bottom:4px;font-size:.82em;flex-wrap:wrap}}
+.assertion-row.status-passed{{background:#f0fdf4;border-left:3px solid {ok}}}
+.assertion-row.status-failed{{background:#fef2f2;border-left:3px solid {err}}}
+.assert-icon{{flex:0 0 auto}}
+.assert-desc{{flex:1;font-weight:600;color:{txt1}}}
+.assert-exp,.assert-act{{color:{txt2};font-size:.9em}}
+.assert-exp code,.assert-act code{{background:{surf2};padding:1px 4px;border-radius:3px;font-family:monospace}}
+
+/* ── FOOTER ──────────────────────────────────────────── */
+.report-footer{{padding:16px 28px;margin-top:auto}}
+.footer-inner{{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}}
+.footer-logo{{height:22px;width:auto;opacity:.7;border-radius:4px}}
+.footer-links{{display:flex;align-items:center;gap:8px;flex-wrap:wrap}}
+.footer-link{{font-size:.82em;opacity:.75;transition:opacity .2s}}
+.footer-link:hover{{opacity:1;text-decoration:underline}}
+.footer-sep{{opacity:.4;font-size:.8em}}
+.footer-creator{{font-size:.8em;opacity:.7}}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:768px){{
+  .header-top{{flex-wrap:wrap}}
+  .header-title{{font-size:1.2em}}
+  .header-meta{{flex-wrap:wrap;gap:12px}}
+  .summary-inner{{flex-direction:column}}
+  .exec-info{{flex:none;width:100%}}
+  .charts-row{{justify-content:center}}
+  .info-cards{{grid-template-columns:1fr 1fr}}
+}}
+"""
+
+    def _get_javascript(self) -> str:
+        collapsed_features = str(self.config.get("features", {}).get("collapsed_by_default", True)).lower()
+        collapsed_scenarios = str(self.config.get("scenarios", {}).get("collapsed_by_default", True)).lower()
+        return """
+function toggleEl(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var open = el.style.display === 'none' || el.style.display === '';
+    el.style.display = open ? 'block' : 'none';
+    // rotate arrow
+    var arrId = 'arr-' + id;
+    var arr = document.getElementById(arrId);
+    if (arr) arr.classList.toggle('open', open);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Expand failed features/scenarios automatically
+    document.querySelectorAll('.feature-hdr.status-failed').forEach(function(hdr) {
+        var bodyId = hdr.nextElementSibling ? hdr.nextElementSibling.id : null;
+        if (bodyId) {
+            var body = document.getElementById(bodyId);
+            if (body) body.style.display = 'block';
+            var arr = hdr.querySelector('.toggle-arrow');
+            if (arr) arr.classList.add('open');
+        }
+    });
+    document.querySelectorAll('.scenario-hdr.status-failed').forEach(function(hdr) {
+        var bodyId = hdr.nextElementSibling ? hdr.nextElementSibling.id : null;
+        if (bodyId) {
+            var body = document.getElementById(bodyId);
+            if (body) body.style.display = 'block';
+            var arr = hdr.querySelector('.toggle-arrow');
+            if (arr) arr.classList.add('open');
+        }
+    });
+});
+"""
+
+
+    def _get_charts_javascript(self, summary: dict) -> str:
+        cc = self.config.get("charts", {})
+        colors = cc.get("colors", {})
+        ok  = colors.get("passed",  "#22c55e")
+        err = colors.get("failed",  "#ef4444")
+        wrn = colors.get("skipped", "#f59e0b")
+        cutout = cc.get("cutout", "72%")
+        animation = str(cc.get("animation", True)).lower()
+        sc = summary["scenario_counts"]
+        stc = summary["step_counts"]
+
+        def chart_js(canvas_id, passed, failed, skipped):
+            return f"""
+if (document.getElementById('{canvas_id}')) {{
+    new Chart(document.getElementById('{canvas_id}'), {{
+        type: 'doughnut',
+        data: {{
+            labels: ['Passed', 'Failed', 'Skipped'],
+            datasets: [{{
+                data: [{passed}, {failed}, {skipped}],
+                backgroundColor: ['{ok}', '{err}', '{wrn}'],
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 4
+            }}]
+        }},
+        options: {{
+            responsive: false,
+            animation: {{ duration: {1 if animation == 'true' else 0} == 1 ? 600 : 0 }},
+            cutout: '{cutout}',
+            plugins: {{
+                legend: {{ display: false }},
+                tooltip: {{
+                    callbacks: {{
+                        label: function(ctx) {{
+                            var total = ctx.dataset.data.reduce(function(a,b){{return a+b}}, 0);
+                            var pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                            return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
                         }}
                     }}
-                }});
+                }}
             }}
-            
-            // Scenarios Pie Chart (second chart in summary)
-            if (document.getElementById('scenariosChart2')) {{
-                const scenariosCtx = document.getElementById('scenariosChart2').getContext('2d');
-                new Chart(scenariosCtx, {{
-                    type: 'pie',
-                    data: {{
-                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
-                        datasets: [{{
-                            data: [{summary['scenario_counts']['passed']}, {summary['scenario_counts']['failed']}, {summary['scenario_counts']['skipped']}],
-                            backgroundColor: [
-                                '{chart_colors['passed']}',
-                                '{chart_colors['failed']}',
-                                '{chart_colors['skipped']}'
-                            ],
-                            borderWidth: 1,
-                            borderColor: '#ffffff'
-                        }}]
-                    }},
-                    options: {{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {{
-                            legend: {{
-                                display: false
-                            }},
-                            tooltip: {{
-                                callbacks: {{
-                                    label: function(context) {{
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
-                                    }}
-                                }}
-                            }}
-                        }}
-                    }}
-                }});
-            }}
-            
-            // Steps Pie Chart (third chart in summary)
-            if (document.getElementById('stepsChart')) {{
-                const stepsCtx = document.getElementById('stepsChart').getContext('2d');
-                new Chart(stepsCtx, {{
-                    type: 'pie',
-                    data: {{
-                        labels: ['Exitosos', 'Fallidos', 'Omitidos'],
-                        datasets: [{{
-                            data: [{summary['step_counts']['passed']}, {summary['step_counts']['failed']}, {summary['step_counts']['skipped']}],
-                            backgroundColor: [
-                                '{chart_colors['passed']}',
-                                '{chart_colors['failed']}',
-                                '{chart_colors['skipped']}'
-                            ],
-                            borderWidth: 1,
-                            borderColor: '#ffffff'
-                        }}]
-                    }},
-                    options: {{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {{
-                            legend: {{
-                                display: false
-                            }},
-                            tooltip: {{
-                                callbacks: {{
-                                    label: function(context) {{
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
-                                    }}
-                                }}
-                            }}
-                        }}
-                    }}
-                }});
-            }}
-        }});
-        """
+        }}
+    }});
+}}"""
+
+        js = "document.addEventListener('DOMContentLoaded', function() {"
+        if cc.get("show_features_chart", True):
+            js += chart_js("featuresChart", sc["passed"], sc["failed"], sc["skipped"])
+        if cc.get("show_scenarios_chart", True):
+            js += chart_js("scenariosChart", sc["passed"], sc["failed"], sc["skipped"])
+        if cc.get("show_steps_chart", True):
+            js += chart_js("stepsChart", stc["passed"], stc["failed"], stc["skipped"])
+        js += "});"
+        return js
+

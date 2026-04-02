@@ -5,6 +5,7 @@ Spanish step definitions for Behave integration
 
 from behave import given, when, then, step
 import json
+import os
 import yaml
 
 

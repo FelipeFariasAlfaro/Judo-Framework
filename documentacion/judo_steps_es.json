@@ -1,0 +1,900 @@
+{
+  "todos_los_pasos": [
+    {
+      "paso": "que la URL base es \"{base_url}\"",
+      "descripcion": "[Configuración inicial] Establecer la URL base para las peticiones. Parámetros: base_url."
+    },
+    {
+      "paso": "la URL base es \"{base_url}\"",
+      "descripcion": "[Configuración inicial] Establecer la URL base para las peticiones. Parámetros: base_url."
+    },
+    {
+      "paso": "que tengo un cliente Judo API",
+      "descripcion": "[Configuración inicial] Inicializar contexto Judo."
+    },
+    {
+      "paso": "tengo un cliente Judo API",
+      "descripcion": "[Configuración inicial] Inicializar contexto Judo."
+    },
+    {
+      "paso": "que establezco la variable \"{nombre}\" a \"{valor}\"",
+      "descripcion": "[Configuración inicial] Establecer una variable. Parámetros: nombre, valor. Soporta interpolación de variables."
+    },
+    {
+      "paso": "establezco la variable \"{nombre}\" a \"{valor}\"",
+      "descripcion": "[Configuración inicial] Establecer una variable. Parámetros: nombre, valor. Soporta interpolación de variables."
+    },
+    {
+      "paso": "que establezco la variable \"{nombre}\" a {valor:d}",
+      "descripcion": "[Configuración inicial] Establecer una variable numérica. Parámetros: nombre, valor. Soporta interpolación de variables."
+    },
+    {
+      "paso": "establezco la variable \"{nombre}\" a {valor:d}",
+      "descripcion": "[Configuración inicial] Establecer una variable numérica. Parámetros: nombre, valor. Soporta interpolación de variables."
+    },
+    {
+      "paso": "que establezco la variable \"{nombre}\" al JSON",
+      "descripcion": "[Configuración inicial] Establecer una variable con datos JSON del texto del paso. Parámetros: nombre. Soporta interpolación de variables."
+    },
+    {
+      "paso": "establezco la variable \"{nombre}\" al JSON",
+      "descripcion": "[Configuración inicial] Establecer una variable con datos JSON del texto del paso. Parámetros: nombre. Soporta interpolación de variables."
+    },
+    {
+      "paso": "que uso el token bearer \"{token}\"",
+      "descripcion": "[Autenticación] Establecer token bearer. Parámetros: token."
+    },
+    {
+      "paso": "uso el token bearer \"{token}\"",
+      "descripcion": "[Autenticación] Establecer token bearer. Parámetros: token."
+    },
+    {
+      "paso": "que uso autenticación básica con usuario \"{usuario}\" y contraseña \"{password}\"",
+      "descripcion": "[Autenticación] Establecer autenticación básica. Parámetros: usuario, password."
+    },
+    {
+      "paso": "uso autenticación básica con usuario \"{usuario}\" y contraseña \"{password}\"",
+      "descripcion": "[Autenticación] Establecer autenticación básica. Parámetros: usuario, password."
+    },
+    {
+      "paso": "que establezco el header \"{nombre}\" a \"{valor}\"",
+      "descripcion": "[Autenticación] Establecer un header. Parámetros: nombre, valor."
+    },
+    {
+      "paso": "establezco el header \"{nombre}\" a \"{valor}\"",
+      "descripcion": "[Autenticación] Establecer un header. Parámetros: nombre, valor."
+    },
+    {
+      "paso": "que establezco el header \"{nombre_header}\" desde env \"{nombre_var_env}\"",
+      "descripcion": "[Autenticación] Establecer un header desde variable de entorno (archivo .env). Parámetros: nombre_header, nombre_var_env."
+    },
+    {
+      "paso": "que agrego el header \"{nombre_header}\" desde env \"{nombre_var_env}\"",
+      "descripcion": "[Autenticación] Establecer un header desde variable de entorno (archivo .env). Parámetros: nombre_header, nombre_var_env."
+    },
+    {
+      "paso": "establezco el header \"{nombre_header}\" desde env \"{nombre_var_env}\"",
+      "descripcion": "[Autenticación] Establecer un header desde variable de entorno (archivo .env). Parámetros: nombre_header, nombre_var_env."
+    },
+    {
+      "paso": "agrego el header \"{nombre_header}\" desde env \"{nombre_var_env}\"",
+      "descripcion": "[Autenticación] Establecer un header desde variable de entorno (archivo .env). Parámetros: nombre_header, nombre_var_env."
+    },
+    {
+      "paso": "que establezco el parámetro \"{nombre}\" a \"{valor}\"",
+      "descripcion": "[Autenticación] Establecer un parámetro de query. Parámetros: nombre, valor."
+    },
+    {
+      "paso": "establezco el parámetro \"{nombre}\" a \"{valor}\"",
+      "descripcion": "[Autenticación] Establecer un parámetro de query. Parámetros: nombre, valor."
+    },
+    {
+      "paso": "hago una petición GET a \"{endpoint}\"",
+      "descripcion": "[Peticiones HTTP] Hacer petición GET. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición POST a \"{endpoint}\"",
+      "descripcion": "[Peticiones HTTP] Hacer petición POST sin cuerpo. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición POST a \"{endpoint}\" con el cuerpo",
+      "descripcion": "[Peticiones HTTP] Hacer petición POST con cuerpo JSON. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición POST a \"{endpoint}\" con el cuerpo:",
+      "descripcion": "[Peticiones HTTP] Hacer petición POST con cuerpo JSON. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición PUT a \"{endpoint}\" con el cuerpo",
+      "descripcion": "[Peticiones HTTP] Hacer petición PUT con cuerpo JSON. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición PUT a \"{endpoint}\" con el cuerpo:",
+      "descripcion": "[Peticiones HTTP] Hacer petición PUT con cuerpo JSON. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición PATCH a \"{endpoint}\" con el cuerpo",
+      "descripcion": "[Peticiones HTTP] Hacer petición PATCH con cuerpo JSON. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición PATCH a \"{endpoint}\" con el cuerpo:",
+      "descripcion": "[Peticiones HTTP] Hacer petición PATCH con cuerpo JSON. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición DELETE a \"{endpoint}\"",
+      "descripcion": "[Peticiones HTTP] Hacer petición DELETE. Parámetros: endpoint."
+    },
+    {
+      "paso": "hago una petición {método} a \"{endpoint}\" con la variable \"{nombre_var}\"",
+      "descripcion": "[Peticiones HTTP] Hacer petición HTTP con datos JSON desde una variable. Parámetros: método, endpoint, nombre_var. Soporta interpolación de variables."
+    },
+    {
+      "paso": "el código de respuesta debe ser {status:d}",
+      "descripcion": "[Validación de respuesta] Validar código de respuesta. Parámetros: status."
+    },
+    {
+      "paso": "la respuesta debe ser exitosa",
+      "descripcion": "[Validación de respuesta] Validar que la respuesta es exitosa (2xx)."
+    },
+    {
+      "paso": "la respuesta debe contener el campo \"{campo}\"",
+      "descripcion": "[Validación de respuesta] Validar que la respuesta contiene un campo. Parámetros: campo."
+    },
+    {
+      "paso": "el campo \"{campo}\" debe ser \"{valor}\"",
+      "descripcion": "[Validación de respuesta] Validar que un campo tiene un valor específico (string). Parámetros: campo, valor."
+    },
+    {
+      "paso": "el campo \"{campo}\" debe ser {valor:d}",
+      "descripcion": "[Validación de respuesta] Validar que un campo tiene un valor específico (número). Parámetros: campo, valor."
+    },
+    {
+      "paso": "el campo \"{campo}\" debe ser igual a la variable \"{variable}\"",
+      "descripcion": "[Validación de respuesta] Validar que un campo es igual a una variable. Parámetros: campo, variable. Soporta interpolación de variables."
+    },
+    {
+      "paso": "la respuesta debe tener la siguiente estructura",
+      "descripcion": "[Validación de respuesta] Validar estructura de la respuesta."
+    },
+    {
+      "paso": "la respuesta debe tener la siguiente estructura:",
+      "descripcion": "[Validación de respuesta] Validar estructura de la respuesta."
+    },
+    {
+      "paso": "la respuesta debe ser un array",
+      "descripcion": "[Validación de respuesta] Validar que la respuesta es un array."
+    },
+    {
+      "paso": "la respuesta debe ser una lista",
+      "descripcion": "[Validación de respuesta] Validar que la respuesta es un array."
+    },
+    {
+      "paso": "la respuesta debe tener {count:d} elementos",
+      "descripcion": "[Validación de respuesta] Validar cantidad de elementos en array. Parámetros: count."
+    },
+    {
+      "paso": "cada elemento debe tener el campo \"{campo}\"",
+      "descripcion": "[Validación de respuesta] Validar que cada elemento tiene un campo. Parámetros: campo."
+    },
+    {
+      "paso": "el array \"{ruta_array}\" debe contener un elemento con \"{campo}\" igual a \"{valor}\"",
+      "descripcion": "[Validación de respuesta] Validar que un array anidado contiene un elemento con un valor específico. Parámetros: ruta_array, campo, valor."
+    },
+    {
+      "paso": "guardo el valor del campo \"{campo}\" en la variable \"{variable}\"",
+      "descripcion": "[Extracción de datos] Guardar valor de un campo en una variable. Parámetros: campo, variable. Soporta interpolación de variables."
+    },
+    {
+      "paso": "guardo la respuesta completa en la variable \"{variable}\"",
+      "descripcion": "[Extracción de datos] Guardar respuesta completa en una variable. Parámetros: variable. Soporta interpolación de variables."
+    },
+    {
+      "paso": "la variable \"{variable1}\" debe ser igual a la variable \"{variable2}\"",
+      "descripcion": "[Comparación de variables] Comparar que dos variables son iguales. Parámetros: variable1, variable2. Soporta interpolación de variables."
+    },
+    {
+      "paso": "la variable \"{variable1}\" no debe ser igual a la variable \"{variable2}\"",
+      "descripcion": "[Comparación de variables] Comparar que dos variables son diferentes. Parámetros: variable1, variable2. Soporta interpolación de variables."
+    },
+    {
+      "paso": "espero {segundos:f} segundos",
+      "descripcion": "[Utilidades] Esperar un tiempo determinado. Parámetros: segundos."
+    },
+    {
+      "paso": "imprimo la respuesta",
+      "descripcion": "[Utilidades] Imprimir la respuesta para debugging."
+    },
+    {
+      "paso": "el tiempo de respuesta debe ser menor a {max_time:f} segundos",
+      "descripcion": "[Utilidades] Validar tiempo de respuesta. Parámetros: max_time."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser \"{valor_esperado}\"",
+      "descripcion": "[Utilidades] Validar resultado de expresión JSONPath (string). Parámetros: ruta_json, valor_esperado."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser {valor_esperado:d}",
+      "descripcion": "[Utilidades] Validar resultado de expresión JSONPath (entero). Parámetros: ruta_json, valor_esperado."
+    },
+    {
+      "paso": "habilito el guardado de peticiones y respuestas",
+      "descripcion": "[Logging] Habilitar guardado automático de peticiones y respuestas."
+    },
+    {
+      "paso": "deshabilito el guardado de peticiones y respuestas",
+      "descripcion": "[Logging] Deshabilitar guardado automático de peticiones y respuestas."
+    },
+    {
+      "paso": "habilito el guardado de peticiones y respuestas en el directorio \"{directory}\"",
+      "descripcion": "[Logging] Habilitar guardado automático con directorio personalizado. Parámetros: directory."
+    },
+    {
+      "paso": "establezco el directorio de salida a \"{directory}\"",
+      "descripcion": "[Logging] Establecer directorio de salida para el guardado de peticiones y respuestas. Parámetros: directory."
+    },
+    {
+      "paso": "hago POST a \"{endpoint}\" con archivo JSON \"{ruta_archivo}\"",
+      "descripcion": "[Archivos] Enviar petición POST con cuerpo JSON desde archivo. Parámetros: endpoint, ruta_archivo."
+    },
+    {
+      "paso": "hago PUT a \"{endpoint}\" con archivo JSON \"{ruta_archivo}\"",
+      "descripcion": "[Archivos] Enviar petición PUT con cuerpo JSON desde archivo. Parámetros: endpoint, ruta_archivo."
+    },
+    {
+      "paso": "hago PATCH a \"{endpoint}\" con archivo JSON \"{ruta_archivo}\"",
+      "descripcion": "[Archivos] Enviar petición PATCH con cuerpo JSON desde archivo. Parámetros: endpoint, ruta_archivo."
+    },
+    {
+      "paso": "guardo la respuesta en el archivo \"{ruta_archivo}\"",
+      "descripcion": "[Archivos] Guardar respuesta en archivo. Parámetros: ruta_archivo."
+    },
+    {
+      "paso": "guardo la variable \"{nombre_var}\" en el archivo \"{ruta_archivo}\"",
+      "descripcion": "[Archivos] Guardar variable en archivo. Parámetros: nombre_var, ruta_archivo. Soporta interpolación de variables."
+    },
+    {
+      "paso": "la respuesta debe coincidir con el esquema",
+      "descripcion": "[Validación de esquemas] Validar respuesta contra esquema JSON."
+    },
+    {
+      "paso": "la respuesta debe coincidir con el archivo de esquema \"{ruta_archivo}\"",
+      "descripcion": "[Validación de esquemas] Validar respuesta contra esquema desde archivo. Parámetros: ruta_archivo."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser una cadena",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea una cadena. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser un número",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea un número. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser un booleano",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea un booleano. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser un array",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea un array. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser un objeto",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea un objeto. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser null",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea null. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" no debe ser null",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath no sea null. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser un email válido",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea un email válido. Parámetros: ruta_json. Validación de formato de email."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser una URL válida",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea una URL válida. Parámetros: ruta_json."
+    },
+    {
+      "paso": "la respuesta \"{ruta_json}\" debe ser un UUID válido",
+      "descripcion": "[Validación de tipos] Validar que el resultado JSONPath sea un UUID válido. Parámetros: ruta_json. Validación de formato UUID."
+    },
+    {
+      "paso": "obtengo el valor \"{env_var_name}\" desde env y lo almaceno en \"{variable_name}\"",
+      "descripcion": "[Variables de entorno] Obtener valor de variable de entorno y almacenarlo en una variable. Parámetros: env_var_name, variable_name."
+    },
+    {
+      "paso": "debo tener la variable \"{variable_name}\" con valor \"{expected_value}\"",
+      "descripcion": "[Variables de entorno] Validar que una variable tenga el valor esperado. Parámetros: variable_name, expected_value. Soporta interpolación de variables."
+    },
+    {
+      "paso": "establezco la política de reintentos con max_retries={max_retries:d} y backoff_strategy=\"{strategy}\"",
+      "descripcion": "[Resiliencia] Establecer política de reintentos con estrategia de backoff. Parámetros: max_retries, strategy. Funcionalidad de reintentos. Control de límite de velocidad."
+    },
+    {
+      "paso": "creo un circuit breaker llamado \"{name}\" con failure_threshold={threshold:d}",
+      "descripcion": "[Resiliencia] Crear circuit breaker. Parámetros: name, threshold. Patrón de resiliencia circuit breaker."
+    },
+    {
+      "paso": "el circuit breaker \"{name}\" debe estar en estado {state}",
+      "descripcion": "[Resiliencia] Validar estado del circuit breaker. Parámetros: name, state. Patrón de resiliencia circuit breaker."
+    },
+    {
+      "paso": "agrego un interceptor de timestamp con nombre de encabezado \"{header_name}\"",
+      "descripcion": "[Interceptores] Agregar interceptor de timestamp. Parámetros: header_name. Middleware interceptor en pipeline."
+    },
+    {
+      "paso": "agrego un interceptor de autorización con token \"{token}\"",
+      "descripcion": "[Interceptores] Agregar interceptor de autorización. Parámetros: token. Middleware interceptor en pipeline."
+    },
+    {
+      "paso": "establezco el límite de velocidad a {requests_per_second:f} solicitudes por segundo",
+      "descripcion": "[Control de velocidad] Establecer limitador de velocidad. Parámetros: requests_per_second. Control de límite de velocidad."
+    },
+    {
+      "paso": "establezco el acelerador con retraso de {delay_ms:f} milisegundos",
+      "descripcion": "[Control de velocidad] Establecer throttle. Parámetros: delay_ms. Control de throttling de peticiones."
+    },
+    {
+      "paso": "envío {count:d} solicitudes GET a \"{endpoint}\"",
+      "descripcion": "[Control de velocidad] Enviar múltiples solicitudes GET. Parámetros: count, endpoint."
+    },
+    {
+      "paso": "todas las respuestas deben tener estado {status:d}",
+      "descripcion": "[Control de velocidad] Validar que todas las respuestas tengan el mismo estado. Parámetros: status."
+    },
+    {
+      "paso": "habilito el caché de respuestas con TTL de {ttl:d} segundos",
+      "descripcion": "[Caché] Habilitar caché de respuestas. Parámetros: ttl. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "deshabilito el caché de respuestas",
+      "descripcion": "[Caché] Deshabilitar caché de respuestas. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "la respuesta debe provenir del caché",
+      "descripcion": "[Caché] Validar que la respuesta proviene del caché. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "habilito el monitoreo de rendimiento",
+      "descripcion": "[Rendimiento] Habilitar monitoreo de rendimiento. Monitoreo y métricas de rendimiento."
+    },
+    {
+      "paso": "establezco alerta de rendimiento para \"{metric}\" con umbral {threshold:f}",
+      "descripcion": "[Rendimiento] Establecer alerta de rendimiento. Parámetros: metric, threshold. Monitoreo y métricas de rendimiento."
+    },
+    {
+      "paso": "debo tener métricas de rendimiento",
+      "descripcion": "[Rendimiento] Validar que se han recopilado métricas de rendimiento. Monitoreo y métricas de rendimiento."
+    },
+    {
+      "paso": "ejecuto consulta GraphQL",
+      "descripcion": "[GraphQL] Ejecutar consulta GraphQL. Para testing de APIs GraphQL."
+    },
+    {
+      "paso": "ejecuto mutación GraphQL",
+      "descripcion": "[GraphQL] Ejecutar mutación GraphQL. Para testing de APIs GraphQL."
+    },
+    {
+      "paso": "me conecto a WebSocket \"{url}\"",
+      "descripcion": "[WebSocket] Conectar a WebSocket. Parámetros: url. Para testing de comunicación WebSocket."
+    },
+    {
+      "paso": "envío mensaje WebSocket",
+      "descripcion": "[WebSocket] Enviar mensaje WebSocket. Para testing de comunicación WebSocket."
+    },
+    {
+      "paso": "debo recibir un mensaje WebSocket dentro de {timeout:f} segundos",
+      "descripcion": "[WebSocket] Recibir mensaje WebSocket. Parámetros: timeout. Para testing de comunicación WebSocket."
+    },
+    {
+      "paso": "cierro la conexión WebSocket",
+      "descripcion": "[WebSocket] Cerrar conexión WebSocket. Para testing de comunicación WebSocket."
+    },
+    {
+      "paso": "configuro OAuth2 con client_id=\"{client_id}\" client_secret=\"{client_secret}\" token_url=\"{token_url}\"",
+      "descripcion": "[Autenticación avanzada] Configurar OAuth2. Parámetros: client_id, client_secret, token_url. Flujo de autenticación OAuth2."
+    },
+    {
+      "paso": "configuro JWT con secreto=\"{secret}\" y algoritmo=\"{algorithm}\"",
+      "descripcion": "[Autenticación avanzada] Configurar JWT. Parámetros: secret, algorithm. Autenticación con JSON Web Token."
+    },
+    {
+      "paso": "creo token JWT con payload",
+      "descripcion": "[Autenticación avanzada] Crear token JWT. Autenticación con JSON Web Token."
+    },
+    {
+      "paso": "el token JWT debe ser válido",
+      "descripcion": "[Autenticación avanzada] Validar token JWT. Autenticación con JSON Web Token."
+    },
+    {
+      "paso": "genero reporte en formato \"{format}\"",
+      "descripcion": "[Reportes] Generar reporte. Parámetros: format. Generación de reportes de pruebas."
+    },
+    {
+      "paso": "cargo especificación OpenAPI desde \"{spec_file}\"",
+      "descripcion": "[Contratos API] Cargar especificación OpenAPI. Parámetros: spec_file. Trabaja con archivos externos. Usa especificación OpenAPI."
+    },
+    {
+      "paso": "la respuesta debe coincidir con contrato OpenAPI para {method} {path}",
+      "descripcion": "[Contratos API] Validar respuesta contra contrato OpenAPI. Parámetros: method, path. Validación de contrato de API. Usa especificación OpenAPI."
+    },
+    {
+      "paso": "cargo el contrato OpenAPI desde \"{contract_file}\"",
+      "descripcion": "[Contratos API] Cargar especificación de contrato OpenAPI. Parámetros: contract_file. Trabaja con archivos externos. Validación de contrato de API. Usa especificación OpenAPI."
+    },
+    {
+      "paso": "cargo el contrato AsyncAPI desde \"{contract_file}\"",
+      "descripcion": "[Contratos API] Cargar especificación de contrato AsyncAPI. Parámetros: contract_file. Trabaja con archivos externos. Validación de contrato de API. Usa especificación AsyncAPI."
+    },
+    {
+      "paso": "la respuesta debe coincidir con el esquema del contrato",
+      "descripcion": "[Contratos API] Validar respuesta contra contrato cargado. Validación de contrato de API."
+    },
+    {
+      "paso": "la respuesta debe coincidir con el esquema \"{schema_name}\"",
+      "descripcion": "[Contratos API] Validar respuesta contra esquema específico del contrato. Parámetros: schema_name. Usa validación JSON Schema inline."
+    },
+    {
+      "paso": "el campo de respuesta \"{field_path}\" debe ser de tipo \"{expected_type}\"",
+      "descripcion": "[Contratos API] Validar que un campo específico tenga el tipo esperado. Parámetros: field_path, expected_type."
+    },
+    {
+      "paso": "la respuesta debe tener los campos requeridos",
+      "descripcion": "[Contratos API] Validar que la respuesta tenga todos los campos requeridos de la tabla."
+    },
+    {
+      "paso": "el array de respuesta debe contener objetos con estructura",
+      "descripcion": "[Contratos API] Validar que el array de respuesta contenga objetos con estructura esperada."
+    },
+    {
+      "paso": "la respuesta debe cumplir con el esquema JSON",
+      "descripcion": "[Contratos API] Validar respuesta contra esquema JSON del texto del paso."
+    },
+    {
+      "paso": "la respuesta debe cumplir con el esquema JSON del archivo \"{schema_file}\"",
+      "descripcion": "[Contratos API] Validar respuesta contra esquema JSON desde archivo. Parámetros: schema_file. Carga datos desde archivo JSON externo."
+    },
+    {
+      "paso": "el campo de respuesta \"{field_path}\" debe coincidir con el patrón \"{pattern}\"",
+      "descripcion": "[Contratos API] Validar que un campo coincida con un patrón regex. Parámetros: field_path, pattern."
+    },
+    {
+      "paso": "la respuesta debe tener tipos de datos consistentes en elementos del array",
+      "descripcion": "[Contratos API] Validar que todos los elementos del array tengan tipos de datos consistentes."
+    },
+    {
+      "paso": "valido los endpoints del contrato de API",
+      "descripcion": "[Contratos API] Validar que todos los endpoints del contrato sean accesibles. Validación de contrato de API."
+    },
+    {
+      "paso": "el mensaje debe coincidir con el contrato AsyncAPI para canal \"{channel}\"",
+      "descripcion": "[Contratos API] Validar mensaje contra contrato AsyncAPI. Parámetros: channel. Validación de contrato de API. Usa especificación AsyncAPI."
+    },
+    {
+      "paso": "habilito ingeniería del caos",
+      "descripcion": "[Ingeniería del caos] Habilitar ingeniería del caos. Testing de ingeniería del caos."
+    },
+    {
+      "paso": "inyecto latencia entre {min_ms:f} y {max_ms:f} milisegundos",
+      "descripcion": "[Ingeniería del caos] Inyectar latencia. Parámetros: min_ms, max_ms."
+    },
+    {
+      "paso": "inyecto tasa de error del {percentage:f} por ciento",
+      "descripcion": "[Ingeniería del caos] Inyectar tasa de error. Parámetros: percentage."
+    },
+    {
+      "paso": "deshabilito ingeniería del caos",
+      "descripcion": "[Ingeniería del caos] Deshabilitar ingeniería del caos. Testing de ingeniería del caos."
+    },
+    {
+      "paso": "establezco nivel de registro a \"{level}\"",
+      "descripcion": "[Logging avanzado] Establecer nivel de registro. Parámetros: level. Registro de peticiones/respuestas."
+    },
+    {
+      "paso": "habilito registro de solicitud al directorio \"{directory}\"",
+      "descripcion": "[Logging avanzado] Habilitar registro de solicitudes. Parámetros: directory. Registro de peticiones/respuestas."
+    },
+    {
+      "paso": "establezco la política de reintentos con max_retries={max_retries:d}, initial_delay={initial_delay:f}, y max_delay={max_delay:f}",
+      "descripcion": "[Resiliencia] Establecer política de reintentos con parámetros de retraso personalizados. Parámetros: max_retries, initial_delay, max_delay. Funcionalidad de reintentos."
+    },
+    {
+      "paso": "creo un circuit breaker llamado \"{name}\" con failure_threshold={failure_threshold:d}, success_threshold={success_threshold:d}, y timeout={timeout:d}",
+      "descripcion": "[Resiliencia] Crear circuit breaker con umbrales personalizados. Parámetros: name, failure_threshold, success_threshold, timeout. Patrón de resiliencia circuit breaker."
+    },
+    {
+      "paso": "agrego un interceptor de registro",
+      "descripcion": "[Resiliencia] Agregar interceptor de registro. Middleware interceptor en pipeline. Registro de peticiones/respuestas."
+    },
+    {
+      "paso": "agrego un interceptor de registro de respuestas",
+      "descripcion": "[Resiliencia] Agregar interceptor de registro de respuestas. Middleware interceptor en pipeline. Registro de peticiones/respuestas."
+    },
+    {
+      "paso": "el limitador de velocidad debe tener {remaining:d} solicitudes restantes",
+      "descripcion": "[Resiliencia] Validar solicitudes restantes en limitador de velocidad. Parámetros: remaining. Control de límite de velocidad."
+    },
+    {
+      "paso": "cargo datos de prueba del archivo \"{file_path}\"",
+      "descripcion": "[Caché y rendimiento] Cargar datos de prueba desde archivo (sintaxis alternativa). Parámetros: file_path. Trabaja con archivos externos."
+    },
+    {
+      "paso": "ejecuto prueba dirigida por datos para cada fila",
+      "descripcion": "[Caché y rendimiento] Ejecutar prueba dirigida por datos para cada fila."
+    },
+    {
+      "paso": "todas las pruebas deben completarse exitosamente",
+      "descripcion": "[Caché y rendimiento] Validar que todas las pruebas dirigidas por datos se completaron exitosamente."
+    },
+    {
+      "paso": "envío la misma solicitud GET a \"{endpoint}\" nuevamente",
+      "descripcion": "[Caché y rendimiento] Enviar solicitud GET idéntica (para pruebas de caché). Parámetros: endpoint."
+    },
+    {
+      "paso": "la segunda respuesta debe provenir del caché",
+      "descripcion": "[Caché y rendimiento] Validar que la respuesta proviene del caché. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "el caché debe contener {count:d} entradas",
+      "descripcion": "[Caché y rendimiento] Validar número de entradas en caché. Parámetros: count. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "el tiempo promedio de respuesta debe ser menor a {max_time:d} milisegundos",
+      "descripcion": "[Caché y rendimiento] Validar tiempo promedio de respuesta. Parámetros: max_time."
+    },
+    {
+      "paso": "el tiempo de respuesta p95 debe ser menor a {max_time:d} milisegundos",
+      "descripcion": "[Caché y rendimiento] Validar tiempo de respuesta p95. Parámetros: max_time."
+    },
+    {
+      "paso": "la tasa de error debe ser menor al {percentage:d} por ciento",
+      "descripcion": "[Caché y rendimiento] Validar tasa de error. Parámetros: percentage."
+    },
+    {
+      "paso": "me desconecto de WebSocket",
+      "descripcion": "[Caché y rendimiento] Desconectar de WebSocket (sintaxis alternativa). Para testing de comunicación WebSocket."
+    },
+    {
+      "paso": "la solicitud debe incluir encabezado Authorization",
+      "descripcion": "[Caché y rendimiento] Validar que encabezado Authorization está presente."
+    },
+    {
+      "paso": "el token OAuth2 debe ser válido",
+      "descripcion": "[Caché y rendimiento] Validar que token OAuth2 es válido. Flujo de autenticación OAuth2."
+    },
+    {
+      "paso": "el token debe contener claim \"{claim}\" con valor \"{value}\"",
+      "descripcion": "[Caché y rendimiento] Validar que token JWT contiene claim específico. Parámetros: claim, value."
+    },
+    {
+      "paso": "ejecuto suite de pruebas",
+      "descripcion": "[Reportes y contratos] Ejecutar suite de pruebas."
+    },
+    {
+      "paso": "debo generar reportes en formatos",
+      "descripcion": "[Reportes y contratos] Generar reportes en múltiples formatos (basado en tabla). Generación de reportes de pruebas."
+    },
+    {
+      "paso": "el reporte debe ser generado en formato \"{format}\"",
+      "descripcion": "[Reportes y contratos] Validar que reporte fue generado en formato especificado. Parámetros: format. Generación de reportes de pruebas."
+    },
+    {
+      "paso": "cargo especificación AsyncAPI desde \"{file_path}\"",
+      "descripcion": "[Reportes y contratos] Cargar especificación AsyncAPI. Parámetros: file_path. Trabaja con archivos externos. Usa especificación AsyncAPI."
+    },
+    {
+      "paso": "la respuesta debe completarse a pesar de la latencia inyectada",
+      "descripcion": "[Reportes y contratos] Validar que respuesta se completó a pesar de inyección de latencia."
+    },
+    {
+      "paso": "algunas solicitudes pueden fallar debido a errores inyectados",
+      "descripcion": "[Reportes y contratos] Validar que algunas solicitudes fallaron debido a inyección de errores."
+    },
+    {
+      "paso": "tasa de error debe ser menor al {percentage:d} por ciento",
+      "descripcion": "[Reportes y contratos] Validar que tasa de error está por debajo del umbral (sintaxis alternativa). Parámetros: percentage."
+    },
+    {
+      "paso": "solicitud y respuesta deben registrarse en archivo",
+      "descripcion": "[Reportes y contratos] Validar que solicitud/respuesta fueron registradas en archivo."
+    },
+    {
+      "paso": "el array de respuesta debe tener más de {count:d} elementos",
+      "descripcion": "[Validaciones adicionales] Validar que array tiene más de cantidad especificada de elementos. Parámetros: count."
+    },
+    {
+      "paso": "la respuesta debe contener todos los campos: {fields}",
+      "descripcion": "[Validaciones adicionales] Validar que respuesta contiene todos los campos especificados. Parámetros: fields."
+    },
+    {
+      "paso": "ambas respuestas deben tener estado {status:d}",
+      "descripcion": "[Validaciones adicionales] Validar que ambas respuestas tienen el mismo estado. Parámetros: status."
+    },
+    {
+      "paso": "el campo \"{field}\" debe estar en rango {min_val:d} a {max_val:d}",
+      "descripcion": "[Validaciones adicionales] Validar que campo de respuesta está dentro del rango. Parámetros: field, min_val, max_val."
+    },
+    {
+      "paso": "el tiempo de respuesta debe ser menor a {milliseconds:d} milisegundos",
+      "descripcion": "[Validaciones adicionales] Validar tiempo de respuesta en milisegundos. Parámetros: milliseconds."
+    },
+    {
+      "paso": "métricas de rendimiento deben ser recopiladas",
+      "descripcion": "[Validaciones adicionales] Validar que métricas de rendimiento fueron recopiladas. Monitoreo y métricas de rendimiento."
+    },
+    {
+      "paso": "caché debe contener {count:d} entrada",
+      "descripcion": "[Validaciones adicionales] Validar que caché contiene número específico de entradas. Parámetros: count. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "que establezco la política de reintentos con max_retries={count:d} y backoff_strategy=\"{strategy}\"",
+      "descripcion": "[Variantes numéricas] Establecer política de reintentos con estrategia de backoff. Parámetros: count, strategy. Funcionalidad de reintentos. Control de límite de velocidad."
+    },
+    {
+      "paso": "establezco la política de reintentos con max_retries={count:d} y backoff_strategy=\"{strategy}\"",
+      "descripcion": "[Variantes numéricas] Establecer política de reintentos con estrategia de backoff. Parámetros: count, strategy. Funcionalidad de reintentos. Control de límite de velocidad."
+    },
+    {
+      "paso": "que establezco la política de reintentos con max_retries={count:d}, initial_delay={delay:f}, y max_delay={max_delay:f}",
+      "descripcion": "[Variantes numéricas] Establecer política de reintentos con retrasos personalizados. Parámetros: count, delay, max_delay. Funcionalidad de reintentos."
+    },
+    {
+      "paso": "establezco la política de reintentos con max_retries={count:d}, initial_delay={delay:f}, y max_delay={max_delay:f}",
+      "descripcion": "[Variantes numéricas] Establecer política de reintentos con retrasos personalizados. Parámetros: count, delay, max_delay. Funcionalidad de reintentos."
+    },
+    {
+      "paso": "que establezco el límite de velocidad a {count:d} peticiones por segundo",
+      "descripcion": "[Control de velocidad] Set rate limit with integer requests per second. Parámetros: count. Control de límite de velocidad."
+    },
+    {
+      "paso": "establezco el límite de velocidad a {count:d} peticiones por segundo",
+      "descripcion": "[Control de velocidad] Set rate limit with integer requests per second. Parámetros: count. Control de límite de velocidad."
+    },
+    {
+      "paso": "que establezco throttle con retraso {delay:d} milisegundos",
+      "descripcion": "[Control de velocidad] Set throttle with integer delay in milliseconds. Parámetros: delay. Control de throttling de peticiones."
+    },
+    {
+      "paso": "establezco throttle con retraso {delay:d} milisegundos",
+      "descripcion": "[Control de velocidad] Set throttle with integer delay in milliseconds. Parámetros: delay. Control de throttling de peticiones."
+    },
+    {
+      "paso": "que establezco límite de velocidad adaptativo con inicial {rps:d} peticiones por segundo",
+      "descripcion": "[Control de velocidad] Set adaptive rate limit with integer initial RPS. Parámetros: rps. Control de límite de velocidad."
+    },
+    {
+      "paso": "establezco límite de velocidad adaptativo con inicial {rps:d} peticiones por segundo",
+      "descripcion": "[Control de velocidad] Set adaptive rate limit with integer initial RPS. Parámetros: rps. Control de límite de velocidad."
+    },
+    {
+      "paso": "envío {count:d} peticiones GET a \"{endpoint}\"",
+      "descripcion": "[Peticiones múltiples] Send multiple GET requests to an endpoint. Parámetros: count, endpoint."
+    },
+    {
+      "paso": "cuando hago la misma petición GET a \"{endpoint}\" nuevamente",
+      "descripcion": "[Peticiones múltiples] Send the same GET request again. Parámetros: endpoint."
+    },
+    {
+      "paso": "que habilito caching de respuestas con TTL {ttl:d} segundos",
+      "descripcion": "[Caché] Enable response caching with TTL. Parámetros: ttl."
+    },
+    {
+      "paso": "la segunda respuesta debe venir del cache",
+      "descripcion": "[Caché] Validate that response came from cache. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "el cache debe contener {count:d} entradas",
+      "descripcion": "[Caché] Validate number of entries in cache. Parámetros: count. Funcionalidad de caché de respuestas."
+    },
+    {
+      "paso": "que agrego un interceptor de autorización con token \"{token}\" y esquema \"{schema}\"",
+      "descripcion": "[Interceptores] Add authorization interceptor with custom schema. Parámetros: token, schema. Usa validación JSON Schema inline. Middleware interceptor en pipeline."
+    },
+    {
+      "paso": "que configuro OAuth2 con:",
+      "descripcion": "[Autenticación avanzada] Configure OAuth2 with table. Flujo de autenticación OAuth2."
+    },
+    {
+      "paso": "que configuro JWT con secret \"{secret}\" y algoritmo \"{algorithm}\"",
+      "descripcion": "[Autenticación avanzada] Configure JWT with secret and algorithm. Parámetros: secret, algorithm. Autenticación con JSON Web Token."
+    },
+    {
+      "paso": "creo token JWT con payload:",
+      "descripcion": "[Autenticación avanzada] Create JWT token with payload. Autenticación con JSON Web Token."
+    },
+    {
+      "paso": "el token debe ser válido",
+      "descripcion": "[Autenticación avanzada] Validate JWT token is valid."
+    },
+    {
+      "paso": "la petición debe incluir encabezado Authorization",
+      "descripcion": "[Autenticación avanzada] Validate Authorization header is present."
+    },
+    {
+      "paso": "la respuesta debe tener más de 0 elementos",
+      "descripcion": "[Validación de respuesta] Validate response has more than 0 items."
+    },
+    {
+      "paso": "el campo de respuesta \"{field_path}\" debe ser un email válido",
+      "descripcion": "[Validación de formatos] Validar que un campo contenga una dirección de email válida. Parámetros: field_path. Validación de formato de email."
+    },
+    {
+      "paso": "el campo de respuesta \"{field_path}\" debe ser una URL válida",
+      "descripcion": "[Validación de formatos] Validar que un campo contenga una URL válida. Parámetros: field_path."
+    },
+    {
+      "paso": "el campo de respuesta \"{field_path}\" debe ser un UUID válido",
+      "descripcion": "[Validación de formatos] Validar que un campo contenga un UUID válido. Parámetros: field_path. Validación de formato UUID."
+    },
+    {
+      "paso": "el campo de respuesta \"{field_path}\" debe ser una fecha ISO válida",
+      "descripcion": "[Validación de formatos] Validar que un campo contenga una fecha ISO válida. Parámetros: field_path. Validación de formato de fecha ISO."
+    },
+    {
+      "paso": "la respuesta debe tener estructura anidada",
+      "descripcion": "[Validación de formatos] Validar que la respuesta tenga estructura anidada esperada del texto del paso."
+    },
+    {
+      "paso": "valido el cuerpo de petición contra contrato para {method} {path}",
+      "descripcion": "[Validación de formatos] Validar cuerpo de petición contra contrato OpenAPI. Parámetros: method, path. Validación de contrato de API."
+    },
+    {
+      "paso": "valido los headers de respuesta contra contrato",
+      "descripcion": "[Validación de formatos] Validar headers de respuesta contra contrato OpenAPI. Validación de contrato de API."
+    },
+    {
+      "paso": "la respuesta debe coincidir con especificación completa del contrato de datos",
+      "descripcion": "[Validación de formatos] Validación comprensiva contra contrato cargado incluyendo headers y cuerpo. Validación de contrato de API."
+    },
+    {
+      "paso": "uso el campo de respuesta \"{field}\" como respuesta de IA",
+      "descripcion": "[GenAI - Conexion] Extrae un campo de la ultima respuesta HTTP y lo establece como texto a evaluar. Soporta notacion de punto para campos anidados."
+    },
+    {
+      "paso": "uso el campo de respuesta \"{field}\" como respuesta de IA con valor por defecto \"{fallback}\"",
+      "descripcion": "[GenAI - Conexion] Igual que el anterior pero usa un valor por defecto si el campo no existe en la respuesta."
+    },
+    {
+      "paso": "establezco el texto de respuesta de IA como \"{text}\"",
+      "descripcion": "[GenAI - Conexion] Establece manualmente el texto de respuesta de IA a evaluar."
+    },
+    {
+      "paso": "establezco el texto de respuesta de IA",
+      "descripcion": "[GenAI - Conexion] Establece el texto de respuesta de IA desde un bloque multilinea docstring."
+    },
+    {
+      "paso": "uso la variable \"{variable_name}\" como respuesta de IA",
+      "descripcion": "[GenAI - Conexion] Usa el valor de una variable de Judo como texto de respuesta de IA a evaluar."
+    },
+    {
+      "paso": "almaceno el texto de respuesta de IA en la variable \"{variable_name}\"",
+      "descripcion": "[GenAI - Conexion] Almacena el texto de respuesta de IA actual en una variable de Judo para reutilizarlo."
+    },
+    {
+      "paso": "cargo el contexto RAG desde el archivo \"{file_path}\"",
+      "descripcion": "[GenAI - RAG] Carga un documento local como contexto RAG. Soporta .txt, .md, .json, .yaml, .csv, .pdf, .docx."
+    },
+    {
+      "paso": "cargo el contexto RAG desde la URL \"{url}\"",
+      "descripcion": "[GenAI - RAG] Obtiene contenido de una URL y lo usa como contexto RAG de referencia."
+    },
+    {
+      "paso": "cargo el contexto RAG desde multiples archivos",
+      "descripcion": "[GenAI - RAG] Carga multiples archivos como contexto RAG combinado. Usar tabla con columna 'archivo'."
+    },
+    {
+      "paso": "establezco el contexto RAG",
+      "descripcion": "[GenAI - RAG] Establece el contexto RAG desde un bloque de texto multilinea inline."
+    },
+    {
+      "paso": "establezco el contexto RAG como \"{text}\"",
+      "descripcion": "[GenAI - RAG] Establece el contexto RAG desde una cadena de texto simple."
+    },
+    {
+      "paso": "la respuesta de IA debe estar fundamentada en el contexto RAG con umbral {threshold:f}",
+      "descripcion": "[GenAI - RAG] Verifica que la respuesta de IA esta fundamentada en el contexto RAG. Detecta alucinaciones. Umbral recomendado: 0.6-0.8."
+    },
+    {
+      "paso": "la respuesta de IA debe contener hechos del contexto RAG con umbral {threshold:f}",
+      "descripcion": "[GenAI - RAG] Verifica que la respuesta contiene terminos clave del contexto RAG. Umbral recomendado: 0.5-0.8."
+    },
+    {
+      "paso": "la similitud semantica de la respuesta de IA con el contexto RAG debe ser al menos {threshold:f}",
+      "descripcion": "[GenAI - RAG] Verifica similitud semantica entre la respuesta y el contexto RAG. Umbral recomendado: 0.4-0.7."
+    },
+    {
+      "paso": "la respuesta de IA no debe estar vacia",
+      "descripcion": "[GenAI - Semantica] Verifica que el texto de respuesta de IA no esta vacio."
+    },
+    {
+      "paso": "la respuesta de IA debe contener \"{text}\"",
+      "descripcion": "[GenAI - Semantica] Verifica que la respuesta de IA contiene un texto especifico (sin distincion de mayusculas)."
+    },
+    {
+      "paso": "la respuesta de IA no debe contener \"{text}\"",
+      "descripcion": "[GenAI - Semantica] Verifica que la respuesta de IA NO contiene un texto especifico."
+    },
+    {
+      "paso": "la longitud de la respuesta de IA debe ser menor a {max_chars:d} caracteres",
+      "descripcion": "[GenAI - Semantica] Verifica que la respuesta de IA es mas corta que el numero de caracteres indicado."
+    },
+    {
+      "paso": "la longitud de la respuesta de IA debe ser mayor a {min_chars:d} caracteres",
+      "descripcion": "[GenAI - Semantica] Verifica que la respuesta de IA es mas larga que el numero de caracteres indicado."
+    },
+    {
+      "paso": "la similitud semantica de la respuesta de IA con \"{expected}\" debe ser al menos {threshold:f}",
+      "descripcion": "[GenAI - Semantica] Mide similitud semantica entre la respuesta y un texto esperado. Usa Sentence Transformers > TF-IDF > Jaccard. Umbral: 0.5-0.8."
+    },
+    {
+      "paso": "la respuesta de IA debe ser relevante para \"{prompt}\" con umbral {threshold:f}",
+      "descripcion": "[GenAI - Semantica] Verifica que la respuesta es relevante para el prompt dado. Umbral recomendado: 0.3-0.6."
+    },
+    {
+      "paso": "la respuesta de IA no debe ser toxica con umbral {threshold:f}",
+      "descripcion": "[GenAI - Semantica] Detecta contenido toxico en la respuesta. Score 1.0=limpio, 0.0=muy toxico. Umbral recomendado: 0.8-0.95."
+    },
+    {
+      "paso": "la respuesta de IA debe contener los hechos requeridos",
+      "descripcion": "[GenAI - Semantica] Verifica que la respuesta contiene hechos especificos de una tabla (columna 'hecho'). Umbral opcional en columna 'umbral'."
+    },
+    {
+      "paso": "el tono de la respuesta de IA debe ser \"{expected_tone}\" con umbral {threshold:f}",
+      "descripcion": "[GenAI - Semantica] Verifica el tono de la respuesta. Tonos: professional, friendly, formal, concise, empathetic. Umbral: 0.3-0.6."
+    },
+    {
+      "paso": "la respuesta de IA debe cubrir los temas requeridos con umbral {threshold:f}",
+      "descripcion": "[GenAI - Semantica] Verifica que la respuesta cubre todos los temas de una tabla (columna 'tema'). Umbral recomendado: 0.7-0.9."
+    },
+    {
+      "paso": "configuro el juez de IA con proveedor \"{provider}\" y modelo \"{model}\"",
+      "descripcion": "[GenAI - Juez LLM] Configura un modelo de IA especifico como juez. Proveedores: openai, claude, gemini. Si no se llama, usa JUDO_AI_PROVIDER del .env."
+    },
+    {
+      "paso": "establezco el criterio del juez como \"{criteria}\"",
+      "descripcion": "[GenAI - Juez LLM] Almacena el criterio de evaluacion para usarlo en pasos del juez."
+    },
+    {
+      "paso": "establezco el criterio del juez",
+      "descripcion": "[GenAI - Juez LLM] Almacena criterios de evaluacion multilinea desde un bloque docstring."
+    },
+    {
+      "paso": "establezco el prompt del juez como \"{prompt}\"",
+      "descripcion": "[GenAI - Juez LLM] Almacena el prompt/pregunta original para dar contexto al juez."
+    },
+    {
+      "paso": "evaluo la respuesta de IA con el juez usando criterio \"{criteria}\" y umbral {threshold:f}",
+      "descripcion": "[GenAI - Juez LLM] Usa un LLM como juez para evaluar la respuesta con criterio en lenguaje natural. Retorna puntuacion 0.0-1.0, veredicto y razonamiento."
+    },
+    {
+      "paso": "evaluo la respuesta de IA con el juez usando umbral {threshold:f}",
+      "descripcion": "[GenAI - Juez LLM] Usa un LLM como juez con criterios multilinea desde un bloque docstring."
+    },
+    {
+      "paso": "evaluo la respuesta de IA con el juez contra el contexto RAG usando criterio \"{criteria}\" y umbral {threshold:f}",
+      "descripcion": "[GenAI - Juez LLM + RAG] Usa un LLM como juez evaluando la respuesta contra el contexto RAG como verdad de referencia."
+    },
+    {
+      "paso": "evaluo la respuesta de IA con el juez contra el contexto RAG usando umbral {threshold:f}",
+      "descripcion": "[GenAI - Juez LLM + RAG] Igual que el anterior pero con criterios multilinea desde bloque docstring."
+    },
+    {
+      "paso": "la evaluacion del juez debe pasar",
+      "descripcion": "[GenAI - Juez LLM] Verifica que la evaluacion del juez LLM paso (score >= threshold)."
+    },
+    {
+      "paso": "la puntuacion del juez debe ser al menos {min_score:f}",
+      "descripcion": "[GenAI - Juez LLM] Verifica que la puntuacion del juez cumple un minimo especifico (0.0-1.0)."
+    },
+    {
+      "paso": "imprimo el texto de respuesta de IA",
+      "descripcion": "[GenAI - Debug] Imprime el texto de respuesta de IA actual en consola para depuracion."
+    },
+    {
+      "paso": "imprimo el resultado de la evaluacion del juez",
+      "descripcion": "[GenAI - Debug] Imprime el resultado completo del juez: veredicto, puntuacion, umbral y razonamiento."
+    }
+  ]
+}

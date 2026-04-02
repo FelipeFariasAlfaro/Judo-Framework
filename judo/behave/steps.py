@@ -4,6 +4,7 @@ Provides comprehensive Gherkin step definitions for API testing
 """
 
 import json
+import os
 import yaml
 import traceback
 from behave import given, when, then, step

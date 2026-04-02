@@ -17,14 +17,17 @@ from .reporting.html_reporter import HTMLReporter
 from .runner.base_runner import BaseRunner
 from .runner.test_suite import TestSuite, CommonSuites
 from .utils.helpers import *
+from .genai.client import GenAIClient
+from .genai.judge import GenAIJudge
+from .genai.context_loader import ContextLoader
 
-__version__ = "1.5.0"
+__version__ = "1.6.9"
 __author__ = "Judo Framework Team"
 
 # Main exports
 __all__ = [
     "Judo",
-    "JudoResponse", 
+    "JudoResponse",
     "Matcher",
     "VariableManager",
     "HttpClient",
@@ -33,9 +36,14 @@ __all__ = [
     "HTMLReporter",
     "BaseRunner",
     "TestSuite",
-    "CommonSuites"
+    "CommonSuites",
+    # GenAI
+    "GenAIClient",
+    "GenAIJudge",
+    "ContextLoader",
 ]
 
 # Behave integration is available via judo.behave module
+# GenAI testing is available via judo.genai module
 # Reporting is available via judo.reporting module
 # Runners are available via judo.runner module

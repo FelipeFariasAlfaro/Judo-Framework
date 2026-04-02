@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="judo-framework",
-    version="1.5.9.5",
+    version="1.6.9",
     author="Felipe Farias - CENTYC",
     author_email="felipe.farias@centyc.cl",
     description="A comprehensive API testing framework for Python, inspired by Karate Framework",
@@ -48,20 +48,19 @@ setup(
             "flake8>=6.0.0",
             "mypy>=1.0.0",
         ],
-        "crypto": [
-            "cryptography>=40.0.0",
-        ],
-        "xml": [
-            "lxml>=4.9.0",
-        ],
-        "excel": [
-            "openpyxl>=3.0.0",
-        ],
-        "websocket": [
-            "websockets>=10.0",
-        ],
-        "graphql": [
-            "graphql-core>=3.2.0",
+        "crypto": ["cryptography>=40.0.0"],
+        "xml": ["lxml>=4.9.0"],
+        "excel": ["openpyxl>=3.0.0"],
+        "websocket": ["websockets>=10.0"],
+        "graphql": ["graphql-core>=3.2.0"],
+        "genai": [
+            "openai>=1.0.0",
+            "anthropic>=0.20.0",
+            "google-generativeai>=0.5.0",
+            "sentence-transformers>=2.2.0",
+            "scikit-learn>=1.0.0",
+            "pypdf>=3.0.0",
+            "python-docx>=0.8.11",
         ],
         "full": [
             "cryptography>=40.0.0",
@@ -69,14 +68,19 @@ setup(
             "openpyxl>=3.0.0",
             "websockets>=10.0",
             "graphql-core>=3.2.0",
-        ]
+            "openai>=1.0.0",
+            "anthropic>=0.20.0",
+            "google-generativeai>=0.5.0",
+            "sentence-transformers>=2.2.0",
+            "scikit-learn>=1.0.0",
+            "pypdf>=3.0.0",
+            "python-docx>=0.8.11",
+        ],
     },
     entry_points={
-        "console_scripts": [
-            "judo=judo.cli:main",
-        ],
-        "behave.formatters": [
-            "judo = judo.behave.formatter:JudoFormatter",
-        ],
+        "console_scripts": ["judo=judo.cli:main"],
+        "behave.formatters": ["judo = judo.behave.formatter:JudoFormatter"],
     },
+    include_package_data=True,
+    package_data={"judo": ["assets/logos/*.png", "assets/logos/*.jpg"]},
 )

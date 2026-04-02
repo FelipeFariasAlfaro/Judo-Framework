@@ -3,6 +3,7 @@ Integrated Reporter - Captures test execution data automatically
 """
 
 import json
+import os
 import traceback
 from datetime import datetime
 from typing import Any, Dict, Optional
@@ -24,13 +25,16 @@ class JudoReporter:
         
         # Usar directorio del proyecto del usuario
         if output_dir is None:
-            import os
-            output_dir = os.path.join(os.getcwd(), "judo_reports")
+            # Preferir la variable de entorno seteada por el runner (ya es ruta absoluta)
+            env_output = os.environ.get('JUDO_REPORT_OUTPUT_DIR')
+            if env_output:
+                output_dir = env_output
+            else:
+                output_dir = os.path.join(os.getcwd(), "judo_reports")
         
         self.html_reporter = HTMLReporter(output_dir, config_file)
         
         # Capture environment info
-        import os
         import platform
         self.report_data.environment = {
             "python_version": platform.python_version(),

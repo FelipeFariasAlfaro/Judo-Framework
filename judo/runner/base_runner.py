@@ -69,21 +69,42 @@ class BaseRunner:
         ]
         
         env_loaded = False
+        self._project_root = None  # Guardar la raíz del proyecto para anclar rutas
+
         for env_path in env_paths:
             if env_path.exists():
                 load_dotenv(env_path)
+                self._project_root = env_path.parent
                 env_loaded = True
                 break
         
         if not env_loaded:
-            # Si no se encuentra .env, usar load_dotenv() sin parámetros (busca automáticamente)
             load_dotenv()
-        
+
+        # Si no encontramos el .env, buscar la raíz por marcadores comunes
+        if self._project_root is None:
+            for candidate in [Path.cwd()] + list(Path.cwd().parents):
+                if any([
+                    (candidate / '.git').exists(),
+                    (candidate / 'pyproject.toml').exists(),
+                    (candidate / 'setup.py').exists(),
+                    (candidate / 'features').exists(),
+                ]):
+                    self._project_root = candidate
+                    break
+            if self._project_root is None:
+                self._project_root = Path.cwd()
+
+        # CRÍTICO: cambiar el directorio de trabajo a la raíz del proyecto
+        # Esto garantiza que todas las rutas relativas (behave, features, reportes)
+        # se resuelvan siempre desde la raíz, sin importar desde dónde se lanza el runner
+        os.chdir(self._project_root)
+
         # Configurar directorio de features
-        self.features_dir = Path(features_dir or self._get_env_value('JUDO_FEATURES_DIR', 'features'))
+        self.features_dir = self._resolve_path(features_dir or self._get_env_value('JUDO_FEATURES_DIR', 'features'))
         
         # Configurar directorio de salida
-        self.output_dir = Path(output_dir or self._get_env_value('JUDO_OUTPUT_DIR', 'judo_reports'))
+        self.output_dir = self._resolve_path(output_dir or self._get_env_value('JUDO_OUTPUT_DIR', 'judo_reports'))
         
         # Configurar ejecución paralela
         self.parallel = self._get_bool_env('JUDO_PARALLEL', parallel, False)
@@ -103,11 +124,11 @@ class BaseRunner:
         # Configuración de Cucumber JSON
         self.generate_cucumber_json = self._get_bool_env('JUDO_GENERATE_CUCUMBER_JSON', generate_cucumber_json, True)
         if cucumber_json_dir:
-            self.cucumber_json_dir = Path(cucumber_json_dir)
+            self.cucumber_json_dir = self._resolve_path(cucumber_json_dir)
         else:
             cucumber_json_env = self._get_env_value('JUDO_CUCUMBER_JSON_DIR', None)
             if cucumber_json_env:
-                self.cucumber_json_dir = Path(cucumber_json_env)
+                self.cucumber_json_dir = self._resolve_path(cucumber_json_env)
             else:
                 self.cucumber_json_dir = self.output_dir / "cucumber-json"
         
@@ -118,11 +139,11 @@ class BaseRunner:
         # Configuración de Request/Response logging
         self.save_requests_responses = self._get_bool_env('JUDO_SAVE_REQUESTS_RESPONSES', save_requests_responses, False)
         if requests_responses_dir:
-            self.requests_responses_dir = Path(requests_responses_dir)
+            self.requests_responses_dir = self._resolve_path(requests_responses_dir)
         else:
             requests_responses_env = self._get_env_value('JUDO_REQUESTS_RESPONSES_DIR', None)
             if requests_responses_env:
-                self.requests_responses_dir = Path(requests_responses_env)
+                self.requests_responses_dir = self._resolve_path(requests_responses_env)
             else:
                 self.requests_responses_dir = self.output_dir / "requests_responses"
         
@@ -172,6 +193,19 @@ class BaseRunner:
         # Log de configuración cargada
         self._log_configuration()
     
+    def _resolve_path(self, path_str: str) -> Path:
+        """
+        Resuelve una ruta relativa anclándola a la raíz del proyecto.
+        Las rutas absolutas se devuelven tal cual.
+        Esto garantiza que las rutas del .env sean siempre relativas
+        a la raíz del proyecto, independientemente del directorio de trabajo
+        del IDE o ejecutor.
+        """
+        p = Path(path_str)
+        if p.is_absolute():
+            return p
+        return self._project_root / p
+
     def _get_env_value(self, key: str, default: str) -> str:
         """Obtener valor de variable de entorno con default"""
         return os.getenv(key, default)
@@ -243,7 +277,7 @@ class BaseRunner:
         self.save_requests_responses = enabled
         
         if directory:
-            self.requests_responses_dir = Path(directory)
+            self.requests_responses_dir = self._resolve_path(directory)
         elif not hasattr(self, 'requests_responses_dir'):
             self.requests_responses_dir = self.output_dir / "requests_responses"
         
@@ -984,7 +1018,6 @@ class BaseRunner:
                     else:
                         consolidated.append(data)
             except json.JSONDecodeError as e:
-                self.log(f"⚠️ Error leyendo {json_file.name}: JSON malformado - {e}")
                 # Intentar recuperación más robusta
                 try:
                     with open(json_file, 'r', encoding='utf-8', errors='replace') as f:
@@ -998,7 +1031,7 @@ class BaseRunner:
                             consolidated.extend(data)
                         else:
                             consolidated.append(data)
-                        self.log(f"✅ Recuperado contenido de {json_file.name}")
+                        # Recuperación silenciosa - no mostrar advertencia si se resolvió
                     else:
                         self.log(f"❌ No se pudo recuperar {json_file.name}")
                 except Exception:

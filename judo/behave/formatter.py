@@ -4,6 +4,7 @@ Se registra automáticamente como formatter de Behave
 """
 
 import traceback
+import os
 from datetime import datetime
 from behave.formatter.base import Formatter
 from behave.model import Step, Scenario, Feature, ScenarioOutline

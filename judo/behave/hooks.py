@@ -3,6 +3,7 @@ Behave Hooks for Judo Framework
 Provides setup and teardown functionality for BDD tests
 """
 
+import os
 from behave import fixture
 from .context import JudoContext
 

@@ -4,6 +4,7 @@ Inject failures for resilience testing
 """
 
 import random
+import os
 import time
 from typing import Optional, Callable
 

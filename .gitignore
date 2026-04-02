@@ -66,9 +66,6 @@ Thumbs.db
 # Internal documentation (technical docs for development)
 .kiro/
 
-# Publishing scripts (internal use only)
-publish.py
-
 # Cleanup scripts (internal use only)
 cleanup_sensitive_files.sh
 cleanup_sensitive_files.ps1
@@ -81,5 +78,25 @@ info-es.html
 # Release notes (internal tracking)
 RELEASE_NOTES_*.md
 
-# Steps directory (if it's for internal testing)
+# Steps directory (empty, internal)
 steps/
+
+# Generated test outputs
+test_output/
+test_reports/
+debug_output/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# PyPI publishing (private - keep local only)
+publish.py
+setup.py
+pyproject.toml
+MANIFEST.in
+.pypirc
+
+# Kiro IDE internal files
+.kiro/
