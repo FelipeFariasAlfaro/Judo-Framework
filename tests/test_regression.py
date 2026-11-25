@@ -114,7 +114,7 @@ def test_no_state_leaks_between_scenarios(project, server):
     assert res["summary"]["failed"] == 1  # 2nd scenario must see no Authorization header at all
 
 
-@pytest.mark.parametrize("feature", ["flow_en.feature"])
+@pytest.mark.parametrize("feature", ["flow_en.feature", "flow_es.feature"])
 def test_flow_features_pass(project, server, feature):
     (project / "data").mkdir()
     (project / "data" / "exists.txt").write_text("x")
@@ -139,7 +139,7 @@ XSD = """<?xml version="1.0"?>
 </xs:schema>"""
 
 
-@pytest.mark.parametrize("feature", ["protocols_en.feature"])
+@pytest.mark.parametrize("feature", ["protocols_en.feature", "protocols_es.feature"])
 def test_protocol_features_pass(project, server, feature):
     pytest.importorskip("lxml")
     (project / "data").mkdir()
