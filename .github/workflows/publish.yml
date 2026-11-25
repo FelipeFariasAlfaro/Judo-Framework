@@ -1,0 +1,64 @@
+name: Publish to PyPI
+
+# Publishes when a version tag is pushed (git tag v1.7.0 && git push origin v1.7.0)
+# or when started by hand from the Actions tab.
+# Uses PyPI Trusted Publishing (OIDC): no API token is stored in GitHub.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest build twine mcp grpcio grpcio-reflection protobuf lxml
+      - name: Check that versions match (tag, setup.py, pyproject.toml, judo.__version__)
+        run: |
+          python - <<'EOF'
+          import os, re, sys
+          import judo
+          setup = re.search(r'version="([^"]+)"', open("setup.py").read()).group(1)
+          pyproject = re.search(r'^version = "([^"]+)"', open("pyproject.toml").read(), re.M).group(1)
+          versions = {"setup.py": setup, "pyproject.toml": pyproject, "judo.__version__": judo.__version__}
+          ref = os.environ.get("GITHUB_REF", "")
+          if ref.startswith("refs/tags/v"):
+              versions["tag"] = ref[len("refs/tags/v"):]
+          print(versions)
+          if len(set(versions.values())) != 1:
+              sys.exit("Version mismatch: " + str(versions))
+          EOF
+      - name: Step catalog sanity
+        run: judo steps --check
+      - name: Tests
+        run: python -m pytest tests -q
+      - name: Build
+        run: python -m build
+      - name: Check distribution
+        run: python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/judo-framework/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
