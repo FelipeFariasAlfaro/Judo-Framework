@@ -23,6 +23,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Judo run artifacts
+judo_reports/
+rerun_failing.features*
+
 # Virtual environments
 venv/
 env/

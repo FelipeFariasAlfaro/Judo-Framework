@@ -2,6 +2,7 @@
 HTTP Client - Advanced HTTP client with Karate-like features
 """
 
+import os
 import requests
 from requests.auth import HTTPBasicAuth
 from typing import Any, Dict, List, Optional, Union
@@ -17,12 +18,23 @@ class HttpClient:
     def __init__(self, judo_instance):
         self.judo = judo_instance
         self.session = requests.Session()
+        self.timeout = self._default_timeout()
+        self.cert = None
         self.default_headers = {}
         self.default_params = {}
         self.default_cookies = {}
         self.form_fields = {}
         self.multipart_fields = {}
         
+    @staticmethod
+    def _default_timeout() -> Optional[float]:
+        raw = os.getenv('JUDO_TIMEOUT', '30')
+        try:
+            value = float(raw)
+        except ValueError:
+            return 30.0
+        return value if value > 0 else None
+
     def _build_url(self, url: str) -> str:
         """Build complete URL"""
         if url.startswith(('http://', 'https://')):
@@ -37,6 +49,11 @@ class HttpClient:
         headers = self.default_headers.copy()
         headers.update(kwargs.get('headers', {}))
         kwargs['headers'] = headers
+        # Per-request timeout (requests ignores Session.timeout) and client certificate
+        if self.timeout is not None:
+            kwargs.setdefault('timeout', self.timeout)
+        if self.cert and 'cert' not in kwargs:
+            kwargs['cert'] = self.cert
         
         # Merge params
         params = self.default_params.copy()
@@ -223,7 +240,11 @@ class HttpClient:
     
     def set_timeout(self, timeout: float) -> None:
         """Set request timeout"""
-        self.session.timeout = timeout
+        self.timeout = float(timeout) if timeout else None
+
+    def set_client_cert(self, cert: str, key: Optional[str] = None) -> None:
+        """Use a client certificate (mTLS)"""
+        self.cert = (cert, key) if key else cert
     
     def set_verify_ssl(self, verify: bool) -> None:
         """Set SSL verification"""

@@ -406,16 +406,20 @@ def step_validate_array_contains_item(context, key, value):
 
 @step('the response array "{array_path}" should contain an item with "{key}" equal to "{value}"')
 def step_validate_nested_array_contains_item(context, array_path, key, value):
-    """Validate that nested array contains item with specific key-value"""
+    """Validate that nested array contains item with specific key-value.
+
+    Also stores the matched element in ``context.judo_context.matched_array_element``
+    so that subsequent field-validation steps can operate on that specific item
+    instead of the whole array.
+    """
     response = context.judo_context.response
     value = context.judo_context.interpolate_string(value)
-    
+
     # Get the array
     array_data = response.json
-    
+
     # If response is already an array directly, use it
     if isinstance(array_data, list):
-        # Response is directly the array
         pass
     else:
         # Navigate to the nested array
@@ -426,27 +430,30 @@ def step_validate_nested_array_contains_item(context, array_path, key, value):
                     assert False, f"Path '{array_path}' not found in response"
             else:
                 assert False, f"Cannot navigate to '{array_path}' - invalid path"
-    
+
     # Validate it's an array
     assert isinstance(array_data, list), f"'{array_path}' is not an array, it's {type(array_data).__name__}"
-    
+
     # Try to convert to int if it's a numeric string
     try:
         numeric_value = int(value)
     except ValueError:
         numeric_value = None
-    
-    # Search for the item
-    found = False
+
+    # Search for the item and store it
+    matched_item = None
     for item in array_data:
         if isinstance(item, dict):
             item_value = item.get(key)
-            # Check both string and numeric comparison
             if item_value == value or (numeric_value is not None and item_value == numeric_value):
-                found = True
+                matched_item = item
                 break
-    
-    assert found, f"Array '{array_path}' does not contain item with {key}={value}"
+
+    assert matched_item is not None, \
+        f"Array '{array_path}' does not contain item with {key}={value}"
+
+    # Store matched element for subsequent field-validation steps
+    context.judo_context.matched_array_element = matched_item
 
 
 @step('each item in the response array should have "{key}"')

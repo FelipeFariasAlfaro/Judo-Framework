@@ -258,16 +258,21 @@ def step_validate_each_has_field_es(context, campo):
 
 @step('el array "{ruta_array}" debe contener un elemento con "{campo}" igual a "{valor}"')
 def step_validate_nested_array_contains_item_es(context, ruta_array, campo, valor):
-    """Validar que un array anidado contiene un elemento con un valor específico"""
+    """Validar que un array anidado contiene un elemento con un valor específico.
+
+    Además de validar la existencia del elemento, lo guarda en
+    ``context.judo_context.matched_array_element`` para que los pasos
+    siguientes de validación de campos (ej. 'el campo "X" debe ser Y')
+    puedan operar sobre ese elemento en lugar del array completo.
+    """
     response = context.judo_context.response
     valor = context.judo_context.interpolate_string(valor)
-    
+
     # Obtener el array
     array_data = response.json
-    
+
     # Si la respuesta ya es un array directamente, usarlo
     if isinstance(array_data, list):
-        # La respuesta es directamente el array
         pass
     else:
         # Navegar al array anidado
@@ -278,27 +283,30 @@ def step_validate_nested_array_contains_item_es(context, ruta_array, campo, valo
                     assert False, f"No se encontró la ruta '{ruta_array}' en la respuesta"
             else:
                 assert False, f"No se puede navegar a '{ruta_array}' - ruta inválida"
-    
+
     # Validar que es un array
     assert isinstance(array_data, list), f"'{ruta_array}' no es un array, es {type(array_data).__name__}"
-    
+
     # Intentar convertir a número si es posible
     try:
         valor_numerico = int(valor)
     except ValueError:
         valor_numerico = None
-    
-    # Buscar el elemento
-    encontrado = False
+
+    # Buscar el elemento y guardarlo en contexto
+    elemento_encontrado = None
     for item in array_data:
         if isinstance(item, dict):
             valor_item = item.get(campo)
-            # Comparar tanto string como número
             if valor_item == valor or (valor_numerico is not None and valor_item == valor_numerico):
-                encontrado = True
+                elemento_encontrado = item
                 break
-    
-    assert encontrado, f"El array '{ruta_array}' no contiene un elemento con {campo}={valor}"
+
+    assert elemento_encontrado is not None, \
+        f"El array '{ruta_array}' no contiene un elemento con {campo}={valor}"
+
+    # Guardar el elemento encontrado para que los pasos siguientes puedan usarlo
+    context.judo_context.matched_array_element = elemento_encontrado
 
 
 # ============================================================

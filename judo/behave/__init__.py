@@ -6,6 +6,16 @@ Provides step definitions and utilities for BDD testing with Behave
 # Import all steps to register them automatically
 from . import steps  # English steps (use @step, work with any keyword)
 from . import steps_es  # Spanish steps (use @step, work with any keyword including Given/When/Then)
+from . import steps_extra  # Polling, SQL (SQLite), pagination (EN)
+from . import steps_extra_es  # Polling, SQL (SQLite), pagination (ES)
+from . import steps_flow  # Conditional / control-flow steps (EN)
+from . import steps_flow_es  # Conditional / control-flow steps (ES)
+from . import steps_protocols  # XML/SOAP, forms, CSV, SSE, GraphQL (EN)
+from . import steps_protocols_es  # XML/SOAP, forms, CSV, SSE, GraphQL (ES)
+from . import steps_grpc  # gRPC via reflection (EN)
+from . import steps_grpc_es  # gRPC via reflection (ES)
+from ..plugins import load_all as _load_plugins
+_load_plugins()  # third-party steps registered via the 'judo.plugins' entry point
 from .context import JudoContext
 from .hooks import *
 
@@ -81,7 +91,7 @@ def setup_judo_context(context):
     context.judo_context = JudoContext(context)
     
     # Initialize Judo instance (for backward compatibility)
-    context.judo = context.judo_context.judo
+    context.judo = context.judo_context.facade
     
     # Add helper methods to context
     context.get_last_response = lambda: getattr(context.judo_context, 'response', None)

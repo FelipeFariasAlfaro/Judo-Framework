@@ -1,0 +1,1714 @@
+[
+ [
+  "en",
+  "I PATCH to \"{endpoint}\" with JSON file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I POST to \"{endpoint}\" with JSON file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I PUT to \"{endpoint}\" with JSON file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I add a logging interceptor"
+ ],
+ [
+  "en",
+  "I add a response logging interceptor"
+ ],
+ [
+  "en",
+  "I add a timestamp interceptor with header name \"{header_name}\""
+ ],
+ [
+  "en",
+  "I add an authorization interceptor with token \"{token}\""
+ ],
+ [
+  "en",
+  "I add authorization interceptor with token \"{token}\""
+ ],
+ [
+  "en",
+  "I add timestamp interceptor with header name \"{header_name}\""
+ ],
+ [
+  "en",
+  "I close WebSocket connection"
+ ],
+ [
+  "en",
+  "I configure JWT with secret=\"{secret}\" algorithm=\"{algorithm}\""
+ ],
+ [
+  "en",
+  "I configure OAuth2 with client_id=\"{client_id}\" client_secret=\"{client_secret}\" token_url=\"{token_url}\""
+ ],
+ [
+  "en",
+  "I configure judge AI with provider \"{provider}\" and model \"{model}\""
+ ],
+ [
+  "en",
+  "I connect to WebSocket \"{url}\""
+ ],
+ [
+  "en",
+  "I create JWT token with payload"
+ ],
+ [
+  "en",
+  "I create circuit breaker \"{name}\" with failure_threshold={failure_threshold:d}, success_threshold={success_threshold:d}, and timeout={timeout:d}"
+ ],
+ [
+  "en",
+  "I create circuit breaker \"{name}\" with failure_threshold={threshold:d}"
+ ],
+ [
+  "en",
+  "I disable chaos engineering"
+ ],
+ [
+  "en",
+  "I disable request/response logging"
+ ],
+ [
+  "en",
+  "I disable response caching"
+ ],
+ [
+  "en",
+  "I disconnect from WebSocket"
+ ],
+ [
+  "en",
+  "I enable chaos engineering"
+ ],
+ [
+  "en",
+  "I enable performance monitoring"
+ ],
+ [
+  "en",
+  "I enable request logging to directory \"{directory}\""
+ ],
+ [
+  "en",
+  "I enable request/response logging"
+ ],
+ [
+  "en",
+  "I enable request/response logging to directory \"{directory}\""
+ ],
+ [
+  "en",
+  "I enable response caching with TTL {ttl:d} seconds"
+ ],
+ [
+  "en",
+  "I evaluate the AI response as judge against RAG context with criteria \"{criteria}\" and threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "I evaluate the AI response as judge against RAG context with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "I evaluate the AI response as judge with criteria \"{criteria}\" and threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "I evaluate the AI response as judge with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "I execute GraphQL mutation"
+ ],
+ [
+  "en",
+  "I execute GraphQL query"
+ ],
+ [
+  "en",
+  "I execute test suite"
+ ],
+ [
+  "en",
+  "I extract \"{json_path}\" from the response as \"{variable_name}\""
+ ],
+ [
+  "en",
+  "I generate report in \"{format}\" format"
+ ],
+ [
+  "en",
+  "I get the value \"{env_var_name}\" from env and store it in \"{variable_name}\""
+ ],
+ [
+  "en",
+  "I have a Judo API client"
+ ],
+ [
+  "en",
+  "I inject error rate {percentage:f} percent"
+ ],
+ [
+  "en",
+  "I inject latency between {min_ms:f} and {max_ms:f} milliseconds"
+ ],
+ [
+  "en",
+  "I load AsyncAPI contract from \"{contract_file}\""
+ ],
+ [
+  "en",
+  "I load AsyncAPI spec from \"{file_path}\""
+ ],
+ [
+  "en",
+  "I load OpenAPI contract from \"{contract_file}\""
+ ],
+ [
+  "en",
+  "I load OpenAPI spec from \"{spec_file}\""
+ ],
+ [
+  "en",
+  "I load RAG context from URL \"{url}\""
+ ],
+ [
+  "en",
+  "I load RAG context from file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I load RAG context from multiple files"
+ ],
+ [
+  "en",
+  "I load test data \"{data_name}\" from JSON"
+ ],
+ [
+  "en",
+  "I load test data \"{data_name}\" from YAML"
+ ],
+ [
+  "en",
+  "I load test data \"{data_name}\" from file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I load test data from file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I print the AI response text"
+ ],
+ [
+  "en",
+  "I print the judge evaluation result"
+ ],
+ [
+  "en",
+  "I print the response"
+ ],
+ [
+  "en",
+  "I run data-driven test for each row"
+ ],
+ [
+  "en",
+  "I save the response to file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I save the variable \"{var_name}\" to file \"{file_path}\""
+ ],
+ [
+  "en",
+  "I send WebSocket message"
+ ],
+ [
+  "en",
+  "I send a DELETE request to \"{endpoint}\""
+ ],
+ [
+  "en",
+  "I send a GET request to \"{endpoint}\""
+ ],
+ [
+  "en",
+  "I send a PATCH request to \"{endpoint}\" with JSON"
+ ],
+ [
+  "en",
+  "I send a POST request to \"{endpoint}\""
+ ],
+ [
+  "en",
+  "I send a POST request to \"{endpoint}\" with JSON"
+ ],
+ [
+  "en",
+  "I send a PUT request to \"{endpoint}\" with JSON"
+ ],
+ [
+  "en",
+  "I send a {method} request to \"{endpoint}\" with the variable \"{var_name}\""
+ ],
+ [
+  "en",
+  "I send the same GET request to \"{endpoint}\" again"
+ ],
+ [
+  "en",
+  "I send {count:d} GET requests to \"{endpoint}\""
+ ],
+ [
+  "en",
+  "I set AI response text"
+ ],
+ [
+  "en",
+  "I set AI response text to \"{text}\""
+ ],
+ [
+  "en",
+  "I set RAG context"
+ ],
+ [
+  "en",
+  "I set RAG context \"{text}\""
+ ],
+ [
+  "en",
+  "I set adaptive rate limit with initial {rps:f} requests per second"
+ ],
+ [
+  "en",
+  "I set judge criteria"
+ ],
+ [
+  "en",
+  "I set judge criteria \"{criteria}\""
+ ],
+ [
+  "en",
+  "I set judge prompt \"{prompt}\""
+ ],
+ [
+  "en",
+  "I set logging level to \"{level}\""
+ ],
+ [
+  "en",
+  "I set performance alert for \"{metric}\" with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "I set rate limit to {requests_per_second:f} requests per second"
+ ],
+ [
+  "en",
+  "I set retry policy with max_retries={max_retries:d} and backoff_strategy=\"{strategy}\""
+ ],
+ [
+  "en",
+  "I set retry policy with max_retries={max_retries:d}, initial_delay={initial_delay:f}, and max_delay={max_delay:f}"
+ ],
+ [
+  "en",
+  "I set the base URL to \"{base_url}\""
+ ],
+ [
+  "en",
+  "I set the header \"{header_name}\" from env \"{env_var_name}\""
+ ],
+ [
+  "en",
+  "I set the header \"{name}\" to \"{value}\""
+ ],
+ [
+  "en",
+  "I set the output directory to \"{directory}\""
+ ],
+ [
+  "en",
+  "I set the query parameter \"{name}\" to \"{value}\""
+ ],
+ [
+  "en",
+  "I set the query parameter \"{name}\" to {value:d}"
+ ],
+ [
+  "en",
+  "I set the variable \"{name}\" to \"{value}\""
+ ],
+ [
+  "en",
+  "I set the variable \"{name}\" to the JSON"
+ ],
+ [
+  "en",
+  "I set the variable \"{name}\" to {value:d}"
+ ],
+ [
+  "en",
+  "I set throttle with delay {delay_ms:f} milliseconds"
+ ],
+ [
+  "en",
+  "I setup JWT with secret \"{secret}\" and algorithm \"{algorithm}\""
+ ],
+ [
+  "en",
+  "I setup OAuth2 with"
+ ],
+ [
+  "en",
+  "I should generate reports in formats"
+ ],
+ [
+  "en",
+  "I should have performance metrics"
+ ],
+ [
+  "en",
+  "I should have variable \"{variable_name}\" with value \"{expected_value}\""
+ ],
+ [
+  "en",
+  "I should receive WebSocket message within {timeout:f} seconds"
+ ],
+ [
+  "en",
+  "I store AI response text in variable \"{variable_name}\""
+ ],
+ [
+  "en",
+  "I store the response as \"{variable_name}\""
+ ],
+ [
+  "en",
+  "I use basic authentication with username \"{username}\" and password \"{password}\""
+ ],
+ [
+  "en",
+  "I use bearer token \"{token}\""
+ ],
+ [
+  "en",
+  "I use response field \"{field}\" as AI response"
+ ],
+ [
+  "en",
+  "I use response field \"{field}\" as AI response with fallback \"{fallback}\""
+ ],
+ [
+  "en",
+  "I use variable \"{variable_name}\" as AI response"
+ ],
+ [
+  "en",
+  "I validate request body against contract for {method} {path}"
+ ],
+ [
+  "en",
+  "I validate response headers against contract"
+ ],
+ [
+  "en",
+  "I validate the API contract endpoints"
+ ],
+ [
+  "en",
+  "I wait {seconds:f} seconds"
+ ],
+ [
+  "en",
+  "I {method} to \"{endpoint}\" with data file \"{file_path}\""
+ ],
+ [
+  "en",
+  "JWT token should be valid"
+ ],
+ [
+  "en",
+  "all responses should have status {status:d}"
+ ],
+ [
+  "en",
+  "all tests should complete successfully"
+ ],
+ [
+  "en",
+  "both responses should have status {status:d}"
+ ],
+ [
+  "en",
+  "circuit breaker \"{name}\" should be in state {state}"
+ ],
+ [
+  "en",
+  "circuit breaker should remain in CLOSED state"
+ ],
+ [
+  "en",
+  "each item in the response array should have \"{key}\""
+ ],
+ [
+  "en",
+  "error rate should be less than {percentage:d} percent"
+ ],
+ [
+  "en",
+  "performance metrics should be collected"
+ ],
+ [
+  "en",
+  "request and response should be logged to file"
+ ],
+ [
+  "en",
+  "response should match OpenAPI contract for {method} {path}"
+ ],
+ [
+  "en",
+  "some requests may fail due to injected errors"
+ ],
+ [
+  "en",
+  "the AI response length should be less than {max_chars:d} characters"
+ ],
+ [
+  "en",
+  "the AI response length should be more than {min_chars:d} characters"
+ ],
+ [
+  "en",
+  "the AI response semantic similarity to \"{expected}\" should be at least {threshold:f}"
+ ],
+ [
+  "en",
+  "the AI response semantic similarity to RAG context should be at least {threshold:f}"
+ ],
+ [
+  "en",
+  "the AI response should be grounded in RAG context with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "the AI response should be relevant to \"{prompt}\" with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "the AI response should contain \"{text}\""
+ ],
+ [
+  "en",
+  "the AI response should contain RAG facts with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "the AI response should contain required facts"
+ ],
+ [
+  "en",
+  "the AI response should cover required topics with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "the AI response should not be empty"
+ ],
+ [
+  "en",
+  "the AI response should not be toxic with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "the AI response should not contain \"{text}\""
+ ],
+ [
+  "en",
+  "the AI response tone should be \"{expected_tone}\" with threshold {threshold:f}"
+ ],
+ [
+  "en",
+  "the OAuth2 token should be valid"
+ ],
+ [
+  "en",
+  "the average response time should be less than {max_time:d} milliseconds"
+ ],
+ [
+  "en",
+  "the base URL is \"{base_url}\""
+ ],
+ [
+  "en",
+  "the cache should contain {count:d} entries"
+ ],
+ [
+  "en",
+  "the error rate should be less than {percentage:d} percent"
+ ],
+ [
+  "en",
+  "the judge evaluation should pass"
+ ],
+ [
+  "en",
+  "the judge score should be at least {min_score:f}"
+ ],
+ [
+  "en",
+  "the message should match AsyncAPI contract for channel \"{channel}\""
+ ],
+ [
+  "en",
+  "the p95 response time should be less than {max_time:d} milliseconds"
+ ],
+ [
+  "en",
+  "the rate limiter should have {remaining:d} requests remaining"
+ ],
+ [
+  "en",
+  "the report should be generated in \"{format}\" format"
+ ],
+ [
+  "en",
+  "the request should include Authorization header"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be \"{expected_value}\""
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be a boolean"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be a number"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be a string"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be a valid URL"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be a valid UUID"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be a valid email"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be an array"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be an object"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be null"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should be {expected_value:d}"
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should match \"{pattern}\""
+ ],
+ [
+  "en",
+  "the response \"{json_path}\" should not be null"
+ ],
+ [
+  "en",
+  "the response array \"{array_path}\" should contain an item with \"{key}\" equal to \"{value}\""
+ ],
+ [
+  "en",
+  "the response array should contain an item with \"{key}\" equal to \"{value}\""
+ ],
+ [
+  "en",
+  "the response array should contain objects with structure"
+ ],
+ [
+  "en",
+  "the response array should have more than {count:d} items"
+ ],
+ [
+  "en",
+  "the response array should have {count:d} items"
+ ],
+ [
+  "en",
+  "the response field \"{field_path}\" should be a valid ISO date"
+ ],
+ [
+  "en",
+  "the response field \"{field_path}\" should be a valid URL"
+ ],
+ [
+  "en",
+  "the response field \"{field_path}\" should be a valid UUID"
+ ],
+ [
+  "en",
+  "the response field \"{field_path}\" should be a valid email"
+ ],
+ [
+  "en",
+  "the response field \"{field_path}\" should be of type \"{expected_type}\""
+ ],
+ [
+  "en",
+  "the response field \"{field_path}\" should match pattern \"{pattern}\""
+ ],
+ [
+  "en",
+  "the response field \"{field}\" should be in range {min_val:d} to {max_val:d}"
+ ],
+ [
+  "en",
+  "the response field \"{key}\" should equal \"{value}\""
+ ],
+ [
+  "en",
+  "the response field \"{key}\" should equal {value:d}"
+ ],
+ [
+  "en",
+  "the response should be an array"
+ ],
+ [
+  "en",
+  "the response should be successful"
+ ],
+ [
+  "en",
+  "the response should be valid JSON"
+ ],
+ [
+  "en",
+  "the response should come from cache"
+ ],
+ [
+  "en",
+  "the response should complete despite injected latency"
+ ],
+ [
+  "en",
+  "the response should conform to JSON Schema"
+ ],
+ [
+  "en",
+  "the response should conform to JSON Schema from file \"{schema_file}\""
+ ],
+ [
+  "en",
+  "the response should contain"
+ ],
+ [
+  "en",
+  "the response should contain \"{key}\""
+ ],
+ [
+  "en",
+  "the response should contain all fields: {fields}"
+ ],
+ [
+  "en",
+  "the response should have consistent data types across array items"
+ ],
+ [
+  "en",
+  "the response should have nested structure"
+ ],
+ [
+  "en",
+  "the response should have required fields"
+ ],
+ [
+  "en",
+  "the response should match \"{json_path}\" with \"{matcher}\""
+ ],
+ [
+  "en",
+  "the response should match JSON file \"{file_path}\""
+ ],
+ [
+  "en",
+  "the response should match data contract specification"
+ ],
+ [
+  "en",
+  "the response should match schema \"{schema_name}\""
+ ],
+ [
+  "en",
+  "the response should match schema file \"{file_path}\""
+ ],
+ [
+  "en",
+  "the response should match the contract schema"
+ ],
+ [
+  "en",
+  "the response should match the schema"
+ ],
+ [
+  "en",
+  "the response status should be {status:d}"
+ ],
+ [
+  "en",
+  "the response time should be less than {max_time:f} seconds"
+ ],
+ [
+  "en",
+  "the response time should be less than {milliseconds:d} milliseconds"
+ ],
+ [
+  "en",
+  "the second response should come from cache"
+ ],
+ [
+  "en",
+  "the token should be valid"
+ ],
+ [
+  "en",
+  "the token should contain claim \"{claim}\" with value \"{value}\""
+ ],
+ [
+  "es",
+  "I set adaptive rate limit with initial {rps:d} requests per second"
+ ],
+ [
+  "es",
+  "I set rate limit to {count:d} requests per second"
+ ],
+ [
+  "es",
+  "I set throttle with delay {delay:d} milliseconds"
+ ],
+ [
+  "es",
+  "agrego el header \"{nombre_header}\" desde env \"{nombre_var_env}\""
+ ],
+ [
+  "es",
+  "agrego un interceptor de autorización con token \"{token}\""
+ ],
+ [
+  "es",
+  "agrego un interceptor de registro"
+ ],
+ [
+  "es",
+  "agrego un interceptor de registro de respuestas"
+ ],
+ [
+  "es",
+  "agrego un interceptor de timestamp con nombre de encabezado \"{header_name}\""
+ ],
+ [
+  "es",
+  "algunas solicitudes pueden fallar debido a errores inyectados"
+ ],
+ [
+  "es",
+  "almaceno el texto de respuesta de IA en la variable \"{variable_name}\""
+ ],
+ [
+  "es",
+  "ambas respuestas deben tener estado {status:d}"
+ ],
+ [
+  "es",
+  "caché debe contener {count:d} entrada"
+ ],
+ [
+  "es",
+  "cada elemento debe tener el campo \"{campo}\""
+ ],
+ [
+  "es",
+  "cargo datos de prueba del archivo \"{file_path}\""
+ ],
+ [
+  "es",
+  "cargo el contexto RAG desde el archivo \"{file_path}\""
+ ],
+ [
+  "es",
+  "cargo el contexto RAG desde la URL \"{url}\""
+ ],
+ [
+  "es",
+  "cargo el contexto RAG desde múltiples archivos"
+ ],
+ [
+  "es",
+  "cargo el contrato AsyncAPI desde \"{contract_file}\""
+ ],
+ [
+  "es",
+  "cargo el contrato OpenAPI desde \"{contract_file}\""
+ ],
+ [
+  "es",
+  "cargo especificación AsyncAPI desde \"{file_path}\""
+ ],
+ [
+  "es",
+  "cargo especificación OpenAPI desde \"{spec_file}\""
+ ],
+ [
+  "es",
+  "cierro la conexión WebSocket"
+ ],
+ [
+  "es",
+  "circuit breaker debe permanecer en estado CLOSED"
+ ],
+ [
+  "es",
+  "configuro JWT con secreto=\"{secret}\" y algoritmo=\"{algorithm}\""
+ ],
+ [
+  "es",
+  "configuro OAuth2 con client_id=\"{client_id}\" client_secret=\"{client_secret}\" token_url=\"{token_url}\""
+ ],
+ [
+  "es",
+  "configuro el juez de IA con proveedor \"{provider}\" y modelo \"{model}\""
+ ],
+ [
+  "es",
+  "creo token JWT con payload"
+ ],
+ [
+  "es",
+  "creo token JWT con payload:"
+ ],
+ [
+  "es",
+  "creo un circuit breaker llamado \"{name}\" con failure_threshold={failure_threshold:d}, success_threshold={success_threshold:d}, y timeout={timeout:d}"
+ ],
+ [
+  "es",
+  "creo un circuit breaker llamado \"{name}\" con failure_threshold={threshold:d}"
+ ],
+ [
+  "es",
+  "cuando hago la misma petición GET a \"{endpoint}\" nuevamente"
+ ],
+ [
+  "es",
+  "debo generar reportes en formatos"
+ ],
+ [
+  "es",
+  "debo recibir un mensaje WebSocket dentro de {timeout:f} segundos"
+ ],
+ [
+  "es",
+  "debo tener la variable \"{variable_name}\" con valor \"{expected_value}\""
+ ],
+ [
+  "es",
+  "debo tener métricas de rendimiento"
+ ],
+ [
+  "es",
+  "deshabilito el caché de respuestas"
+ ],
+ [
+  "es",
+  "deshabilito el guardado de peticiones y respuestas"
+ ],
+ [
+  "es",
+  "deshabilito ingeniería del caos"
+ ],
+ [
+  "es",
+  "ejecuto consulta GraphQL"
+ ],
+ [
+  "es",
+  "ejecuto mutación GraphQL"
+ ],
+ [
+  "es",
+  "ejecuto prueba dirigida por datos para cada fila"
+ ],
+ [
+  "es",
+  "ejecuto suite de pruebas"
+ ],
+ [
+  "es",
+  "el array \"{ruta_array}\" debe contener un elemento con \"{campo}\" igual a \"{valor}\""
+ ],
+ [
+  "es",
+  "el array de respuesta debe contener objetos con estructura"
+ ],
+ [
+  "es",
+  "el array de respuesta debe tener más de {count:d} elementos"
+ ],
+ [
+  "es",
+  "el cache debe contener {count:d} entradas"
+ ],
+ [
+  "es",
+  "el caché debe contener {count:d} entradas"
+ ],
+ [
+  "es",
+  "el campo \"{campo}\" debe ser \"{valor}\""
+ ],
+ [
+  "es",
+  "el campo \"{campo}\" debe ser igual a la variable \"{variable}\""
+ ],
+ [
+  "es",
+  "el campo \"{campo}\" debe ser {valor:d}"
+ ],
+ [
+  "es",
+  "el campo \"{field}\" debe estar en rango {min_val:d} a {max_val:d}"
+ ],
+ [
+  "es",
+  "el campo de respuesta \"{field_path}\" debe coincidir con el patrón \"{pattern}\""
+ ],
+ [
+  "es",
+  "el campo de respuesta \"{field_path}\" debe ser de tipo \"{expected_type}\""
+ ],
+ [
+  "es",
+  "el campo de respuesta \"{field_path}\" debe ser un UUID válido"
+ ],
+ [
+  "es",
+  "el campo de respuesta \"{field_path}\" debe ser un email válido"
+ ],
+ [
+  "es",
+  "el campo de respuesta \"{field_path}\" debe ser una URL válida"
+ ],
+ [
+  "es",
+  "el campo de respuesta \"{field_path}\" debe ser una fecha ISO válida"
+ ],
+ [
+  "es",
+  "el circuit breaker \"{name}\" debe estar en estado {state}"
+ ],
+ [
+  "es",
+  "el código de respuesta debe ser {status:d}"
+ ],
+ [
+  "es",
+  "el limitador de velocidad debe tener {remaining:d} solicitudes restantes"
+ ],
+ [
+  "es",
+  "el mensaje debe coincidir con el contrato AsyncAPI para canal \"{channel}\""
+ ],
+ [
+  "es",
+  "el reporte debe ser generado en formato \"{format}\""
+ ],
+ [
+  "es",
+  "el tiempo de respuesta debe ser menor a {max_time:f} segundos"
+ ],
+ [
+  "es",
+  "el tiempo de respuesta debe ser menor a {milliseconds:d} milisegundos"
+ ],
+ [
+  "es",
+  "el tiempo de respuesta p95 debe ser menor a {max_time:d} milisegundos"
+ ],
+ [
+  "es",
+  "el tiempo promedio de respuesta debe ser menor a {max_time:d} milisegundos"
+ ],
+ [
+  "es",
+  "el token JWT debe ser válido"
+ ],
+ [
+  "es",
+  "el token OAuth2 debe ser válido"
+ ],
+ [
+  "es",
+  "el token debe contener claim \"{claim}\" con valor \"{value}\""
+ ],
+ [
+  "es",
+  "el token debe ser válido"
+ ],
+ [
+  "es",
+  "el tono de la respuesta de IA debe ser \"{expected_tone}\" con umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "envío la misma solicitud GET a \"{endpoint}\" nuevamente"
+ ],
+ [
+  "es",
+  "envío mensaje WebSocket"
+ ],
+ [
+  "es",
+  "envío {count:d} peticiones GET a \"{endpoint}\""
+ ],
+ [
+  "es",
+  "envío {count:d} solicitudes GET a \"{endpoint}\""
+ ],
+ [
+  "es",
+  "espero {segundos:f} segundos"
+ ],
+ [
+  "es",
+  "establezco alerta de rendimiento para \"{metric}\" con umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "establezco el acelerador con retraso de {delay_ms:f} milisegundos"
+ ],
+ [
+  "es",
+  "establezco el contexto RAG"
+ ],
+ [
+  "es",
+  "establezco el contexto RAG como \"{text}\""
+ ],
+ [
+  "es",
+  "establezco el criterio del juez"
+ ],
+ [
+  "es",
+  "establezco el criterio del juez como \"{criteria}\""
+ ],
+ [
+  "es",
+  "establezco el directorio de salida a \"{directory}\""
+ ],
+ [
+  "es",
+  "establezco el header \"{nombre_header}\" desde env \"{nombre_var_env}\""
+ ],
+ [
+  "es",
+  "establezco el header \"{nombre}\" a \"{valor}\""
+ ],
+ [
+  "es",
+  "establezco el límite de velocidad a {count:d} peticiones por segundo"
+ ],
+ [
+  "es",
+  "establezco el límite de velocidad a {requests_per_second:f} solicitudes por segundo"
+ ],
+ [
+  "es",
+  "establezco el parámetro \"{nombre}\" a \"{valor}\""
+ ],
+ [
+  "es",
+  "establezco el prompt del juez como \"{prompt}\""
+ ],
+ [
+  "es",
+  "establezco el texto de respuesta de IA"
+ ],
+ [
+  "es",
+  "establezco el texto de respuesta de IA como \"{text}\""
+ ],
+ [
+  "es",
+  "establezco la política de reintentos con max_retries={count:d} y backoff_strategy=\"{strategy}\""
+ ],
+ [
+  "es",
+  "establezco la política de reintentos con max_retries={count:d}, initial_delay={delay:f}, y max_delay={max_delay:f}"
+ ],
+ [
+  "es",
+  "establezco la política de reintentos con max_retries={max_retries:d} y backoff_strategy=\"{strategy}\""
+ ],
+ [
+  "es",
+  "establezco la política de reintentos con max_retries={max_retries:d}, initial_delay={initial_delay:f}, y max_delay={max_delay:f}"
+ ],
+ [
+  "es",
+  "establezco la variable \"{nombre}\" a \"{valor}\""
+ ],
+ [
+  "es",
+  "establezco la variable \"{nombre}\" a {valor:d}"
+ ],
+ [
+  "es",
+  "establezco la variable \"{nombre}\" al JSON"
+ ],
+ [
+  "es",
+  "establezco límite de velocidad adaptativo con inicial {rps:d} peticiones por segundo"
+ ],
+ [
+  "es",
+  "establezco nivel de registro a \"{level}\""
+ ],
+ [
+  "es",
+  "establezco throttle con retraso {delay:d} milisegundos"
+ ],
+ [
+  "es",
+  "evalúo la respuesta de IA con el juez contra el contexto RAG usando criterio \"{criteria}\" y umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "evalúo la respuesta de IA con el juez contra el contexto RAG usando umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "evalúo la respuesta de IA con el juez usando criterio \"{criteria}\" y umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "evalúo la respuesta de IA con el juez usando umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "genero reporte en formato \"{format}\""
+ ],
+ [
+  "es",
+  "guardo el valor del campo \"{campo}\" en la variable \"{variable}\""
+ ],
+ [
+  "es",
+  "guardo la respuesta completa en la variable \"{variable}\""
+ ],
+ [
+  "es",
+  "guardo la respuesta en el archivo \"{ruta_archivo}\""
+ ],
+ [
+  "es",
+  "guardo la variable \"{nombre_var}\" en el archivo \"{ruta_archivo}\""
+ ],
+ [
+  "es",
+  "habilito el caché de respuestas con TTL de {ttl:d} segundos"
+ ],
+ [
+  "es",
+  "habilito el guardado de peticiones y respuestas"
+ ],
+ [
+  "es",
+  "habilito el guardado de peticiones y respuestas en el directorio \"{directory}\""
+ ],
+ [
+  "es",
+  "habilito el monitoreo de rendimiento"
+ ],
+ [
+  "es",
+  "habilito ingeniería del caos"
+ ],
+ [
+  "es",
+  "habilito registro de solicitud al directorio \"{directory}\""
+ ],
+ [
+  "es",
+  "hago PATCH a \"{endpoint}\" con archivo JSON \"{ruta_archivo}\""
+ ],
+ [
+  "es",
+  "hago POST a \"{endpoint}\" con archivo JSON \"{ruta_archivo}\""
+ ],
+ [
+  "es",
+  "hago PUT a \"{endpoint}\" con archivo JSON \"{ruta_archivo}\""
+ ],
+ [
+  "es",
+  "hago una petición DELETE a \"{endpoint}\""
+ ],
+ [
+  "es",
+  "hago una petición GET a \"{endpoint}\""
+ ],
+ [
+  "es",
+  "hago una petición PATCH a \"{endpoint}\" con el cuerpo"
+ ],
+ [
+  "es",
+  "hago una petición PATCH a \"{endpoint}\" con el cuerpo:"
+ ],
+ [
+  "es",
+  "hago una petición POST a \"{endpoint}\""
+ ],
+ [
+  "es",
+  "hago una petición POST a \"{endpoint}\" con el cuerpo"
+ ],
+ [
+  "es",
+  "hago una petición POST a \"{endpoint}\" con el cuerpo:"
+ ],
+ [
+  "es",
+  "hago una petición PUT a \"{endpoint}\" con el cuerpo"
+ ],
+ [
+  "es",
+  "hago una petición PUT a \"{endpoint}\" con el cuerpo:"
+ ],
+ [
+  "es",
+  "hago una petición {método} a \"{endpoint}\" con la variable \"{nombre_var}\""
+ ],
+ [
+  "es",
+  "imprimo el resultado de la evaluación del juez"
+ ],
+ [
+  "es",
+  "imprimo el texto de respuesta de IA"
+ ],
+ [
+  "es",
+  "imprimo la respuesta"
+ ],
+ [
+  "es",
+  "inyecto latencia entre {min_ms:f} y {max_ms:f} milisegundos"
+ ],
+ [
+  "es",
+  "inyecto tasa de error del {percentage:f} por ciento"
+ ],
+ [
+  "es",
+  "la URL base es \"{base_url}\""
+ ],
+ [
+  "es",
+  "la evaluación del juez debe pasar"
+ ],
+ [
+  "es",
+  "la longitud de la respuesta de IA debe ser mayor a {min_chars:d} caracteres"
+ ],
+ [
+  "es",
+  "la longitud de la respuesta de IA debe ser menor a {max_chars:d} caracteres"
+ ],
+ [
+  "es",
+  "la petición debe incluir encabezado Authorization"
+ ],
+ [
+  "es",
+  "la puntuación del juez debe ser al menos {min_score:f}"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser \"{valor_esperado}\""
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser null"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser un UUID válido"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser un array"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser un booleano"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser un email válido"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser un número"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser un objeto"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser una URL válida"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser una cadena"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" debe ser {valor_esperado:d}"
+ ],
+ [
+  "es",
+  "la respuesta \"{ruta_json}\" no debe ser null"
+ ],
+ [
+  "es",
+  "la respuesta de IA debe contener \"{text}\""
+ ],
+ [
+  "es",
+  "la respuesta de IA debe contener hechos del contexto RAG con umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "la respuesta de IA debe contener los hechos requeridos"
+ ],
+ [
+  "es",
+  "la respuesta de IA debe cubrir los temas requeridos con umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "la respuesta de IA debe estar fundamentada en el contexto RAG con umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "la respuesta de IA debe ser relevante para \"{prompt}\" con umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "la respuesta de IA no debe contener \"{text}\""
+ ],
+ [
+  "es",
+  "la respuesta de IA no debe estar vacía"
+ ],
+ [
+  "es",
+  "la respuesta de IA no debe ser tóxica con umbral {threshold:f}"
+ ],
+ [
+  "es",
+  "la respuesta debe coincidir con contrato OpenAPI para {method} {path}"
+ ],
+ [
+  "es",
+  "la respuesta debe coincidir con el archivo de esquema \"{ruta_archivo}\""
+ ],
+ [
+  "es",
+  "la respuesta debe coincidir con el esquema"
+ ],
+ [
+  "es",
+  "la respuesta debe coincidir con el esquema \"{schema_name}\""
+ ],
+ [
+  "es",
+  "la respuesta debe coincidir con el esquema del contrato"
+ ],
+ [
+  "es",
+  "la respuesta debe coincidir con especificación completa del contrato de datos"
+ ],
+ [
+  "es",
+  "la respuesta debe completarse a pesar de la latencia inyectada"
+ ],
+ [
+  "es",
+  "la respuesta debe contener el campo \"{campo}\""
+ ],
+ [
+  "es",
+  "la respuesta debe contener todos los campos: {fields}"
+ ],
+ [
+  "es",
+  "la respuesta debe cumplir con el esquema JSON"
+ ],
+ [
+  "es",
+  "la respuesta debe cumplir con el esquema JSON del archivo \"{schema_file}\""
+ ],
+ [
+  "es",
+  "la respuesta debe provenir del caché"
+ ],
+ [
+  "es",
+  "la respuesta debe ser exitosa"
+ ],
+ [
+  "es",
+  "la respuesta debe ser un array"
+ ],
+ [
+  "es",
+  "la respuesta debe ser una lista"
+ ],
+ [
+  "es",
+  "la respuesta debe tener estructura anidada"
+ ],
+ [
+  "es",
+  "la respuesta debe tener la siguiente estructura"
+ ],
+ [
+  "es",
+  "la respuesta debe tener la siguiente estructura:"
+ ],
+ [
+  "es",
+  "la respuesta debe tener los campos requeridos"
+ ],
+ [
+  "es",
+  "la respuesta debe tener más de 0 elementos"
+ ],
+ [
+  "es",
+  "la respuesta debe tener tipos de datos consistentes en elementos del array"
+ ],
+ [
+  "es",
+  "la respuesta debe tener {count:d} elementos"
+ ],
+ [
+  "es",
+  "la segunda respuesta debe provenir del caché"
+ ],
+ [
+  "es",
+  "la segunda respuesta debe venir del cache"
+ ],
+ [
+  "es",
+  "la similitud semántica de la respuesta de IA con \"{expected}\" debe ser al menos {threshold:f}"
+ ],
+ [
+  "es",
+  "la similitud semántica de la respuesta de IA con el contexto RAG debe ser al menos {threshold:f}"
+ ],
+ [
+  "es",
+  "la solicitud debe incluir encabezado Authorization"
+ ],
+ [
+  "es",
+  "la tasa de error debe ser menor al {percentage:d} por ciento"
+ ],
+ [
+  "es",
+  "la variable \"{variable1}\" debe ser igual a la variable \"{variable2}\""
+ ],
+ [
+  "es",
+  "la variable \"{variable1}\" no debe ser igual a la variable \"{variable2}\""
+ ],
+ [
+  "es",
+  "me conecto a WebSocket \"{url}\""
+ ],
+ [
+  "es",
+  "me desconecto de WebSocket"
+ ],
+ [
+  "es",
+  "métricas de rendimiento deben ser recopiladas"
+ ],
+ [
+  "es",
+  "obtengo el valor \"{env_var_name}\" desde env y lo almaceno en \"{variable_name}\""
+ ],
+ [
+  "es",
+  "que agrego el header \"{nombre_header}\" desde env \"{nombre_var_env}\""
+ ],
+ [
+  "es",
+  "que agrego un interceptor de autorización con token \"{token}\" y esquema \"{schema}\""
+ ],
+ [
+  "es",
+  "que configuro JWT con secret \"{secret}\" y algoritmo \"{algorithm}\""
+ ],
+ [
+  "es",
+  "que configuro OAuth2 con:"
+ ],
+ [
+  "es",
+  "que establezco el header \"{nombre_header}\" desde env \"{nombre_var_env}\""
+ ],
+ [
+  "es",
+  "que establezco el header \"{nombre}\" a \"{valor}\""
+ ],
+ [
+  "es",
+  "que establezco el límite de velocidad a {count:d} peticiones por segundo"
+ ],
+ [
+  "es",
+  "que establezco el parámetro \"{nombre}\" a \"{valor}\""
+ ],
+ [
+  "es",
+  "que establezco la política de reintentos con max_retries={count:d} y backoff_strategy=\"{strategy}\""
+ ],
+ [
+  "es",
+  "que establezco la política de reintentos con max_retries={count:d}, initial_delay={delay:f}, y max_delay={max_delay:f}"
+ ],
+ [
+  "es",
+  "que establezco la variable \"{nombre}\" a \"{valor}\""
+ ],
+ [
+  "es",
+  "que establezco la variable \"{nombre}\" a {valor:d}"
+ ],
+ [
+  "es",
+  "que establezco la variable \"{nombre}\" al JSON"
+ ],
+ [
+  "es",
+  "que establezco límite de velocidad adaptativo con inicial {rps:d} peticiones por segundo"
+ ],
+ [
+  "es",
+  "que establezco throttle con retraso {delay:d} milisegundos"
+ ],
+ [
+  "es",
+  "que habilito caching de respuestas con TTL {ttl:d} segundos"
+ ],
+ [
+  "es",
+  "que la URL base es \"{base_url}\""
+ ],
+ [
+  "es",
+  "que tengo un cliente Judo API"
+ ],
+ [
+  "es",
+  "que uso autenticación básica con usuario \"{usuario}\" y contraseña \"{password}\""
+ ],
+ [
+  "es",
+  "que uso el token bearer \"{token}\""
+ ],
+ [
+  "es",
+  "solicitud y respuesta deben registrarse en archivo"
+ ],
+ [
+  "es",
+  "tasa de error debe ser menor al {percentage:d} por ciento"
+ ],
+ [
+  "es",
+  "tengo un cliente Judo API"
+ ],
+ [
+  "es",
+  "todas las pruebas deben completarse exitosamente"
+ ],
+ [
+  "es",
+  "todas las respuestas deben tener estado {status:d}"
+ ],
+ [
+  "es",
+  "uso autenticación básica con usuario \"{usuario}\" y contraseña \"{password}\""
+ ],
+ [
+  "es",
+  "uso el campo de respuesta \"{field}\" como respuesta de IA"
+ ],
+ [
+  "es",
+  "uso el campo de respuesta \"{field}\" como respuesta de IA con valor por defecto \"{fallback}\""
+ ],
+ [
+  "es",
+  "uso el token bearer \"{token}\""
+ ],
+ [
+  "es",
+  "uso la variable \"{variable_name}\" como respuesta de IA"
+ ],
+ [
+  "es",
+  "valido el cuerpo de petición contra contrato para {method} {path}"
+ ],
+ [
+  "es",
+  "valido los endpoints del contrato de API"
+ ],
+ [
+  "es",
+  "valido los headers de respuesta contra contrato"
+ ],
+ [
+  "es",
+  "when I send the same GET request to \"{endpoint}\" again"
+ ]
+]

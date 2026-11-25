@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "judo-framework"
-version = "1.6.9"
+version = "1.7.0"
 description = "A comprehensive API testing framework for Python, inspired by Karate Framework"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -47,6 +47,8 @@ xml = ["lxml>=4.9.0"]
 excel = ["openpyxl>=3.0.0"]
 websocket = ["websockets>=10.0"]
 graphql = ["graphql-core>=3.2.0"]
+grpc = ["grpcio>=1.50.0", "grpcio-reflection>=1.50.0", "protobuf>=4.21.0"]
+mcp = ["mcp>=1.2.0; python_version >= '3.10'"]
 genai = [
     "openai>=1.0.0",
     "anthropic>=0.20.0",

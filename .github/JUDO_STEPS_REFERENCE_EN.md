@@ -282,6 +282,260 @@ Validates a JSONPath with a matcher pattern (supports Karate-style patterns).
 
 ---
 
+## New steps in v1.7.0
+
+### HTTP settings, files, XML/SOAP basics, security headers, polling, SQL, pagination
+
+#### `I poll "{endpoint}" until the response "{json_path}" equals "{expected}" within {seconds:d} seconds`
+Repeat GET until a JSON path equals the expected value or time runs out.
+#### `I poll "{endpoint}" until the status is {status:d} within {seconds:d} seconds`
+Repeat GET until the status code matches or time runs out.
+#### `I connect to the SQLite database "{path}"`
+Open a SQLite database for data setup and verification.
+#### `I execute the SQL "{sql}"`
+Execute a SQL statement (INSERT, UPDATE, DELETE, DDL).
+#### `I save the first value of the SQL query "{sql}" as "{variable}"`
+Run a SQL query and store the first column of the first row in a variable.
+#### `the SQL query "{sql}" should return {count:d} rows`
+Validate the number of rows a SQL query returns.
+#### `the SQL query "{sql}" should return the value "{expected}"`
+Validate the first value returned by a SQL query.
+#### `I collect all pages from "{endpoint}" using the "{page_param}" parameter up to {max_pages:d} pages as "{variable}"`
+Walk a paginated GET endpoint and store all items in a variable.
+#### `I set the timeout to {seconds:g} seconds`
+Set the HTTP request timeout.
+#### `I disable SSL verification`
+Disable TLS certificate verification (testing only).
+#### `I use the CA bundle "{path}"`
+Verify TLS using a custom CA bundle file.
+#### `I use the client certificate "{cert}" and key "{key}"`
+Use a client certificate and key (mutual TLS).
+#### `I use the proxy "{url}"`
+Send requests through an HTTP proxy.
+#### `I connect to the database "{url}"`
+Connect to SQLite, PostgreSQL or MySQL using a URL.
+#### `I upload the file "{path}" as "{field}" to "{endpoint}"`
+Upload a file as multipart/form-data with POST.
+#### `the response SHA-256 should be "{expected}"`
+Validate the SHA-256 digest of the response body.
+#### `the response header "{name}" should be "{value}"`
+Validate a response header value.
+#### `the response header "{name}" should exist`
+Validate a response header is present.
+#### `the response should include security headers`
+Validate HSTS, nosniff and clickjacking protection headers.
+#### `the response XML "{xpath}" should be "{expected}"`
+Validate the first value selected by an XPath.
+#### `the response XML "{xpath}" should select {count:d} nodes`
+Validate how many nodes an XPath selects.
+#### `I extract the XML "{xpath}" as "{variable}"`
+Store the first value selected by an XPath in a variable.
+#### `the response should equal the JSON ignoring "{fields}"`
+Compare the response with the JSON in the step text, ignoring volatile fields.
+#### `I send a SOAP request to "{endpoint}" with action "{action}"`
+Send the XML in the step text as a SOAP request.
+#### `the response status should be a client error`
+Validate the status is 4xx.
+#### `the response status should be a server error`
+Validate the status is 5xx.
+#### `the response status should be one of "{codes}"`
+Validate the status is one of a comma separated list of codes.
+
+### Conditional and control-flow steps (if / otherwise, loops, retry, soft assertions, skip). The block of steps goes in a docstring; use ''' for a docstring nested inside it
+
+#### `if the response status is {status:d} then run`
+Run the docstring steps when the response status matches.
+#### `if the response status is not {status:d} then run`
+Run the docstring steps when the response status differs.
+#### `if the response "{json_path}" equals "{expected}" then run`
+Run the docstring steps when a JSON path equals a value.
+#### `if the response "{json_path}" exists then run`
+Run the docstring steps when a JSON path exists.
+#### `if the response "{json_path}" does not exist then run`
+Run the docstring steps when a JSON path does not exist.
+#### `if the response "{json_path}" contains "{text}" then run`
+Run the docstring steps when a JSON value (or array item) contains the text.
+#### `if the response "{json_path}" is greater than {number:g} then run`
+Run the docstring steps when a numeric JSON value is greater than a number.
+#### `if the response "{json_path}" is less than {number:g} then run`
+Run the docstring steps when a numeric JSON value is less than a number.
+#### `if the variable "{name}" equals "{expected}" then run`
+Run the docstring steps when a variable equals a value.
+#### `if the variable "{name}" is defined then run`
+Run the docstring steps when a variable is defined.
+#### `if the variable "{name}" is not defined then run`
+Run the docstring steps when a variable is not defined.
+#### `if the variable "{name}" is empty then run`
+Run the docstring steps when a variable is missing or empty.
+#### `if the environment is "{env}" then run`
+Run the docstring steps when JUDO_ENV / KARATE_ENV equals the value.
+#### `if the environment variable "{name}" is set then run`
+Run the docstring steps when an OS environment variable is set.
+#### `if the scenario has the tag "{tag}" then run`
+Run the docstring steps when the scenario carries a tag.
+#### `if the file "{path}" exists then run`
+Run the docstring steps when a file exists.
+#### `if the response header "{name}" exists then run`
+Run the docstring steps when a response header is present.
+#### `if the response body contains "{text}" then run`
+Run the docstring steps when the raw response body contains the text.
+#### `if the response time is greater than {ms:d} milliseconds then run`
+Run the docstring steps when the response was slower than the limit.
+#### `otherwise run`
+Run the docstring steps when the previous 'if' condition was false.
+#### `I skip the scenario if the variable "{name}" equals "{expected}"`
+Skip the rest of the scenario when a variable equals a value.
+#### `I skip the scenario if the environment is "{env}"`
+Skip the rest of the scenario in a given environment.
+#### `I skip the scenario if the response status is {status:d}`
+Skip the rest of the scenario when the response status matches.
+#### `I fail the test with the message "{message}"`
+Fail the scenario with a custom message.
+#### `the variable "{name}" should be defined`
+Validate a variable is defined.
+#### `the variable "{name}" should not be defined`
+Validate a variable is not defined.
+#### `the variable "{name}" should be empty`
+Validate a variable is missing or empty.
+#### `the environment should be "{env}"`
+Validate the current environment name.
+#### `I repeat {count:d} times`
+Run the docstring steps N times (variable ${iteration} = 1..N).
+#### `I repeat until the response "{json_path}" equals "{expected}" up to {count:d} times`
+Run the docstring steps until a JSON path equals a value, at most N times.
+#### `for each item in the response "{json_path}" run`
+Run the docstring steps for each array element (variables ${item} and ${index}).
+#### `I retry the following steps up to {count:d} times with {seconds:g} seconds delay`
+Retry the docstring steps while they fail.
+#### `I verify all of the following`
+Run each docstring line as a step and report every failure at the end.
+
+### Non-JSON services: XML/SOAP, forms, text, CSV, binary downloads, Server-Sent Events, GraphQL
+
+#### `the response should be valid XML`
+Validate the response body is well-formed XML.
+#### `the response XML "{xpath}" should exist`
+Validate an XPath selects at least one node.
+#### `the response XML "{xpath}" should not exist`
+Validate an XPath selects nothing.
+#### `the response XML "{xpath}" should contain "{text}"`
+Validate a node selected by an XPath contains a text.
+#### `the response XML "{xpath}" should match "{pattern}"`
+Validate the first node selected by an XPath matches a regex.
+#### `the response XML should conform to the XSD "{path}"`
+Validate the response XML against an XSD schema (needs lxml).
+#### `the SOAP response should not be a fault`
+Validate the SOAP response is not a fault.
+#### `the SOAP fault code should be "{code}"`
+Validate the SOAP fault code.
+#### `the SOAP fault message should contain "{text}"`
+Validate the SOAP fault message contains a text.
+#### `I send a SOAP 1.2 request to "{endpoint}" with action "{action}"`
+Send the XML in the step text as a SOAP 1.2 request.
+#### `I send the SOAP envelope file "{path}" to "{endpoint}" with action "{action}"`
+Send a SOAP 1.1 request whose envelope is read from a file.
+#### `I send an XML POST to "{endpoint}"`
+POST the XML in the step text with Content-Type application/xml.
+#### `I send a form POST to "{endpoint}"`
+POST application/x-www-form-urlencoded using a table with columns field | value.
+#### `I set the form field "{name}" to "{value}"`
+Stage a form field for the next 'I submit the form'.
+#### `I submit the form to "{endpoint}"`
+POST the staged form fields as application/x-www-form-urlencoded.
+#### `the response text should contain "{text}"`
+Validate the response text contains a string.
+#### `the response text should not contain "{text}"`
+Validate the response text does not contain a string.
+#### `the response text should match "{pattern}"`
+Validate the response text matches a regular expression.
+#### `the response text should equal "{text}"`
+Validate the whole response text (trimmed).
+#### `the response content type should be "{content_type}"`
+Validate the Content-Type header starts with a value.
+#### `the response size should be less than {size:d} bytes`
+Validate the response body size.
+#### `the response should be a CSV with {count:d} rows`
+Validate the number of CSV data rows (header excluded).
+#### `the CSV column "{column}" should contain "{value}"`
+Validate a CSV column has a value in some row.
+#### `the response bytes should equal the file "{path}"`
+Validate the response bytes are identical to a file.
+#### `I download "{endpoint}" to the file "{path}"`
+GET an endpoint and save the raw bytes to a file.
+#### `the response should have the download filename "{name}"`
+Validate the filename in Content-Disposition.
+#### `I save the response text as "{variable}"`
+Store the raw response text in a variable.
+#### `I open the SSE stream "{endpoint}"`
+Open a Server-Sent Events stream and collect events in the background.
+#### `I should receive an SSE event "{event}" within {seconds:g} seconds`
+Wait for an SSE event by name.
+#### `I should receive an SSE event with data containing "{text}" within {seconds:g} seconds`
+Wait for an SSE event whose data contains a text.
+#### `I should receive {count:d} SSE events within {seconds:g} seconds`
+Wait until at least N SSE events have arrived.
+#### `the last SSE event data "{json_path}" should be "{expected}"`
+Validate a JSON field of the last SSE event data.
+#### `I close the SSE stream`
+Close the SSE stream.
+#### `I set the GraphQL variables`
+Set the variables (JSON in the step text) for the next GraphQL request.
+#### `I send the GraphQL query to "{endpoint}"`
+Send the GraphQL query in the step text.
+#### `I send the GraphQL mutation to "{endpoint}"`
+Send the GraphQL mutation in the step text.
+#### `the GraphQL response should not have errors`
+Validate the GraphQL response has no errors.
+#### `the GraphQL response should have an error containing "{text}"`
+Validate a GraphQL error message contains a text.
+#### `the GraphQL data "{json_path}" should be "{expected}"`
+Validate a value inside the GraphQL data.
+#### `the GraphQL data "{json_path}" should exist`
+Validate a path exists inside the GraphQL data.
+#### `the GraphQL data "{json_path}" should have {count:d} items`
+Validate the size of an array inside the GraphQL data.
+#### `I save the GraphQL data "{json_path}" as "{variable}"`
+Store a value of the GraphQL data in a variable.
+#### `I introspect the GraphQL schema at "{endpoint}"`
+Run the introspection query.
+#### `the GraphQL schema should have the type "{name}"`
+Validate a type exists in the introspected schema.
+
+### gRPC through server reflection (needs `pip install "judo-framework[grpc]"`)
+
+#### `I connect to the gRPC server "{target}"`
+Open an insecure gRPC channel (host:port).
+#### `I connect to the gRPC server "{target}" with TLS`
+Open a TLS gRPC channel using the system trust store.
+#### `I set the gRPC metadata "{key}" to "{value}"`
+Add a metadata (header) sent with every gRPC call.
+#### `I set the gRPC timeout to {seconds:g} seconds`
+Set the deadline of gRPC calls.
+#### `I send the gRPC request "{method}"`
+Call a unary method; the request (JSON) goes in the step text.
+#### `I send the gRPC streaming request "{method}"`
+Call a server-streaming method; the request (JSON) goes in the step text.
+#### `the gRPC status should be "{status}"`
+Validate the gRPC status code name (OK, NOT_FOUND, UNAUTHENTICATED, ...).
+#### `the gRPC response "{json_path}" should be "{expected}"`
+Validate a field of the gRPC response.
+#### `the gRPC response should contain "{field}"`
+Validate the gRPC response has a field.
+#### `I save the gRPC response "{json_path}" as "{variable}"`
+Store a field of the gRPC response in a variable.
+#### `the gRPC server should expose the service "{service}"`
+Validate (via reflection) that a service is exposed.
+#### `the gRPC server should expose the method "{method}"`
+Validate (via reflection) that a method exists.
+#### `the gRPC stream should return {count:d} messages`
+Validate how many messages the server stream returned.
+#### `the gRPC stream message {index:d} "{json_path}" should be "{expected}"`
+Validate a field of one stream message (0-based index).
+#### `the gRPC call should take less than {ms:d} milliseconds`
+Validate the duration of the last gRPC call.
+#### `I close the gRPC connection`
+Close the gRPC channel.
+---
 ## Important Notes
 
 - **Variable Interpolation**: Use `{variableName}` syntax in URLs, headers, and JSON bodies.

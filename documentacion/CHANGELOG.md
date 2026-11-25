@@ -2,6 +2,64 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.7.0] - 2026-11-24
+### 🤖 Framework listo para IA, pasos condicionales y servicios no JSON
+
+Resumen: 319 pasos distintos en inglés y 317 en español (contados por función, sin variantes de redacción; incluye GenAI). Unos 130 pasos nuevos por idioma. Todos los pasos de v1.6.10 siguen existiendo.
+
+#### ⚠️ Cambios de comportamiento
+- **Aislamiento entre escenarios**: la autenticación básica, las cookies y lo activado por pasos (retry, caché, rate limit, chaos, interceptores, monitor de rendimiento, circuit breakers, JWT) ya no pasan al escenario siguiente.
+- **Timeout por defecto**: toda petición tiene timeout de 30 s (`JUDO_TIMEOUT`). Antes no había ninguno.
+- **Interpolación**: `${var}` con un dict o lista se inserta como JSON, no como `repr` de Python.
+
+#### 🐛 Correcciones
+- **Los timeouts nunca se aplicaban**: `requests.Session.timeout` no existe. Ahora se pasan en cada petición; también `I set the timeout to N seconds`.
+- **`${var}` producía `$valor`**: se reemplazaba primero `{var}`. Nuevo motor único (`judo.utils.interpolation`) con `${a.b[0]}`, `${x:-defecto}`, `${env.X}`, `${uuid()}`, `${now()}`, `${timestamp()}`. `{var}` sigue funcionando. `JUDO_STRICT_VARS=true` convierte variables desconocidas en errores claros.
+- **Los interceptores no tenían efecto**: se configuraban pero nunca se aplicaban a las peticiones.
+- **~35 pasos de validación fallaban siempre** con `'Context' object has no attribute 'judo'` (tipo, patrón, email, URL, UUID, fecha ISO, campos requeridos, JSON Schema, estructuras, contratos).
+- El formatter JSON ahora reporta como fallo las excepciones que no son aserciones.
+
+#### 🔀 Pasos condicionales y de control de flujo (EN/ES)
+- `if ... then run` / `si ... entonces ejecuto` según estado, JSONPath (igual, existe, contiene, mayor, menor), variable, entorno, variable de entorno, tag, archivo, header, cuerpo o tiempo de respuesta; `otherwise run` / `en caso contrario ejecuto`.
+- Bucles: `I repeat N times`, `I repeat until ...`, `for each item in the response "..." run` (variables `${item}`, `${index}`).
+- `I retry the following steps up to N times`, aserciones suaves (`I verify all of the following`), `I skip the scenario if ...`, `I fail the test with the message ...`.
+- El bloque de pasos va en un docstring (`'''` para un docstring anidado). `judo validate` también revisa los pasos dentro de esos bloques.
+
+#### 🌐 Servicios no JSON y otros protocolos (EN/ES)
+- **XML/SOAP**: XPath, XSD (con lxml), SOAP 1.1 y 1.2, faults, envelope desde archivo, POST XML.
+- **Formularios, texto y binarios**: formularios urlencoded, texto plano, CSV, descargas, nombre de descarga, comparación de bytes y SHA-256.
+- **Server-Sent Events**: abrir stream, esperar eventos por nombre o contenido, contar eventos, validar datos.
+- **GraphQL**: consultas y mutaciones con variables, errores, datos e introspección.
+- **gRPC** (extra `judo-framework[grpc]`): llamadas unarias y streaming del servidor por reflexión (sin `.proto`), metadatos, códigos de estado, deadlines.
+- No incluidos a propósito: Kafka y MQTT, porque no se pudieron probar.
+
+#### 🧰 Otros pasos nuevos (EN/ES)
+- Configuración HTTP: timeout, desactivar SSL, bundle de CA, certificado de cliente (mTLS), proxy.
+- Subida de archivos, headers de respuesta, headers de seguridad, comparación de JSON ignorando campos, estado 4xx/5xx o dentro de una lista.
+- Polling hasta un estado o valor, paginación, SQL (SQLite incluido; PostgreSQL y MySQL con drivers opcionales).
+
+#### 🤖 IA y MCP
+- **Servidor MCP** (`judo mcp`, extra `judo-framework[mcp]`, compatible con `mcp` 1.x y 2.x): 15 herramientas (`search_steps`, `list_step_categories`, `get_step`, `draft_feature`, `validate_feature`, `write_feature`, `run_tests`, `explain_failure`, `api_coverage`, `get_last_report`, `list_reports`, `send_request`, `get_env`, `start_mock`, `stop_mock`), recursos `judo://guide` y `judo://steps`, prompts `generate_tests_from_openapi` y `triage_failure`.
+- Seguridad del MCP: allowlist de hosts (`JUDO_MCP_ALLOWED_HOSTS`, por defecto solo localhost), archivos confinados a `JUDO_MCP_WORKDIR`, secretos enmascarados.
+- `judo init --ai kiro|cursor|claude|generic|all` genera `AGENTS.md`, reglas por herramienta, `llms.txt` y la configuración MCP.
+
+#### 💻 CLI
+- `judo run` ahora ejecuta behave de verdad: `--tags`, `--env`, `--parallel`, `--fail-fast`, `--rerun-failed`, `--retries N` (marca escenarios flaky), `--junit`, `--format json`, `--dry-run`, `--config`.
+- Nuevos: `judo steps` (`--search`, `--json`, `--markdown`, `--check`), `judo validate`, `judo explain`, `judo coverage` (`--min`), `judo import curl|openapi|postman` (`--negative` genera casos negativos), `judo doctor`, `judo mcp`.
+- `judo init` crea un proyecto behave completo con `config/judo.yaml`.
+
+#### ⚙️ Configuración y extensión
+- `config/judo.yaml` tipado (entornos, timeout, verify_ssl, proxy, retries), validado por `judo run` y `judo doctor`.
+- Plugins de terceros mediante el entry point `judo.plugins`; sus pasos aparecen en el catálogo.
+- Catálogo de pasos generado desde el código (`@step`), con detección de duplicados y sugerencias "¿quisiste decir?".
+- Formatter JSON compacto: cada fallo trae el error y la última petición/respuesta con secretos enmascarados.
+
+#### ✅ Calidad
+- Primera suite de tests propia (52 tests), incluida una suite de regresión: los 428 patrones de v1.6.10 deben seguir existiendo y features legacy EN/ES se ejecutan contra un servidor local, además de un servidor gRPC real en proceso.
+- Tests de paridad EN/ES para los módulos nuevos.
+- Workflow de CI en GitHub Actions (Python 3.9 a 3.13).
+- `__version__` alineado con `setup.py` y `pyproject.toml`.
+
 ## [1.5.9.5] - 2026-01-08
 
 ### 🎨 MEJORAS FINALES: Footer Solo Logo Completamente Implementado

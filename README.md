@@ -483,3 +483,47 @@ MIT License — ver [LICENSE](LICENSE)
 <div align="center">
   Creado por <a href="https://www.centyc.cl">CENTYC</a> · Felipe Farias
 </div>
+
+
+## AI & MCP (v1.7.0)
+
+```bash
+pip install "judo-framework[mcp]"
+judo init my-api --ai all        # behave project + AGENTS.md / CLAUDE.md / Kiro & Cursor rules + MCP config
+judo steps --search "poll" --json   # find the exact step instead of inventing one
+judo validate features/             # undefined / ambiguous steps, with suggestions
+judo run features/ --format json    # compact result; failures include masked request/response
+judo run features/ --retries 2 --junit   # flaky detection + JUnit XML
+judo explain                        # classify failures: api bug / env / auth / stale test...
+judo coverage spec.yaml features/   # which OpenAPI operations are tested
+judo import openapi spec.yaml -o features/api.feature --negative   # also: curl, postman
+judo mcp                            # MCP server (stdio)
+```
+
+Conditionals, loops and non-JSON services (SOAP/XML, forms, SSE, GraphQL, gRPC by reflection):
+
+```gherkin
+When I send a GET request to "/users/1"
+And if the response status is 404 then run
+  """
+  When I send a POST request to "/users" with JSON
+    '''
+    {"name": "Ana"}
+    '''
+  """
+And otherwise run
+  """
+  Then the response "$.active" should be "True"
+  """
+```
+
+MCP client config:
+
+```json
+{ "mcpServers": { "judo": { "command": "judo", "args": ["mcp"] } } }
+```
+
+Tools: `search_steps`, `list_step_categories`, `get_step`, `draft_feature`, `validate_feature`,
+`write_feature`, `run_tests`, `get_last_report`, `list_reports`, `send_request`, `get_env`,
+`start_mock`, `stop_mock`. Safety: `send_request` only reaches `localhost` unless
+`JUDO_MCP_ALLOWED_HOSTS` lists more hosts; files are confined to `JUDO_MCP_WORKDIR`; secrets are masked.

@@ -268,6 +268,276 @@ Valida que el valor en la ruta JSONPath especificada tenga formato de UUID váli
 
 ---
 
+## Pasos nuevos en v1.7.0
+
+### Configuración HTTP, archivos, XML/SOAP básico, headers de seguridad, polling, SQL, paginación
+
+#### `consulto "{endpoint}" hasta que la respuesta "{json_path}" sea igual a "{esperado}" en máximo {segundos:d} segundos`
+Repite GET hasta que un JSONPath sea igual al valor esperado o se agote el tiempo.
+#### `consulto "{endpoint}" hasta que el estado sea {estado:d} en máximo {segundos:d} segundos`
+Repite GET hasta que el código de estado coincida o se agote el tiempo.
+#### `que me conecto a la base de datos SQLite "{ruta}"`
+Abre una base SQLite para preparar y verificar datos.
+#### `me conecto a la base de datos SQLite "{ruta}"`
+Abre una base SQLite para preparar y verificar datos.
+#### `que ejecuto el SQL "{sql}"`
+Ejecuta una sentencia SQL (INSERT, UPDATE, DELETE, DDL).
+#### `ejecuto el SQL "{sql}"`
+Ejecuta una sentencia SQL (INSERT, UPDATE, DELETE, DDL).
+#### `guardo el primer valor de la consulta SQL "{sql}" como "{variable}"`
+Ejecuta una consulta SQL y guarda la primera columna de la primera fila en una variable.
+#### `la consulta SQL "{sql}" debe devolver {cantidad:d} filas`
+Valida la cantidad de filas que devuelve una consulta SQL.
+#### `la consulta SQL "{sql}" debe devolver el valor "{esperado}"`
+Valida el primer valor que devuelve una consulta SQL.
+#### `recopilo todas las páginas de "{endpoint}" usando el parámetro "{parametro}" hasta {max_paginas:d} páginas como "{variable}"`
+Recorre un endpoint GET paginado y guarda todos los elementos en una variable.
+#### `que establezco el timeout a {segundos:g} segundos`
+Establece el timeout de las peticiones HTTP.
+#### `establezco el timeout a {segundos:g} segundos`
+Establece el timeout de las peticiones HTTP.
+#### `que deshabilito la verificación SSL`
+Desactiva la verificación del certificado TLS (solo pruebas).
+#### `deshabilito la verificación SSL`
+Desactiva la verificación del certificado TLS (solo pruebas).
+#### `que uso el bundle de CA "{ruta}"`
+Verifica TLS con un archivo de CA personalizado.
+#### `uso el bundle de CA "{ruta}"`
+Verifica TLS con un archivo de CA personalizado.
+#### `que uso el certificado de cliente "{cert}" con la llave "{llave}"`
+Usa un certificado y llave de cliente (TLS mutuo).
+#### `uso el certificado de cliente "{cert}" con la llave "{llave}"`
+Usa un certificado y llave de cliente (TLS mutuo).
+#### `que uso el proxy "{url}"`
+Envía las peticiones a través de un proxy HTTP.
+#### `uso el proxy "{url}"`
+Envía las peticiones a través de un proxy HTTP.
+#### `que me conecto a la base de datos "{url}"`
+Conecta a SQLite, PostgreSQL o MySQL mediante una URL.
+#### `me conecto a la base de datos "{url}"`
+Conecta a SQLite, PostgreSQL o MySQL mediante una URL.
+#### `subo el archivo "{ruta}" como "{campo}" a "{endpoint}"`
+Sube un archivo como multipart/form-data con POST.
+#### `el SHA-256 de la respuesta debe ser "{esperado}"`
+Valida el SHA-256 del cuerpo de la respuesta.
+#### `el header de respuesta "{nombre}" debe ser "{valor}"`
+Valida el valor de un header de respuesta.
+#### `el header de respuesta "{nombre}" debe existir`
+Valida que un header de respuesta esté presente.
+#### `la respuesta debe incluir headers de seguridad`
+Valida HSTS, nosniff y protección contra clickjacking.
+#### `el XML de la respuesta "{xpath}" debe ser "{esperado}"`
+Valida el primer valor seleccionado por un XPath.
+#### `el XML de la respuesta "{xpath}" debe seleccionar {cantidad:d} nodos`
+Valida cuántos nodos selecciona un XPath.
+#### `extraigo el XML "{xpath}" como "{variable}"`
+Guarda en una variable el primer valor seleccionado por un XPath.
+#### `la respuesta debe ser igual al JSON ignorando "{campos}"`
+Compara la respuesta con el JSON del texto del paso, ignorando campos volátiles.
+#### `envío una petición SOAP a "{endpoint}" con la acción "{accion}"`
+Envía el XML del texto del paso como petición SOAP.
+#### `el código de respuesta debe ser un error de cliente`
+Valida que el estado sea 4xx.
+#### `el código de respuesta debe ser un error de servidor`
+Valida que el estado sea 5xx.
+#### `el código de respuesta debe ser uno de "{codigos}"`
+Valida que el estado sea uno de una lista de códigos separados por coma.
+
+### Pasos condicionales y de control de flujo (si / en caso contrario, bucles, reintentos, aserciones suaves, saltar). El bloque de pasos va en un docstring; usa ''' para un docstring anidado
+
+#### `si el estado de la respuesta es {estado:d} entonces ejecuto`
+Ejecuta el bloque cuando el estado de la respuesta coincide.
+#### `si el estado de la respuesta no es {estado:d} entonces ejecuto`
+Ejecuta el bloque cuando el estado de la respuesta es distinto.
+#### `si la respuesta "{ruta}" es igual a "{esperado}" entonces ejecuto`
+Ejecuta el bloque cuando un JSONPath es igual a un valor.
+#### `si la respuesta "{ruta}" existe entonces ejecuto`
+Ejecuta el bloque cuando un JSONPath existe.
+#### `si la respuesta "{ruta}" no existe entonces ejecuto`
+Ejecuta el bloque cuando un JSONPath no existe.
+#### `si la respuesta "{ruta}" contiene "{texto}" entonces ejecuto`
+Ejecuta el bloque cuando un valor JSON (o elemento de array) contiene el texto.
+#### `si la respuesta "{ruta}" es mayor que {numero:g} entonces ejecuto`
+Ejecuta el bloque cuando un valor numérico JSON es mayor que un número.
+#### `si la respuesta "{ruta}" es menor que {numero:g} entonces ejecuto`
+Ejecuta el bloque cuando un valor numérico JSON es menor que un número.
+#### `si la variable "{nombre}" es igual a "{esperado}" entonces ejecuto`
+Ejecuta el bloque cuando una variable es igual a un valor.
+#### `si la variable "{nombre}" está definida entonces ejecuto`
+Ejecuta el bloque cuando una variable está definida.
+#### `si la variable "{nombre}" no está definida entonces ejecuto`
+Ejecuta el bloque cuando una variable no está definida.
+#### `si la variable "{nombre}" está vacía entonces ejecuto`
+Ejecuta el bloque cuando una variable no existe o está vacía.
+#### `si el entorno es "{entorno}" entonces ejecuto`
+Ejecuta el bloque cuando JUDO_ENV / KARATE_ENV coincide.
+#### `si la variable de entorno "{nombre}" está definida entonces ejecuto`
+Ejecuta el bloque cuando una variable de entorno del sistema está definida.
+#### `si el escenario tiene el tag "{tag}" entonces ejecuto`
+Ejecuta el bloque cuando el escenario tiene un tag.
+#### `si el archivo "{ruta}" existe entonces ejecuto`
+Ejecuta el bloque cuando un archivo existe.
+#### `si el header de respuesta "{nombre}" existe entonces ejecuto`
+Ejecuta el bloque cuando un header de respuesta está presente.
+#### `si el cuerpo de la respuesta contiene "{texto}" entonces ejecuto`
+Ejecuta el bloque cuando el cuerpo crudo de la respuesta contiene el texto.
+#### `si el tiempo de respuesta es mayor a {ms:d} milisegundos entonces ejecuto`
+Ejecuta el bloque cuando la respuesta fue más lenta que el límite.
+#### `en caso contrario ejecuto`
+Ejecuta el bloque cuando el 'si' anterior fue falso.
+#### `salto el escenario si la variable "{nombre}" es igual a "{esperado}"`
+Salta el resto del escenario cuando una variable es igual a un valor.
+#### `salto el escenario si el entorno es "{entorno}"`
+Salta el resto del escenario en un entorno determinado.
+#### `salto el escenario si el estado de la respuesta es {estado:d}`
+Salta el resto del escenario cuando el estado de la respuesta coincide.
+#### `fallo la prueba con el mensaje "{mensaje}"`
+Falla el escenario con un mensaje personalizado.
+#### `la variable "{nombre}" debe estar definida`
+Valida que una variable esté definida.
+#### `la variable "{nombre}" no debe estar definida`
+Valida que una variable no esté definida.
+#### `la variable "{nombre}" debe estar vacía`
+Valida que una variable no exista o esté vacía.
+#### `el entorno debe ser "{entorno}"`
+Valida el nombre del entorno actual.
+#### `repito {n:d} veces`
+Ejecuta el bloque N veces (variable ${iteration} = 1..N).
+#### `repito hasta que la respuesta "{ruta}" sea igual a "{esperado}" hasta {n:d} veces`
+Ejecuta el bloque hasta que un JSONPath sea igual a un valor, como máximo N veces.
+#### `para cada elemento en la respuesta "{ruta}" ejecuto`
+Ejecuta el bloque por cada elemento de un array (variables ${item} y ${index}).
+#### `reintento los siguientes pasos hasta {n:d} veces con {segundos:g} segundos de espera`
+Reintenta el bloque mientras falle.
+#### `verifico todo lo siguiente`
+Ejecuta cada línea del bloque como un paso y reporta todos los fallos al final.
+
+### Servicios no JSON: XML/SOAP, formularios, texto, CSV, descargas binarias, Server-Sent Events, GraphQL
+
+#### `la respuesta debe ser XML válido`
+Valida que el cuerpo de la respuesta sea XML bien formado.
+#### `el XML de la respuesta "{xpath}" debe existir`
+Valida que un XPath seleccione al menos un nodo.
+#### `el XML de la respuesta "{xpath}" no debe existir`
+Valida que un XPath no seleccione nada.
+#### `el XML de la respuesta "{xpath}" debe contener "{texto}"`
+Valida que un nodo seleccionado por XPath contenga un texto.
+#### `el XML de la respuesta "{xpath}" debe coincidir con "{patron}"`
+Valida que el primer nodo seleccionado por XPath cumpla una expresión regular.
+#### `el XML de la respuesta debe cumplir con el XSD "{ruta}"`
+Valida el XML de la respuesta contra un esquema XSD (requiere lxml).
+#### `la respuesta SOAP no debe ser un fallo`
+Valida que la respuesta SOAP no sea un fault.
+#### `el código del fallo SOAP debe ser "{codigo}"`
+Valida el código del fault SOAP.
+#### `el mensaje del fallo SOAP debe contener "{texto}"`
+Valida que el mensaje del fault SOAP contenga un texto.
+#### `envío una petición SOAP 1.2 a "{endpoint}" con la acción "{accion}"`
+Envía el XML del texto del paso como petición SOAP 1.2.
+#### `envío el archivo de sobre SOAP "{ruta}" a "{endpoint}" con la acción "{accion}"`
+Envía una petición SOAP 1.1 cuyo envelope se lee de un archivo.
+#### `envío un POST XML a "{endpoint}"`
+Envía por POST el XML del texto del paso con Content-Type application/xml.
+#### `envío un POST de formulario a "{endpoint}"`
+Envía application/x-www-form-urlencoded usando una tabla con columnas field | value.
+#### `establezco el campo de formulario "{nombre}" a "{valor}"`
+Prepara un campo de formulario para el próximo 'envío el formulario'.
+#### `envío el formulario a "{endpoint}"`
+Envía por POST los campos de formulario preparados.
+#### `el texto de la respuesta debe contener "{texto}"`
+Valida que el texto de la respuesta contenga una cadena.
+#### `el texto de la respuesta no debe contener "{texto}"`
+Valida que el texto de la respuesta no contenga una cadena.
+#### `el texto de la respuesta debe coincidir con "{patron}"`
+Valida que el texto de la respuesta cumpla una expresión regular.
+#### `el texto de la respuesta debe ser igual a "{texto}"`
+Valida el texto completo de la respuesta (sin espacios en los extremos).
+#### `el tipo de contenido de la respuesta debe ser "{tipo}"`
+Valida que el header Content-Type comience con un valor.
+#### `el tamaño de la respuesta debe ser menor a {tamano:d} bytes`
+Valida el tamaño del cuerpo de la respuesta.
+#### `la respuesta debe ser un CSV con {cantidad:d} filas`
+Valida la cantidad de filas de datos del CSV (sin encabezado).
+#### `la columna CSV "{columna}" debe contener "{valor}"`
+Valida que una columna CSV tenga un valor en alguna fila.
+#### `los bytes de la respuesta deben ser iguales al archivo "{ruta}"`
+Valida que los bytes de la respuesta sean idénticos a un archivo.
+#### `descargo "{endpoint}" en el archivo "{ruta}"`
+Hace GET a un endpoint y guarda los bytes en un archivo.
+#### `la respuesta debe tener el nombre de descarga "{nombre}"`
+Valida el nombre de archivo en Content-Disposition.
+#### `guardo el texto de la respuesta como "{variable}"`
+Guarda el texto crudo de la respuesta en una variable.
+#### `abro el stream SSE "{endpoint}"`
+Abre un stream de Server-Sent Events y recolecta eventos en segundo plano.
+#### `debo recibir un evento SSE "{evento}" en máximo {segundos:g} segundos`
+Espera un evento SSE por nombre.
+#### `debo recibir un evento SSE con datos que contengan "{texto}" en máximo {segundos:g} segundos`
+Espera un evento SSE cuyos datos contengan un texto.
+#### `debo recibir {cantidad:d} eventos SSE en máximo {segundos:g} segundos`
+Espera hasta que hayan llegado al menos N eventos SSE.
+#### `los datos del último evento SSE "{ruta}" deben ser "{esperado}"`
+Valida un campo JSON de los datos del último evento SSE.
+#### `cierro el stream SSE`
+Cierra el stream SSE.
+#### `establezco las variables GraphQL`
+Define las variables (JSON en el texto del paso) para la próxima petición GraphQL.
+#### `envío la consulta GraphQL a "{endpoint}"`
+Envía la consulta GraphQL del texto del paso.
+#### `envío la mutación GraphQL a "{endpoint}"`
+Envía la mutación GraphQL del texto del paso.
+#### `la respuesta GraphQL no debe tener errores`
+Valida que la respuesta GraphQL no tenga errores.
+#### `la respuesta GraphQL debe tener un error que contenga "{texto}"`
+Valida que algún mensaje de error GraphQL contenga un texto.
+#### `los datos GraphQL "{ruta}" deben ser "{esperado}"`
+Valida un valor dentro de los datos GraphQL.
+#### `los datos GraphQL "{ruta}" deben existir`
+Valida que una ruta exista dentro de los datos GraphQL.
+#### `los datos GraphQL "{ruta}" deben tener {cantidad:d} elementos`
+Valida el tamaño de un array dentro de los datos GraphQL.
+#### `guardo los datos GraphQL "{ruta}" como "{variable}"`
+Guarda un valor de los datos GraphQL en una variable.
+#### `hago introspección del esquema GraphQL en "{endpoint}"`
+Ejecuta la consulta de introspección.
+#### `el esquema GraphQL debe tener el tipo "{nombre}"`
+Valida que un tipo exista en el esquema introspectado.
+
+### gRPC por reflexión (requiere `pip install "judo-framework[grpc]"`)
+
+#### `me conecto al servidor gRPC "{destino}"`
+Abre un canal gRPC sin TLS (host:puerto).
+#### `me conecto al servidor gRPC "{destino}" con TLS`
+Abre un canal gRPC con TLS usando los certificados del sistema.
+#### `establezco el metadato gRPC "{clave}" a "{valor}"`
+Agrega un metadato (header) enviado en cada llamada gRPC.
+#### `establezco el timeout gRPC a {segundos:g} segundos`
+Define el plazo máximo de las llamadas gRPC.
+#### `envío la petición gRPC "{metodo}"`
+Llama a un método unario; la petición (JSON) va en el texto del paso.
+#### `envío la petición gRPC de streaming "{metodo}"`
+Llama a un método con streaming del servidor; la petición (JSON) va en el texto del paso.
+#### `el estado gRPC debe ser "{estado}"`
+Valida el nombre del código gRPC (OK, NOT_FOUND, UNAUTHENTICATED, ...).
+#### `la respuesta gRPC "{ruta}" debe ser "{esperado}"`
+Valida un campo de la respuesta gRPC.
+#### `la respuesta gRPC debe contener "{campo}"`
+Valida que la respuesta gRPC tenga un campo.
+#### `guardo la respuesta gRPC "{ruta}" como "{variable}"`
+Guarda un campo de la respuesta gRPC en una variable.
+#### `el servidor gRPC debe exponer el servicio "{servicio}"`
+Valida (por reflexión) que un servicio esté expuesto.
+#### `el servidor gRPC debe exponer el método "{metodo}"`
+Valida (por reflexión) que un método exista.
+#### `el stream gRPC debe devolver {cantidad:d} mensajes`
+Valida cuántos mensajes devolvió el stream del servidor.
+#### `el mensaje {indice:d} del stream gRPC "{ruta}" debe ser "{esperado}"`
+Valida un campo de un mensaje del stream (índice desde 0).
+#### `la llamada gRPC debe tardar menos de {ms:d} milisegundos`
+Valida la duración de la última llamada gRPC.
+#### `cierro la conexión gRPC`
+Cierra el canal gRPC.
+---
 ## Notas Importantes
 
 - **Interpolación de Variables**: Usa la sintaxis `{nombreVariable}` en URLs, headers y cuerpos JSON.

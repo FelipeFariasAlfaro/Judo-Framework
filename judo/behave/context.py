@@ -47,6 +47,40 @@ def _load_env_file():
         pass
 
 
+class JudoFacade:
+    """
+    What ``context.judo`` points to inside behave steps.
+
+    Adds the response helpers (``get_response_json`` / ``get_response_status`` /
+    ``get_response_headers``) that many steps rely on, and delegates everything else
+    to the underlying :class:`Judo` instance.
+    """
+
+    def __init__(self, judo_context):
+        object.__setattr__(self, '_jc', judo_context)
+
+    def _response(self):
+        response = self._jc.response
+        if response is None:
+            raise AssertionError("No response available. Make a request first.")
+        return response
+
+    def get_response_json(self):
+        return self._response().json
+
+    def get_response_status(self):
+        return self._response().status
+
+    def get_response_headers(self):
+        return dict(self._response().headers)
+
+    def __getattr__(self, name):
+        return getattr(self._jc.judo, name)
+
+    def __setattr__(self, name, value):
+        setattr(self._jc.judo, name, value)
+
+
 class JudoContext:
     """
     Enhanced context for Behave integration with Judo Framework
@@ -57,9 +91,15 @@ class JudoContext:
         """Initialize Judo context"""
         self.behave_context = behave_context
         self.judo = Judo()
+        self.facade = JudoFacade(self)
+        if behave_context is not None:
+            behave_context.judo = self.facade
         self.response = None
         self.variables = {}
         self.test_data = {}
+        # Last element matched by an array-contains step; used by field-validation
+        # steps so they can assert on a specific item instead of the whole array.
+        self.matched_array_element = None
         
         # Request/Response logging configuration
         self.save_requests_responses = False
@@ -106,11 +146,8 @@ class JudoContext:
     
     def interpolate_string(self, text: str) -> str:
         """Interpolate variables in string"""
-        result = text
-        for key, value in self.variables.items():
-            result = result.replace(f"{{{key}}}", str(value))
-            result = result.replace(f"${{{key}}}", str(value))
-        return result
+        from ..utils.interpolation import interpolate
+        return interpolate(text, self.variables)
     
     # Request/Response Logging Configuration
     def configure_request_response_logging(self, enabled: bool, output_directory: str = None):
@@ -204,6 +241,10 @@ class JudoContext:
     def make_request(self, method: str, endpoint: str, **kwargs):
         """Make HTTP request and store response"""
         method = method.upper()
+
+        # Reset matched element from any previous array-contains step so it
+        # doesn't bleed into assertions for this new request.
+        self.matched_array_element = None
         
         # Interpolate endpoint
         endpoint = self.interpolate_string(endpoint)
@@ -278,6 +319,18 @@ class JudoContext:
                 request_data['body'] = None
                 request_data['body_type'] = None
         
+        # Apply request interceptors (timestamp, authorization, logging, ...)
+        chain = getattr(self, 'interceptor_chain', None)
+        if chain is not None:
+            intercepted = chain.process_request({
+                'method': method, 'url': endpoint,
+                'headers': dict(kwargs.get('headers', {})),
+                'params': dict(kwargs.get('params', {})),
+            })
+            if intercepted.get('headers'):
+                kwargs['headers'] = intercepted['headers']
+            if intercepted.get('params'):
+                kwargs['params'] = intercepted['params']
         # Check cache for GET requests
         if method == 'GET' and hasattr(self, 'response_cache'):
             cached_response = self.response_cache.get(method, endpoint, kwargs.get('params'))
@@ -405,6 +458,12 @@ class JudoContext:
                 "scenario": self.current_scenario_name
             }
             
+            # Remember the last exchange (used by JSON formatter / MCP, secrets masked on read)
+            try:
+                from ..utils.exchange import record as _record_exchange
+                _record_exchange(html_request_data, html_response_data)
+            except Exception:
+                pass
             # Send data to HTML reporter system
             try:
                 from ..reporting.reporter import get_reporter
@@ -508,21 +567,40 @@ class JudoContext:
             f"JSONPath {json_path}: expected {expected_value}, but got {actual_value}"
     
     def validate_response_contains(self, key: str, expected_value: Any = None):
-        """Validate that response contains a key or key-value pair"""
+        """Validate that response contains a key or key-value pair.
+
+        When the response body is a JSON array, the check is performed against
+        the element that was last matched by an array-contains step
+        (``matched_array_element``).  If no element has been matched yet the
+        assertion fails with a helpful message instead of the generic
+        "Response is not a JSON object".
+        """
         if not self.response:
             raise AssertionError("No response available. Make a request first.")
-        
+
         json_data = self.response.json
-        
+
         if isinstance(json_data, dict):
-            assert key in json_data, f"Response does not contain key: {key}"
-            
-            if expected_value is not None:
-                actual_value = json_data[key]
-                assert self.judo.match(actual_value, expected_value), \
-                    f"Key {key}: expected {expected_value}, but got {actual_value}"
+            target = json_data
+        elif isinstance(json_data, list):
+            if self.matched_array_element is not None:
+                target = self.matched_array_element
+            else:
+                raise AssertionError(
+                    f"La respuesta es un array. Usa primero el paso "
+                    f"'el array \".\" debe contener un elemento con \"<campo>\" igual a \"<valor>\"' "
+                    f"para seleccionar el elemento que quieres validar, "
+                    f"y luego usa 'el campo \"{key}\" debe ser ...' para verificar sus campos."
+                )
         else:
             raise AssertionError("Response is not a JSON object")
+
+        assert key in target, f"Response does not contain key: {key}"
+
+        if expected_value is not None:
+            actual_value = target[key]
+            assert self.judo.match(actual_value, expected_value), \
+                f"Key {key}: expected {expected_value}, but got {actual_value}"
     
     def validate_response_schema(self, schema: Dict):
         """Validate response against JSON schema"""
@@ -622,6 +700,12 @@ class JudoContext:
         else:
             print("No response available")
     
+    _SCENARIO_SCOPED_ATTRS = (
+        'retry_policy', 'response_cache', 'rate_limiter', 'throttle', 'adaptive_rate_limiter',
+        'chaos_injector', 'interceptor_chain', 'performance_monitor', 'response_history',
+        'circuit_breakers', 'jwt_token', 'jwt_handler',
+    )
+
     def reset(self):
         """Reset context for new scenario"""
         # Preserve logging configuration
@@ -629,6 +713,7 @@ class JudoContext:
         save_output_dir = self.output_directory
         
         self.response = None
+        self.matched_array_element = None
         self.variables.clear()
         self.test_data.clear()
         
@@ -636,6 +721,14 @@ class JudoContext:
         self.judo.http_client.default_headers.clear()
         self.judo.http_client.default_params.clear()
         self.judo.http_client.default_cookies.clear()
+        # Authentication and cookies live in the shared requests session: clear them
+        # so credentials from one scenario never leak into the next.
+        self.judo.http_client.session.auth = None
+        self.judo.http_client.session.cookies.clear()
+        # Scenario-scoped features configured through steps must not leak either
+        for attr in self._SCENARIO_SCOPED_ATTRS:
+            if attr in self.__dict__:
+                delattr(self, attr)
         
         # Re-setup defaults
         self._setup_defaults()

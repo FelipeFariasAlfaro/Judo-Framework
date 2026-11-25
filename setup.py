@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="judo-framework",
-    version="1.6.9",
+    version="1.7.0",
     author="Felipe Farias - CENTYC",
     author_email="felipe.farias@centyc.cl",
     description="A comprehensive API testing framework for Python, inspired by Karate Framework",
@@ -53,6 +53,8 @@ setup(
         "excel": ["openpyxl>=3.0.0"],
         "websocket": ["websockets>=10.0"],
         "graphql": ["graphql-core>=3.2.0"],
+        "grpc": ["grpcio>=1.50.0", "grpcio-reflection>=1.50.0", "protobuf>=4.21.0"],
+        "mcp": ["mcp>=1.2.0; python_version >= '3.10'"],
         "genai": [
             "openai>=1.0.0",
             "anthropic>=0.20.0",
