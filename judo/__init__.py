@@ -21,7 +21,7 @@ from .genai.client import GenAIClient
 from .genai.judge import GenAIJudge
 from .genai.context_loader import ContextLoader
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 __author__ = "Judo Framework Team"
 
 # Main exports

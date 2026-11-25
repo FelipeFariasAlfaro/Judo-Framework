@@ -219,3 +219,21 @@ def test_mcp_new_tools(project, server, monkeypatch):
     d = tools.draft_feature("openapi", json.dumps(SPEC), negative=True)
     assert d["issues"] == [] and "@negative" in d["feature"]
     assert "error" in tools.explain_failure() or "findings" in tools.explain_failure()
+
+
+def test_init_registers_formatters_for_plain_behave(project, server):
+    """`judo init` writes behave.ini so `behave -f judo-json` works without the full module path."""
+    import subprocess
+    assert "judo-json = judo.behave.json_formatter:JudoJsonFormatter" in (project / "behave.ini").read_text()
+    (project / "features" / "f.feature").write_text(f"""Feature: f
+  Scenario: ok
+    Given I have a Judo API client
+    And the base URL is "{server.url}"
+    When I send a GET request to "/health"
+    Then the response status should be 200
+""")
+    out = project / "plain.json"
+    r = subprocess.run([sys.executable, "-m", "behave", "-f", "judo-json", "-o", str(out), "features"],
+                       cwd=str(project), capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert json.loads(out.read_text())["summary"]["passed"] == 1

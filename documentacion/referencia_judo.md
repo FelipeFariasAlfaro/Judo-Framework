@@ -1,7 +1,7 @@
 # Referencia Judo Framework
 
 1. Tema: Requisitos del sistema para instalar Judo Framework
-Descripcion: Se requiere Python 3.8 o superior (recomendado 3.9+), pip como gestor de paquetes, y es compatible con Windows, Linux y macOS.
+Descripcion: Se requiere Python 3.10 o superior, pip como gestor de paquetes, y es compatible con Windows, Linux y macOS.
 
 2. Tema: Instalación básica de Judo Framework
 Descripcion: Se instala desde PyPI con el comando `pip install judo-framework`. Para verificar la instalación ejecutar: `python -c "import judo; print('Judo Framework instalado correctamente')"`.
@@ -113,7 +113,7 @@ Descripcion: Para integración con herramientas CI/CD, configurar `JUDO_GENERATE
 Descripcion: Para debugging detallado, activar `JUDO_SAVE_REQUESTS_RESPONSES=true` en .env. Los logs se guardan en la carpeta configurada con `JUDO_REQUESTS_RESPONSES_DIR=api_logs`. Combinado con `JUDO_VERBOSE=true` proporciona información completa de cada request y response.
 
 38. Tema: Integración con GitHub Actions
-Descripcion: Crear archivo `.github/workflows/api-tests.yml` con job que incluya: checkout del código, setup de Python 3.9, instalación con `pip install judo-framework[full]`, ejecución con `python runner.py`, y upload de artifacts desde `judo_reports/` usando `actions/upload-artifact@v2`.
+Descripcion: Crear archivo `.github/workflows/api-tests.yml` con job que incluya: checkout del código, setup de Python 3.11, instalación con `pip install judo-framework[full]`, ejecución con `python runner.py`, y upload de artifacts desde `judo_reports/` usando `actions/upload-artifact@v7`.
 
 39. Tema: Integración con Jenkins
 Descripcion: Crear pipeline con stages: Install (`pip install judo-framework[full]`), Test (`python runner.py`), Reports (usar `publishHTML` para publicar reportes desde `judo_reports/`). Judo genera JSON Cucumber compatible con el plugin Cucumber Reports de Jenkins.
@@ -255,7 +255,7 @@ Descripcion: Configurar rate limiting con `context.judo.set_rate_limit(requests_
 Descripcion: Verificar variables de entorno en CI (API keys, secrets, URLs). Verificar conectividad de red en CI. Ajustar timeouts para ambiente CI (`JUDO_TIMEOUT=900`). Verificar versión de Python en CI. Usar mismas dependencias con requirements.txt.
 
 85. Tema: Solución - Reportes no se publican en CI/CD
-Descripcion: Verificar que los reportes se generan correctamente. Configurar artifacts: en GitHub Actions usar `actions/upload-artifact@v2` con path `judo_reports/`. Verificar permisos de lectura. Verificar rutas relativas vs absolutas.
+Descripcion: Verificar que los reportes se generan correctamente. Configurar artifacts: en GitHub Actions usar `actions/upload-artifact@v7` con path `judo_reports/`. Verificar permisos de lectura. Verificar rutas relativas vs absolutas.
 
 86. Tema: Solución - OAuth2 no funciona
 Descripcion: Verificar configuración de client_id, client_secret y token_url. Verificar scopes requeridos. Verificar que el token no expiró. Activar debugging con `JUDO_SAVE_REQUESTS_RESPONSES=true` para ver los requests de autenticación.

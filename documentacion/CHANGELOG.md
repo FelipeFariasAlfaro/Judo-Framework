@@ -2,6 +2,24 @@
 
 All notable changes to Judo Framework will be documented in this file.
 
+## [1.7.1] - 2026-11-25
+### 🔧 Mantenimiento del empaquetado y del pipeline
+
+#### ⚠️ Cambios de compatibilidad
+- **Python 3.10 o superior** (`requires-python = ">=3.10"`). Python 3.8 y 3.9 ya no tienen soporte oficial y GitHub Actions ya no los ofrece. Probado en 3.10, 3.11, 3.12 y 3.13.
+
+#### 🐛 Correcciones
+- **Formatters por nombre**: el entry point `behave.formatters` de `setup.py` nunca funcionó (behave no lee entry points y setuptools lo ignoraba). `judo init` ahora crea `behave.ini` con `[behave.formatters]`, así que `behave -f judo` y `behave -f judo-json` funcionan. En proyectos existentes basta con agregar esa sección a `behave.ini`:
+  ```ini
+  [behave.formatters]
+  judo = judo.behave.formatter:JudoFormatter
+  judo-json = judo.behave.json_formatter:JudoJsonFormatter
+  ```
+- **Empaquetado**: `pyproject.toml` es la única fuente de metadatos; `setup.py` queda como shim mínimo. Licencia declarada como expresión SPDX (`license = "MIT"`), lo que elimina los avisos de setuptools que iban a romper el build en 2027. `reporting/report_config.json` se incluye en el paquete.
+- **CI y publicación**: acciones actualizadas a versiones con Node.js 24 (`checkout@v7`, `setup-python@v7`, `upload-artifact@v7`, `download-artifact@v8`). El CI instala los extras `mcp`, `grpc` y `xml`, así que los tests de gRPC y XSD también corren en GitHub.
+- `publish.py` funciona en Linux, macOS y Windows y lee la versión desde `pyproject.toml`. La vía normal de publicación es el pipeline (`git tag vX.Y.Z && git push origin vX.Y.Z`).
+- Documentación actualizada a Python 3.10+ y a las versiones actuales de las acciones de GitHub.
+
 ## [1.7.0] - 2026-11-24
 ### 🤖 Framework listo para IA, pasos condicionales y servicios no JSON
 

@@ -1,30 +1,30 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "judo-framework"
-version = "1.7.0"
+version = "1.7.1"
 description = "A comprehensive API testing framework for Python, inspired by Karate Framework"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name = "Felipe Farias - CENTYC", email = "felipe.farias@centyc.cl"}
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Testing",
     "Topic :: Internet :: WWW/HTTP",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "requests>=2.28.0",
     "jsonpath-ng>=1.5.3",
@@ -48,7 +48,7 @@ excel = ["openpyxl>=3.0.0"]
 websocket = ["websockets>=10.0"]
 graphql = ["graphql-core>=3.2.0"]
 grpc = ["grpcio>=1.50.0", "grpcio-reflection>=1.50.0", "protobuf>=4.21.0"]
-mcp = ["mcp>=1.2.0; python_version >= '3.10'"]
+mcp = ["mcp>=1.2.0"]
 genai = [
     "openai>=1.0.0",
     "anthropic>=0.20.0",
@@ -85,10 +85,12 @@ Issues = "https://github.com/FelipeFariasAlfaro/Judo-Framework/issues"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["judo*"]
+[tool.setuptools.package-data]
+judo = ["assets/logos/*.png", "assets/logos/*.jpg", "reporting/report_config.json"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py310']
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

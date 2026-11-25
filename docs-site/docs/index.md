@@ -6,7 +6,7 @@
   
   <p>
     <a href="https://pypi.org/project/judo-framework/"><img src="https://badge.fury.io/py/judo-framework.svg" alt="PyPI version"></a>
-    <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="Python 3.8+"></a>
+    <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
     <a href="https://pepy.tech/project/judo-framework"><img src="https://pepy.tech/badge/judo-framework" alt="Downloads"></a>
   </p>

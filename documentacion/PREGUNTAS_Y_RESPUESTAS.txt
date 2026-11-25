@@ -24,7 +24,7 @@ AUTOR: Felipe Farias - CENTYC
 ===============================================================================
 
 P: ¿Qué versión de Python necesito para Judo Framework?
-R: Judo Framework requiere Python 3.8 o superior. Es compatible con Python 3.8, 3.9, 3.10 y 3.11. Recomendamos usar Python 3.9 o superior para mejor rendimiento.
+R: Judo Framework requiere Python 3.10 o superior. Es compatible con Python 3.10, 3.11, 3.12 y 3.13.
 
 P: ¿Cómo instalo Judo Framework?
 R: Usa pip para instalar desde PyPI:
