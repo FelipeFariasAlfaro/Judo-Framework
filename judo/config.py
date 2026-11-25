@@ -85,7 +85,7 @@ def resolve(cfg: Dict[str, Any], env: Optional[str] = None) -> Dict[str, Any]:
 
 def apply_to_environment(values: Dict[str, Any], environ=None) -> Dict[str, str]:
     environ = os.environ if environ is None else environ
-    mapping = {"baseUrl": "JUDO_BASE_URL", "timeout": "JUDO_TIMEOUT", "verify_ssl": "JUDO_VERIFY_SSL",
+    mapping = {"baseUrl": "JUDO_BASE_URL", "timeout": "JUDO_REQUEST_TIMEOUT", "verify_ssl": "JUDO_VERIFY_SSL",
                "proxy": "JUDO_PROXY", "retries": "JUDO_RETRIES", "strict_variables": "JUDO_STRICT_VARS",
                "env": "JUDO_ENV"}
     applied = {}

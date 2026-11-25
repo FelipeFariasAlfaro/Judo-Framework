@@ -25,7 +25,7 @@ def before_all(context):
         context.judo_context.set_base_url(base_url)
     
     # Set default timeout
-    timeout = os.getenv('JUDO_TIMEOUT', '30')
+    timeout = os.getenv('JUDO_REQUEST_TIMEOUT') or os.getenv('JUDO_TIMEOUT') or '30'
     try:
         timeout_seconds = float(timeout)
         context.judo_context.judo.http_client.set_timeout(timeout_seconds)

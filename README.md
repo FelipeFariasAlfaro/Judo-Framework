@@ -395,7 +395,8 @@ JUDO_OUTPUT_DIR=judo_reports
 # Ejecución
 JUDO_PARALLEL=false
 JUDO_MAX_WORKERS=4
-JUDO_TIMEOUT=300
+JUDO_TIMEOUT=300            # timeout total de la ejecución (runner)
+JUDO_REQUEST_TIMEOUT=30     # timeout por petición HTTP (v1.7.1+)
 JUDO_RETRY_COUNT=0
 JUDO_FAIL_FAST=false
 

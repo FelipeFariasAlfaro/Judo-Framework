@@ -20,6 +20,9 @@ class HttpClient:
         self.session = requests.Session()
         self.timeout = self._default_timeout()
         self.cert = None
+        proxy = os.getenv('JUDO_PROXY')
+        if proxy:
+            self.set_proxy(proxy)
         self.default_headers = {}
         self.default_params = {}
         self.default_cookies = {}
@@ -28,7 +31,9 @@ class HttpClient:
         
     @staticmethod
     def _default_timeout() -> Optional[float]:
-        raw = os.getenv('JUDO_TIMEOUT', '30')
+        # JUDO_REQUEST_TIMEOUT is the per-request timeout. JUDO_TIMEOUT is kept as a fallback
+        # for compatibility (older projects used it for requests in before_all).
+        raw = os.getenv('JUDO_REQUEST_TIMEOUT') or os.getenv('JUDO_TIMEOUT') or '30'
         try:
             value = float(raw)
         except ValueError:

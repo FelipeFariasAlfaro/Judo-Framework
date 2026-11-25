@@ -45,10 +45,10 @@ def test_config_validate_resolve_apply():
         "dev": {"baseUrl": "http://d"}, "prod": {"baseUrl": "http://p", "timeout": 5}}}
     assert config.validate(cfg) == []
     assert config.resolve(cfg, "prod")["timeout"] == 5
-    env = {"JUDO_TIMEOUT": "99"}
+    env = {"JUDO_REQUEST_TIMEOUT": "99"}
     applied = config.apply_to_environment(config.resolve(cfg, "prod"), env)
-    assert env["JUDO_BASE_URL"] == "http://p" and env["JUDO_TIMEOUT"] == "99"   # explicit env wins
-    assert "JUDO_TIMEOUT" not in applied
+    assert env["JUDO_BASE_URL"] == "http://p" and env["JUDO_REQUEST_TIMEOUT"] == "99"   # explicit env wins
+    assert "JUDO_REQUEST_TIMEOUT" not in applied
     assert any("unknown key" in e for e in config.validate({"bogus": 1}))
     assert any("expected" in e for e in config.validate({"timeout": "x"}))
     assert any("default_env" in e for e in config.validate({"default_env": "z", "environments": {}}))
@@ -237,3 +237,15 @@ def test_init_registers_formatters_for_plain_behave(project, server):
                        cwd=str(project), capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr
     assert json.loads(out.read_text())["summary"]["passed"] == 1
+
+
+def test_http_client_reads_timeout_and_proxy_from_env(monkeypatch):
+    from judo.core.judo import Judo
+    monkeypatch.setenv("JUDO_TIMEOUT", "300")
+    monkeypatch.delenv("JUDO_REQUEST_TIMEOUT", raising=False)
+    assert Judo().http_client.timeout == 300.0          # fallback kept for old projects
+    monkeypatch.setenv("JUDO_REQUEST_TIMEOUT", "7")
+    monkeypatch.setenv("JUDO_PROXY", "http://proxy.local:3128")
+    client = Judo().http_client
+    assert client.timeout == 7.0
+    assert client.session.proxies == {"http": "http://proxy.local:3128", "https": "http://proxy.local:3128"}
