@@ -19,6 +19,7 @@ All notable changes to Judo Framework will be documented in this file.
 - **CI y publicación**: acciones actualizadas a versiones con Node.js 24 (`checkout@v7`, `setup-python@v7`, `upload-artifact@v7`, `download-artifact@v8`). El CI instala los extras `mcp`, `grpc` y `xml`, así que los tests de gRPC y XSD también corren en GitHub.
 - **`proxy` en `judo.yaml` no tenía efecto**: ahora el cliente HTTP lee `JUDO_PROXY`.
 - **Timeout por petición separado del timeout del runner**: nueva variable `JUDO_REQUEST_TIMEOUT` (por defecto 30 s), que es la que usa `timeout` de `judo.yaml`. `JUDO_TIMEOUT` sigue siendo el timeout total del runner y, si no hay `JUDO_REQUEST_TIMEOUT`, se usa también para las peticiones, como antes.
+- **`judo validate` aceptaba números que behave rechaza**: un paso con `{x:f}` necesita decimal (`5.0`, no `5`). El validador ahora sigue las mismas reglas que behave para `:d`, `:f` y `:g`.
 - `publish.py` funciona en Linux, macOS y Windows y lee la versión desde `pyproject.toml`. La vía normal de publicación es el pipeline (`git tag vX.Y.Z && git push origin vX.Y.Z`).
 - Documentación actualizada a Python 3.10+ y a las versiones actuales de las acciones de GitHub.
 

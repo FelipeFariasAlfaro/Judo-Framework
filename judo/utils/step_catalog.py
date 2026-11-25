@@ -134,8 +134,14 @@ def _pattern_to_regex(pattern: str) -> "re.Pattern":
         out += re.escape(pattern[last:m.start()])
         spec = m.group(1)
         fmt = spec.split(":", 1)[1] if ":" in spec else ""
-        if fmt in ("d", "g", "f"):
-            out += r"[-+]?[\d.,]+"
+        # Same number rules as the ``parse`` library used by behave:
+        # {x:d} integer, {x:f} needs a decimal point (5.0, not 5), {x:g} any number.
+        if fmt == "d":
+            out += r"[-+]?\d+"
+        elif fmt == "f":
+            out += r"[-+]?\d*\.\d+"
+        elif fmt == "g":
+            out += r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
         else:
             out += r".+?"
         last = m.end()

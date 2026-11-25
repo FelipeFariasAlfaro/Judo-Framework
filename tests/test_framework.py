@@ -232,3 +232,14 @@ def test_validator_checks_steps_nested_in_flow_blocks(catalog):
     issues = validate_feature_text(text, catalog)
     assert [(i["type"], i["step"]) for i in issues] == [("undefined", 'I send a GETT request to "/b"')]
     assert issues[0]["line"] == 6
+
+
+def test_validator_number_formats_follow_behave(catalog):
+    """{x:f} needs a decimal point in behave: '5 seconds' is undefined, '5.0 seconds' is fine."""
+    def undefined(step):
+        return [i for i in validate_feature_text(f"Feature: x\n  Scenario: y\n    Then {step}\n", catalog)
+                if i["type"] == "undefined"]
+    assert undefined("the response time should be less than 5 seconds")
+    assert not undefined("the response time should be less than 5.0 seconds")
+    assert undefined("the response status should be 2.5")
+    assert not undefined('I poll "/x" until the status is 200 within 5 seconds')
